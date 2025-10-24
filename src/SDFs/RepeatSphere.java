@@ -4,13 +4,13 @@ import java.awt.Color;
 import Utility.vec3;
 
 
-public class FractalSphere extends SDF{
+public class RepeatSphere extends SDF{
 
     private vec3 center;
     private float radius, spacing;
     private Color color;
     
-    public FractalSphere(vec3 center, float radius, float spacing, Color color) { this.radius = radius; this.color = color; this.spacing = spacing; this.center = center; }
+    public RepeatSphere(vec3 center, float radius, float spacing, Color color) { this.radius = radius; this.color = color; this.spacing = spacing; this.center = center; }
     
     public float sdf(vec3 point) {
         vec3 worldP = point.subtract(center); // move into object space
@@ -24,5 +24,12 @@ public class FractalSphere extends SDF{
         return (local.length() - radius);
     }
     public Color getColor() { return color; }
+    
+    public String getType() { return "repeatsphere"; }
+    
+    @Override
+    public String toString() {
+        return super.toString() + center.toString() + "," + radius + ",";
+    }
       
 }

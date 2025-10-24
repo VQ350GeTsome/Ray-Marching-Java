@@ -5,9 +5,29 @@ public class vec3 {
     
     public float x, y, z;
 
-    public vec3(float x, float y, float z){ this.x = x; this.y = y; this.z = z; }
-    public vec3() { x = 0; y = 0; z = 0; }
-    
+    /**
+     * Default constructor. { 0.0 , 0.0 , 0.0 }
+     */
+    public vec3()                           { x = 0.0f; y = 0.0f; z = 0.0f; }
+    /**
+     * Constructor with just x component { x, 0.0, 0.0 } .
+     * @param x The x component.
+     */
+    public vec3(float x)                    { this.x = x; y = 0.0f; z = 0.0f; }
+    /**
+     * Constructor with only x & y components { x , y , 0.0 } .
+     * @param x The x component.
+     * @param y The y component.
+     */
+    public vec3(float x, float y)           { this.x = x; this.y = y; z = 0.0f; }
+    /**
+     * Full constructor with x , y , & z components { x , y , z } .
+     * @param x The x component.
+     * @param y The y component.
+     * @param z The z component.
+     */
+    public vec3(float x, float y, float z)  { this.x = x; this.y = y; this.z = z; }
+ 
     //Returns a vector that is the sum of this and another vector
     public vec3 add(vec3 other) { return new vec3(x + other.x, y + other.y, z + other.z); }
     //Returns a vector that is the difference of this and another vector
@@ -35,5 +55,23 @@ public class vec3 {
         z * other.x - x * other.z,
         x * other.y - y * other.x);
     }
-    public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; }   
+    public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
+    
+    @Override
+    public String toString() {
+        return "{ " + x + " , " + y + " , " + z + " }";
+    }
+    public vec3(String vector) {
+        vector = vector.trim().substring(1, vector.length() - 1);
+        String[] componenets = vector.split(",");
+        
+        if (componenets.length != 3) {
+            throw new IllegalArgumentException("Invalid vec3 format: " + vector);
+        }
+        
+        // Parse and assign
+        this.x = Float.parseFloat(componenets[0].trim());
+        this.y = Float.parseFloat(componenets[1].trim());
+        this.z = Float.parseFloat(componenets[2].trim());
+    }
 }

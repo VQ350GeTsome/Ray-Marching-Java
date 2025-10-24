@@ -22,5 +22,7 @@ public class Cube extends SDF {
         return (float)(outsideDist + Math.min(insideDist, 0.0));
     }
     public Color getColor() { return color; }
+    public String getType() { return "cube"; }
+    
 
 }

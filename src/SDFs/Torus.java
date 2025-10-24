@@ -20,5 +20,5 @@ public class Torus extends SDF{
         return tubeDist - minorR;
     }
     public Color getColor() { return color; }
-
+    public String getType() { return "torus"; }
 }

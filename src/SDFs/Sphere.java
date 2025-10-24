@@ -13,5 +13,11 @@ public class Sphere extends SDF{
     
     public float sdf(vec3 point) { return point.getDist(center) - radius; }
     public Color getColor() { return color; }
-
-}
+    
+    public String getType() { return "sphere"; }
+    
+    @Override
+    public String toString() {
+        return super.toString() + center.toString() + "," + radius + ",";
+    }
+ }
