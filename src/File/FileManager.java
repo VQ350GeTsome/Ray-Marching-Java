@@ -1,7 +1,11 @@
 package File;
 
 import Render.Scene;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class FileManager {
        
@@ -33,7 +37,27 @@ public class FileManager {
     
     public static void saveScene(File location) {
         String packedScene = scene.packageScene();
+        try (FileWriter writer = new FileWriter(location)) {
+            writer.write(packedScene);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
+    public static void loadScene(File newScene) {
+        StringBuilder pack = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(newScene))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                pack.append(line).append("\n"); // Preserve line breaks if needed
+            }
+            scene.unpackageScene(pack.toString().trim());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to load scene from: " + newScene.getAbsolutePath());
+        }
+    }   
     
 }

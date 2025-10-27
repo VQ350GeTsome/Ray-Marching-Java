@@ -1,6 +1,5 @@
 package Utility;
 
-
 public class vec3 {
     
     public float x, y, z;
@@ -27,11 +26,23 @@ public class vec3 {
      * @param z The z component.
      */
     public vec3(float x, float y, float z)  { this.x = x; this.y = y; this.z = z; }
+    public vec3(vec3 copy) {
+        x = copy.x;
+        y = copy.y;
+        z = copy.z;
+    }
  
     //Returns a vector that is the sum of this and another vector
     public vec3 add(vec3 other) { return new vec3(x + other.x, y + other.y, z + other.z); }
     //Returns a vector that is the difference of this and another vector
     public vec3 subtract(vec3 other) { return new vec3(x - other.x, y - other.y, z - other.z); }
+    public vec3 subtract(float f) {
+        return new vec3(
+                x - f,
+                y - f,
+                z - f
+        );
+    }
     //Returns a vector where each element was multiplied by the input
     public vec3 multiply(float p) { return new vec3(x * p, y * p, z * p); } 
     //Returns a vector such that each elemtent is moduloed
@@ -42,6 +53,7 @@ public class vec3 {
     public vec3 abs() { return new vec3(Math.abs(x), Math.abs(y), Math.abs(z)); }
     //Returns the length of a vector from 0, 0, 0
     public float length() { return (float)Math.sqrt(x * x + y * y + z * z); }
+    public float lengthSqr() { return x*x + y*y + z*z; }
     //Returns a vector that is the max of each element from this vector and another
     public vec3 max(vec3 other) { return new vec3(Math.max(this.x, other.x), Math.max(this.y, other.y), Math.max(this.z, other.z)); }
     //Normalizes the vector
@@ -59,19 +71,23 @@ public class vec3 {
     
     @Override
     public String toString() {
-        return "{ " + x + " , " + y + " , " + z + " }";
+        return "{ " + x + " | " + y + " | " + z + " }";
     }
     public vec3(String vector) {
-        vector = vector.trim().substring(1, vector.length() - 1);
-        String[] componenets = vector.split(",");
+        vector = vector.trim().substring(2, vector.length() - 2);
+        String[] componenets = vector.split("\\|");
         
         if (componenets.length != 3) {
             throw new IllegalArgumentException("Invalid vec3 format: " + vector);
         }
-        
+                
         // Parse and assign
         this.x = Float.parseFloat(componenets[0].trim());
         this.y = Float.parseFloat(componenets[1].trim());
         this.z = Float.parseFloat(componenets[2].trim());
+    }
+    
+    public vec2 xz() {
+        return new vec2(x, z);
     }
 }

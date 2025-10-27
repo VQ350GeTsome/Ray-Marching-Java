@@ -17,7 +17,7 @@ public class Light {
     
     public String packLight() {
         return  sceneLight.toString()   + "," +
-                ambientLight            + "," ;
+                ambientLight            + ",\n" ;
     }
     public void unpackLight(String[] parts) {
         sceneLight = new vec3(parts[0]);

@@ -79,17 +79,20 @@ public class Camera {
                 .add(m);    //Move camera
     }
     public void rotate(float yawDelta, float pitchDelta) {
-        yaw     += yawDelta;
-        pitch   += pitchDelta;
-
-        float y = yaw   * DEG_TO_RAD;
-        float p = pitch * DEG_TO_RAD;
-        forward.x = (float) (Math.cos(p) * Math.sin(y));
-        forward.y = (float) (Math.sin(p));
-        forward.z = (float) (Math.cos(p) * Math.cos(y));
+        forward = rotateAroundAxis(forward, right, pitchDelta);
+        forward = rotateAroundAxis(forward, worldUp, yawDelta);
         forward = forward.normalize();
-        right = forward.cross(worldUp).normalize(); 
+        right = forward.cross(worldUp).normalize();
         up = right.cross(forward).normalize();
+    }
+    
+    private vec3 rotateAroundAxis(vec3 v, vec3 axis, float angleDeg) {
+        float angleRad = angleDeg * DEG_TO_RAD;
+        float cos = (float)Math.cos(angleRad);
+        float sin = (float)Math.sin(angleRad);
+        return v.multiply(cos)
+                .add(axis.cross(v).multiply(sin))
+                .add(axis.multiply(axis.dot(v) * (1 - cos)));
     }
     public void zoom(float zoom) { 
         float newFov = fov * (1 + zoom);
@@ -116,7 +119,7 @@ public class Camera {
                 up.toString()       + "," + 
                 right.toString()    + "," + 
                 yaw + "," + pitch   + "," +
-                fov                 + "," ;   //Proceding delimiter
+                fov                 + ",\n"; 
                          
     }
     public void unpackageCamera(String[] parts) {
@@ -126,6 +129,6 @@ public class Camera {
         right   = new vec3(parts[3]);
         yaw     = Float.parseFloat(parts[4]);
         pitch   = Float.parseFloat(parts[5]);
-        updateFov(Float.parseFloat(parts[6]));
+        updateFov((float) Double.parseDouble(parts[6]));
     }
 }

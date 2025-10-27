@@ -1,5 +1,6 @@
 package SDFs;
 
+import Utility.Material;
 import java.awt.Color;
 import Utility.vec3;
 
@@ -10,6 +11,9 @@ import Utility.vec3;
  * @author Harrison
  */
 public abstract class SDF {
+    
+    protected Material material;
+    
     /**
      * Takes in a point and returns the distance 
      * to the surface of the object.
@@ -18,14 +22,14 @@ public abstract class SDF {
      */
     public abstract float sdf(vec3 point);
     /**
-     * Returns the color of the object.
-     * @return The color.
+     * Returns the material of the SDF object
+     * @return The material.
      */
-    public abstract Color getColor();
+    public Material getMaterial(vec3 p) { return material; }
     public abstract String getType();
     
     public String colorString() {
-        Color c = getColor();
+        Color c = material.color;
         return c.getRed() + ":" + c.getGreen() + ":" + c.getBlue();
     }
     

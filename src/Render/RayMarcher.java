@@ -11,10 +11,12 @@ public class RayMarcher {
     private Light       light;
     private SDFManager  sdfMgr;
     
-    private Color background    = Color.BLACK;
-    private int   maxSteps      = 100,
-                  maxDist       = 100,
-                  shadowSteps   = 50;
+    private Color background    = new Color(135, 205, 235);
+    public Color getBackground() { return background; }
+    private int   maxSteps      = 1024,
+                  maxDist       =  128,
+                  shadowSteps   =   64,
+                  fogFalloff    =    5;
 
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
@@ -23,8 +25,8 @@ public class RayMarcher {
     }
         
     public HitInfo marchRay(int x, int y, int w, int h) {
-        float nx = (x + 0.5f) / (float)w;
-        float ny = (y + 0.5f) / (float)h;
+        float nx = (x + 0.5f) / (float) w;
+        float ny = (y + 0.5f) / (float) h;
         vec3 dir = camera.getRayDirection(nx, ny, w / (float)h);
         vec3 pos = camera.getPosition();
         
@@ -33,7 +35,7 @@ public class RayMarcher {
             float distance = sdfMgr.getClosestSDFDist(pos);        //Minimum distance we can step
 
             if (distance < Core.getEps()) { return new HitInfo(pos, totalDistance); }
-            if (totalDistance > maxDist) { return new HitInfo(pos, totalDistance); }
+            if (totalDistance > maxDist)  { return new HitInfo(pos, totalDistance); }
 
             pos =   pos
                     .add(   dir
@@ -43,6 +45,45 @@ public class RayMarcher {
 
         }
         return new HitInfo(pos, totalDistance);
+    }
+
+    public Color[][] marchScreen(int w, int h) {
+        Color[][] screen = new Color[w][h];                                 //2D array for screen of size { width , height }
+        
+        IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
+            for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
+                HitInfo hit = marchRay(x, y, w, h);
+                vec3 hitVec = hit.hit;                                      //March ray from pixel { x , y } and get the point it hits
+                SDF hitObj = sdfMgr.getSDFAtPos(hitVec);                    //Check to see if their is an SDF where the ray hit
+                if (hitObj == null) screen[x][y] = background;              //If there is none, set the current pixel to the background color
+                else {
+                    Color color = shade(hitObj, hit);                       //Calculate the objects color depending on light
+                    float fog       =  (hit.totalDist / maxDist);           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
+                    fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
+                                                          
+                    Color finalColor =  ColorMath
+                                        .blend(color, background, fog);
+                    screen[x][y] = finalColor;
+                }
+            }
+        });
+        return screen;
+    }
+    
+    private Color shade(SDF obj, HitInfo hit) {
+        float shadow = getShadow(hit.hit);              //Get shadow amount
+        
+        vec3 normal = estimateNormal(obj, hit.hit);     //Get the ~normal
+        vec3 sceneLight = light.getSceneLighting().multiply(-1);    //Invert the scene lighting
+        
+        float brightness = Math.max(0.0f, normal.dot(sceneLight));
+        brightness = customClamp(brightness, 5);
+
+        
+        Color finalColor = ColorMath.blend( obj.getMaterial(hit.hit).color , Color.WHITE, brightness );
+              finalColor = ColorMath.scale( finalColor     , shadow );
+              
+        return finalColor;
     }
     
     public float getShadow(vec3 orgin) {
@@ -67,35 +108,38 @@ public class RayMarcher {
         return lighting + ambientLight;
     }
     
-    public Color[][] marchScreen(int w, int h) {
-        Color[][] screen = new Color[w][h];                                 //2D array for screen of size { width , height }
+    /**
+     * A custom clamp for lighting.
+     * @param f What will be exponentiated
+     * @param n Hoe many times to multiply
+     * @return ( ( f^n ) / ( f^n + 1 ) )
+     */
+    private float customClamp(float f, int n) {
+        float result = (float) Math.pow(f, n);
         
-        IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
-            for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
-                HitInfo hit = marchRay(x, y, w, h);
-                vec3 hitVec = marchRay(x, y, w, h).hit;                     //March ray from pixel { x , y } and get the point it hits
-                SDF hitObj = sdfMgr.getSDFAtPos(hitVec);                    //Check to see if their is an SDF where the ray hit
-                if (hitObj == null) screen[x][y] = background;              //If there is none, set the current pixel to the background color
-                else {
-                    Color objColor  = hitObj.getColor();                    //Get the objects we hits color
-                    float lighting  = getShadow(hitVec);                    //Cast a ray to the scene light direction to see if it is occluded
-                    float fog       = 1 - (hit.totalDist / maxDist);
-                                                          
-                    Color finalColor =  ColorMath                           
-                                        .scale(objColor, lighting);
-                    finalColor =        ColorMath
-                                        .blend(finalColor, background, fog);
-                    screen[x][y] = finalColor;
-                }
-            }
-        });
-        return screen;
+        return result / (result + 1.0f);
+    }
+    
+    
+    
+    /**
+     * Estimates a normal based off of an SDF and a position.
+     * @param obj   SDF that we are using to estimate
+     * @param p     Point we are starting at
+     * @return      A normalized vec3 that it about the normal
+     */
+    private vec3 estimateNormal(SDF obj, vec3 p) {
+        float eps = Core.getEps();
+        float x = obj.sdf(p.add(new vec3(eps, 0.0f, 0.0f))) - obj.sdf(p.subtract(new vec3(eps, 0.0f, 0.0f)));
+        float y = obj.sdf(p.add(new vec3(0.0f, eps, 0.0f))) - obj.sdf(p.subtract(new vec3(0.0f, eps, 0.0f)));
+        float z = obj.sdf(p.add(new vec3(0.0f, 0.0f, eps))) - obj.sdf(p.subtract(new vec3(0.0f, 0.0f, eps)));
+        return new vec3(x, y, z).normalize();
     }
     
     public String packRayMarcher() {
         return  background.getRed() + ":" + background.getGreen() + ":" + background.getBlue() + "," +
                 maxSteps    + "," + maxDist + "," +
-                shadowSteps + "," ;
+                shadowSteps + "," + fogFalloff + ",\n" ;
     }
     public void unpackRayMarcher(String[] parts) {
         String[] rgb = parts[0].split(":");
@@ -112,6 +156,7 @@ public class RayMarcher {
         this.maxSteps       = Integer.parseInt(parts[1].trim());
         this.maxDist        = Integer.parseInt(parts[2].trim());
         this.shadowSteps    = Integer.parseInt(parts[3].trim());
+        this.fogFalloff     = Integer.parseInt(parts[4].trim());
     }
 
 }

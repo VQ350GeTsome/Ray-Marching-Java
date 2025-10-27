@@ -1,11 +1,22 @@
 package Render;
 
-import File.FileManager;
-import Utility.vec3;
+import File.*;
+import Utility.*;
+
 import java.io.File;
+import javax.swing.Box;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class Window extends javax.swing.JFrame {
+    
+    private final int   LEFT    = 37,
+                        UP      = 38,
+                        RIGHT   = 39,
+                        DOWN    = 40;
 
     public Window() {
         initComponents();
@@ -29,13 +40,12 @@ public class Window extends javax.swing.JFrame {
         core.moveSceneCamera(move); //Call the core that'll move the camera
     }
     private void cameraRotater(int input) {
-        //note ... left = 37, up = 38, right = 39, down = 40 
         float grain = Core.getCameraRotateGrain();
         switch (input) {
-            case 37:    core.rotateSceneCamera( 0.0f , grain );    break;   //Rotate left
-            case 39:    core.rotateSceneCamera( 0.0f ,-grain );    break;   //Rotate right
-            case 38:    core.rotateSceneCamera(-grain , 0.0f );    break;   //Rotate down
-            case 40:    core.rotateSceneCamera( grain , 0.0f );    break;   //Rotate up
+            case UP:        core.rotateSceneCamera( 0.0f  , grain );    break;
+            case DOWN:      core.rotateSceneCamera( 0.0f  ,-grain );    break; 
+            case RIGHT:     core.rotateSceneCamera(-grain ,  0.0f );    break;  
+            case LEFT:      core.rotateSceneCamera( grain ,  0.0f );    break;  
         }
     }
     private void cameraZoomer(char input) {
@@ -44,6 +54,32 @@ public class Window extends javax.swing.JFrame {
         } else {
             core.zoomSceneCamera(-0.033f );
         }
+    }
+    
+    private String[] createOptionsPane(String[] options, String[] defaults) {
+        JPanel panel = new JPanel();    //Create the panel we will use
+        
+        int length = options.length;
+        
+        JTextField[] fields = new JTextField[length];
+        
+        for (int i = 0; length > i; i++) {
+            fields[i] = new JTextField(defaults[i], 10);
+            panel.add(new JLabel(options[i]));
+            panel.add(fields[i]);
+            panel.add(Box.createHorizontalStrut(10));
+        }
+        
+        int result = JOptionPane.showConfirmDialog(null, panel);
+        
+        String[] inputs = new String[length];
+        if (result == JOptionPane.OK_OPTION) {
+            for (int i = 0; length > i; i++) {
+                String input = fields[i].getText();
+                inputs[i] = input;
+            }
+        }
+        return inputs;
     }
     
     @SuppressWarnings("unchecked")
@@ -57,6 +93,7 @@ public class Window extends javax.swing.JFrame {
         exportScene = new javax.swing.JMenuItem();
         sceneMenu = new javax.swing.JMenu();
         cameraMenu = new javax.swing.JMenu();
+        cameraGrain = new javax.swing.JMenuItem();
         renderMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -82,11 +119,6 @@ public class Window extends javax.swing.JFrame {
         fileMenu.setText("File");
 
         openScene.setText("Open Scene");
-        openScene.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                openSceneMouseClicked(evt);
-            }
-        });
         openScene.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openSceneActionPerformed(evt);
@@ -108,6 +140,15 @@ public class Window extends javax.swing.JFrame {
         menuBar.add(sceneMenu);
 
         cameraMenu.setText("Camera");
+
+        cameraGrain.setText("Change Camera Grain");
+        cameraGrain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cameraGrainActionPerformed(evt);
+            }
+        });
+        cameraMenu.add(cameraGrain);
+
         menuBar.add(cameraMenu);
 
         renderMenu.setText("Render");
@@ -146,10 +187,6 @@ public class Window extends javax.swing.JFrame {
         
     }//GEN-LAST:event_formKeyPressed
 
-    private void openSceneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_openSceneMouseClicked
-
-    }//GEN-LAST:event_openSceneMouseClicked
-
     private void openSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSceneActionPerformed
         JFileChooser fileChooser = new JFileChooser();  //New file chooser 
         
@@ -161,7 +198,7 @@ public class Window extends javax.swing.JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {    //If the user ends up selecting a file
             File selectedFile = fileChooser
                                 .getSelectedFile();     //Get the file the user picked
-            
+            FileManager.loadScene(selectedFile);
         }
     }//GEN-LAST:event_openSceneActionPerformed
 
@@ -179,6 +216,18 @@ public class Window extends javax.swing.JFrame {
             FileManager.saveScene(selectedFile);
         }
     }//GEN-LAST:event_exportSceneActionPerformed
+
+    private void cameraGrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraGrainActionPerformed
+        String[] options    = new String[] { "Movement Grain: " , "Pan Grain: " };
+        String defaultMove  = String.valueOf(Core.getCameraMoveGrain());
+        String defaultPan   = String.valueOf(Core.getCameraRotateGrain());
+        String[] defaults   = new String[] { defaultMove, defaultPan };
+        String[] inputs = createOptionsPane(options, defaults);
+        
+        Core.setCameraMoveGrain(Float.parseFloat(inputs[0]));
+        Core.setCameraRotateGrain(Float.parseFloat(inputs[1]));        
+        
+    }//GEN-LAST:event_cameraGrainActionPerformed
 
     /**
      * @param args the command line arguments
@@ -216,6 +265,7 @@ public class Window extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
     private Render.Core core;
     private javax.swing.JMenuItem exportScene;

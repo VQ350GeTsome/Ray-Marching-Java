@@ -19,7 +19,6 @@
                 <Property name="text" type="java.lang.String" value="Open Scene"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="openSceneMouseClicked"/>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openSceneActionPerformed"/>
               </Events>
             </MenuItem>
@@ -42,6 +41,16 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Camera"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="cameraGrain">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Camera Grain"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cameraGrainActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="renderMenu">
           <Properties>

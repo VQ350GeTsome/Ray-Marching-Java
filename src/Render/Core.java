@@ -1,5 +1,7 @@
 package Render;
 
+import SDFs.Primitives.Cube;
+import SDFs.Primitives.Sphere;
 import SDFs.*;
 import Utility.*;
 import java.awt.Color;
@@ -12,25 +14,35 @@ import javax.swing.Timer;
 
 public class Core extends JPanel {
 
-    private static float eps = 0.0001f;
+    private static float eps = 0.000001f;
     public static float getEps() { return eps; }
     
-    private static float cameraMoveGrain = 0.1f, cameraRotateGrain = 1.0f;
+    private static float cameraMoveGrain = 0.5f, cameraRotateGrain = 0.5f;
     public static float getCameraMoveGrain()    { return cameraMoveGrain; }
+    public static void  setCameraMoveGrain(float f) { cameraMoveGrain = f; }
     public static float getCameraRotateGrain()  { return cameraRotateGrain; }
+    public static void  setCameraRotateGrain(float f)  { cameraRotateGrain = f; }
     
-    private BufferedImage image;
-    private int width = 250, height = width;
+    private BufferedImage screen;               //What we will use as the screen
+    private int width = 250, height = width;    //screens dimensions
     
     private Scene scene;
     
     public Core() {
-        imageSizer();
-        scene = new Scene();
-        scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));
-        scene.setAmbientLighting(0.05f);
-        scene.addSDF(new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, Color.CYAN));
-        scene.addSDF(new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, Color.GRAY));
+        imageSizer();           //Size & initialize screen
+        scene = new Scene();    //Initialize scene
+        scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));  //Set the lighting
+        scene.setAmbientLighting(0.05f);                        //Set the ambient lighting
+        
+        /* Add some SDFs */
+        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, Color.CYAN);
+        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, Color.GRAY);
+        
+        SDF blend = new BlendedSDF(sphere, cube, 0.25f);
+        
+        scene.addSDF(blend);
+        
+        PostProcessor.initalize(width, height); //Initalize the post processor
     }
     /**
      * Main loop ... we are constantly updating
@@ -52,10 +64,13 @@ public class Core extends JPanel {
      * BufferedImage image ... and repaint it.
      */
     private void renderScene() {
-        Color[][] screen = scene.renderScene(width, height);
-        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)
-            image.setRGB(x, y, screen[x][y].getRGB());
-        repaint();
+        Color[][] image = scene.renderScene(width, height);
+              
+        image = PostProcessor.addBloom(scene.getBackground(), image, 150, 25);
+        
+        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
+            screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen
+        repaint();  //Update screen
     }
     
     public void moveSceneCamera(vec3 m)                 { scene.moveCamera(m); }
@@ -63,7 +78,7 @@ public class Core extends JPanel {
     public void zoomSceneCamera(float z)                { scene.zoomCamera(z); }
     public vec3[] getSceneCameraOrien()                 { return scene.getCameraOrien(); }
     
-    public void imageSizer() { image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
-    @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(image, 0, 0, getWidth(), getHeight(), null); }
+    public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
+    @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
     
 }
