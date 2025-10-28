@@ -66,7 +66,6 @@ public class Scene {
         light.unpackLight(lightPack);                               //Update light
         
         String[] sdfs = Arrays.copyOfRange(parts, 14, parts.length);
-        for (String s : sdfs)
         sdfManager.unpackSDFs(sdfs);
     }
 }

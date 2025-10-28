@@ -1,7 +1,6 @@
 package Render;
 
-import SDFs.Primitives.Cube;
-import SDFs.Primitives.Sphere;
+import SDFs.Primitives.*;
 import SDFs.*;
 import Utility.*;
 import java.awt.Color;
@@ -24,7 +23,7 @@ public class Core extends JPanel {
     public static void  setCameraRotateGrain(float f)  { cameraRotateGrain = f; }
     
     private BufferedImage screen;               //What we will use as the screen
-    private int width = 250, height = width;    //screens dimensions
+    private int width = 200, height = width;    //screens dimensions
     
     private Scene scene;
     
@@ -35,12 +34,19 @@ public class Core extends JPanel {
         scene.setAmbientLighting(0.05f);                        //Set the ambient lighting
         
         /* Add some SDFs */
+        
         SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, Color.CYAN);
         SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, Color.GRAY);
         
         SDF blend = new BlendedSDF(sphere, cube, 0.25f);
         
         scene.addSDF(blend);
+        
+        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), Color.DARK_GRAY);
+        
+        scene.addSDF(floor);
+        
+        /* Finish adding SDFs */
         
         PostProcessor.initalize(width, height); //Initalize the post processor
     }
@@ -56,6 +62,10 @@ public class Core extends JPanel {
         });
         timer.start(); /* Start timer */
     }
+    
+    private int bloomAmount = 150,
+                bloomRadius =  25;
+    
     /**
      * Calls the scenes raymarcher which will march
      * the entire screen and return a 2D array of
@@ -66,7 +76,7 @@ public class Core extends JPanel {
     private void renderScene() {
         Color[][] image = scene.renderScene(width, height);
               
-        image = PostProcessor.addBloom(scene.getBackground(), image, 150, 25);
+        image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius);
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen

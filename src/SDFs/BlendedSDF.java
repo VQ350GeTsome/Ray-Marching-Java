@@ -24,7 +24,7 @@ public class BlendedSDF extends SDF {
     public Material getMaterial(vec3 p) {
         float d1 = a.sdf(p);
         float d2 = b.sdf(p);
-        //float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;
+        //float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;  //At seem coloring
         
         float total = Math.abs(d2) + Math.abs(d1);
         float h = total == 0 ? 0.5f : Math.abs(d1) / total;
@@ -36,5 +36,10 @@ public class BlendedSDF extends SDF {
         return new Material(blendedColor);
     }
     
-    public String getType() { return "blended"; }
+    public String getType() { return "bleneded"; }
+    
+    @Override
+    public String toString() { 
+        return "blended" + ",\n" + a.toString() + b.toString() + "endblend,\n";
+    }
 }
