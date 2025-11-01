@@ -48,7 +48,7 @@ public class PostProcessor {
         
         IntStream.range(0, width).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
             for (int y = 0; height > y; y++) {  //Loop screen
-                blurredImage[x][y] = boxAverage(background, image, x, y, radius);
+                blurredImage[x][y] = circleAverage(background, image, x, y, radius);
             }
         });
         return blurredImage;
@@ -88,9 +88,14 @@ public class PostProcessor {
      */
     private static Color boxAverage(Color background, Color[][] image, int x, int y, int radius) {
         int r = 0, g = 0, b = 0, c = 0;     //Start rgb at 0 and the count (c)
-        for (int dx = -radius; dx <= radius; dx++) for (int dy = -radius; dy <= radius; dy++) {     //Loop around the radius
-                    int nx = x + dx;
+        for (int dx = -radius; dx <= radius; dx++) {
+            
+            int nx = x + dx;
+            
+            for (int dy = -radius; dy <= radius; dy++) {     //Loop around the radius
+                
                     int ny = y + dy;
+                    
                     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
                         Color color = image[nx][ny];
                         if (background.equals(color)) color = Color.BLACK;
@@ -101,7 +106,35 @@ public class PostProcessor {
                         
                     }
                 }
-                if (c == 0) return Color.BLACK;
-                else return new Color(r / c, g / c, b / c);
+        }
+        if (c == 0) return Color.BLACK;
+        else return new Color(r / c, g / c, b / c);
+    }
+    private static Color circleAverage(Color background, Color[][] image, int x, int y, int radius) {
+        int r = 0, g = 0, b = 0, c = 0,     //Start rgb at 0 and the count (c)
+                radiSqrd = radius * radius; //Radius sqaured
+                
+        for (int dx = -radius; dx <= radius; dx++) {    //dx is the x location relative to the center of the point we are getting the average
+            
+            int nx = x + dx;                            //nx is the location on the screen
+            if (nx < 0 || nx >= width) continue;        //Continue if the radius' coordinate is not valid
+            int dxSqrd = dx * dx;                       //dx squared
+            
+            for (int dy = -radius; dy <= radius; dy++) {    //dy is the y location relative to the pixel we are averaging around
+                
+                if (dxSqrd + dy * dy > radiSqrd) continue;  //Check if the (dx, dy) is within a circle, if it's not continue
+                int ny = y + dy;                            //ny is the location on screen
+                if (ny < 0 || ny >= height) continue;       //Check if ny is a valid pixel
+
+                Color color = image[nx][ny];
+                if (background.equals(color)) color = Color.BLACK;
+                r += color.getRed();
+                g += color.getGreen();
+                b += color.getBlue();
+                c++;
+            }
+        }
+        if (c == 0) return Color.BLACK;
+        else return new Color(r / c, g / c, b / c);
     }
 }
