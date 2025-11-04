@@ -83,8 +83,11 @@ public class Window extends javax.swing.JFrame {
                 String input = fields[i].getText();
                 inputs[i] = input;
             }
+            return inputs;
+        } else {
+            return null;
         }
-        return inputs;
+        
     }
     
     @SuppressWarnings("unchecked")
@@ -102,6 +105,7 @@ public class Window extends javax.swing.JFrame {
         cameraGrain = new javax.swing.JMenuItem();
         lightingMenu = new javax.swing.JMenu();
         changeSceneLighitng = new javax.swing.JMenuItem();
+        changeAmbientLighting = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -170,6 +174,14 @@ public class Window extends javax.swing.JFrame {
             }
         });
         lightingMenu.add(changeSceneLighitng);
+
+        changeAmbientLighting.setText("Change Ambient Lighting");
+        changeAmbientLighting.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeAmbientLightingActionPerformed(evt);
+            }
+        });
+        lightingMenu.add(changeAmbientLighting);
 
         menuBar.add(lightingMenu);
 
@@ -243,6 +255,8 @@ public class Window extends javax.swing.JFrame {
         String[] defaults   = new String[] { defaultMove, defaultPan };
         String[] inputs = createOptionsPane("Enter new grains: ", options, defaults);
         
+        if (inputs == null) return;
+        
         Core.setCameraMoveGrain(Float.parseFloat(inputs[0]));
         Core.setCameraRotateGrain(Float.parseFloat(inputs[1]));        
         
@@ -251,10 +265,26 @@ public class Window extends javax.swing.JFrame {
     private void changeSceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeSceneLighitngActionPerformed
         String[] options    = new String[] { "x: ", "y: ", "z: " };
         String[] defaultDir = core.scene.getSceneLighting().toStringArray();
-        String[] inputs     = createOptionsPane("Enter new Lighting Direction: ", options, defaultDir);
+        String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir);
+        
+        if (inputs == null) return; 
         
         core.scene.setSceneLighting(new vec3(inputs));
     }//GEN-LAST:event_changeSceneLighitngActionPerformed
+
+    private void changeAmbientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeAmbientLightingActionPerformed
+        String[] options = new String[] { "New Level: " };
+        String[] current = new String[] { ""+core.scene.getAmbientLighting() };
+        String[] input  = createOptionsPane("Enter New Ambient Lighting Level", options, current);
+        
+        if (input == null) return;
+        
+        float f = Float.parseFloat(input[0]);   //Parse the new float given by the user
+        f = (0 > f) ? 0 : f;
+        f = (f > 1) ? 1 : f;    //Clamp to [0, 1]
+        
+        core.scene.setAmbientLighting(f);
+    }//GEN-LAST:event_changeAmbientLightingActionPerformed
 
     /**
      * @param args the command line arguments
@@ -294,6 +324,7 @@ public class Window extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
+    private javax.swing.JMenuItem changeAmbientLighting;
     private javax.swing.JMenuItem changeSceneLighitng;
     private Render.Core core;
     private javax.swing.JMenuItem exportScene;
