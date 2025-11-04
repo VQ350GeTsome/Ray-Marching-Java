@@ -28,7 +28,9 @@ public class Scene {
     }
 
     public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
+    public vec3 getSceneLighting()              { return light.getSceneLighting(); }
     public void setAmbientLighting(float k)     { light.setAmbientLight(k); }
+    public float getAmbientLighting()           { return light.getAmbeintLight(); }
     
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }

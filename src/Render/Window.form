@@ -32,9 +32,14 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="sceneMenu">
+        <Menu class="javax.swing.JMenu" name="objectsMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Scene"/>
+            <Property name="text" type="java.lang.String" value="Objects"/>
+          </Properties>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="renderMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Render"/>
           </Properties>
         </Menu>
         <Menu class="javax.swing.JMenu" name="cameraMenu">
@@ -52,10 +57,20 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="renderMenu">
+        <Menu class="javax.swing.JMenu" name="lightingMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Render"/>
+            <Property name="text" type="java.lang.String" value="Lighting"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="changeSceneLighitng">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Scene Lighting"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="changeSceneLighitngActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
       </SubComponents>
     </Menu>

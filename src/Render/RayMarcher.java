@@ -48,14 +48,14 @@ public class RayMarcher {
     }
 
     public Color[][] marchScreen(int w, int h) {
-        Color[][] screen = new Color[w][h];                                 //2D array for screen of size { width , height }
+        Color[][] image = new Color[w][h];                                 //2D array for image of size { width , height }
         
         IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
             for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
                 HitInfo hit = marchRay(x, y, w, h);
                 vec3 hitVec = hit.hit;                                      //March ray from pixel { x , y } and get the point it hits
                 SDF hitObj = sdfMgr.getSDFAtPos(hitVec);                    //Check to see if their is an SDF where the ray hit
-                if (hitObj == null) screen[x][y] = background;              //If there is none, set the current pixel to the background color
+                if (hitObj == null) image[x][y] = background;              //If there is none, set the current pixel to the background color
                 else {
                     Color color = shade(hitObj, hit);                       //Calculate the objects color depending on light
                     float fog       =  (hit.totalDist / maxDist);           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
@@ -63,11 +63,11 @@ public class RayMarcher {
                                                           
                     Color finalColor =  ColorMath
                                         .blend(color, background, fog);
-                    screen[x][y] = finalColor;
+                    image[x][y] = finalColor;
                 }
             }
         });
-        return screen;
+        return image;
     }
     
     private Color shade(SDF obj, HitInfo hit) {

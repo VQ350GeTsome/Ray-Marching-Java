@@ -73,6 +73,13 @@ public class vec3 {
     public String toString() {
         return "{ " + x + " | " + y + " | " + z + " }";
     }
+    public String[] toStringArray() {
+        return new String[] { ""+x, ""+y, ""+z };
+    }
+    /**
+     * Turns the .toString() method back into a vec3 object
+     * @param vector A String in the form { x | y | z }
+     */
     public vec3(String vector) {
         vector = vector.trim().substring(2, vector.length() - 2);
         String[] componenets = vector.split("\\|");
@@ -85,6 +92,15 @@ public class vec3 {
         this.x = Float.parseFloat(componenets[0].trim());
         this.y = Float.parseFloat(componenets[1].trim());
         this.z = Float.parseFloat(componenets[2].trim());
+    }
+    /**
+     * Turns the .toStringArray method back into a vec3 object
+     * @param components A length 3 array of Strings that are floats
+     */
+    public vec3(String[] components) {
+        this.x = Float.parseFloat(components[0].trim());
+        this.y = Float.parseFloat(components[1].trim());
+        this.z = Float.parseFloat(components[2].trim());
     }
     
     public vec2 xz() {

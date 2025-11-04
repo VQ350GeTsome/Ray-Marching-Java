@@ -25,7 +25,7 @@ public class Core extends JPanel {
     private BufferedImage screen;               //What we will use as the screen
     private int width = 200, height = width;    //screens dimensions
     
-    private Scene scene;
+    public Scene scene;
     
     public Core() {
         imageSizer();           //Size & initialize screen
@@ -85,12 +85,7 @@ public class Core extends JPanel {
             screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen
         repaint();  //Update screen
     }
-    
-    public void moveSceneCamera(vec3 m)                 { scene.moveCamera(m); }
-    public void rotateSceneCamera(float y, float p)     { scene.rotateCamera(y, p); }
-    public void zoomSceneCamera(float z)                { scene.zoomCamera(z); }
-    public vec3[] getSceneCameraOrien()                 { return scene.getCameraOrien(); }
-    
+        
     public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
     @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
     
