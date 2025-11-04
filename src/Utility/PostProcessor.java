@@ -22,33 +22,35 @@ public class PostProcessor {
      * @param blurRadius        How much to blur by
      * @return                  The final image
      */
-    public static Color[][] addBloom(Color background, Color[][] image, int bloomSensitivity, int blurRadius) {
+    public static Color[][] addBloom(Color background, Color[][] image, int bloomSensitivity, int blurRadius, boolean circle) {
         
-        Color[][] brightRegions = isolateBright(image, bloomSensitivity);
+        Color[][] brightRegions = isolateBright(image, bloomSensitivity);               //Isolate the bright regions using the sensitivity
         
-        Color[][] blurredBright = blur(background, brightRegions, blurRadius);
+        Color[][] blurredBright = blur(background, brightRegions, blurRadius, circle);  //Blur those bright regions using the settings
         
-        Color[][] finalImage = new Color[width][height];
+        Color[][] finalImage = new Color[width][height];                            
         
-        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++) {  //Loop screen
-            finalImage[x][y] = ColorMath.add(image[x][y], blurredBright[x][y]);
-        }
+        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)                //Loop the image & add the isolated bright regions
+            finalImage[x][y] = ColorMath.add(image[x][y], blurredBright[x][y]);         //that we blurred back to the original image
         
         return finalImage;
     }
     /**
-     * Currently uses boxAverage to blur an image
+     * Blurs an image using either a circle average or box average
      * @param background    The color not to blur (background color)
      * @param image         The image to use
      * @param radius        The size of the blur
-     * @return              The blurred image
+     * @param circle        If we are using the circle average, else the square average
+     * @return              The final blurred image
      */
-    private static Color[][] blur(Color background, Color[][] image, int radius) {
+    private static Color[][] blur(Color background, Color[][] image, int radius, boolean circle) {
         Color[][] blurredImage = new Color[width][height];
         
-        IntStream.range(0, width).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
-            for (int y = 0; height > y; y++) {  //Loop screen
-                blurredImage[x][y] = circleAverage(background, image, x, y, radius);
+        IntStream.range(0, width).parallel().forEach(x -> { //Parellelize each x row and call the 
+            for (int y = 0; height > y; y++) {              //for loop for each y column in the image
+                blurredImage[x][y] = 
+                        (circle) ? circleAverage(background, image, x, y, radius) 
+                                 : squareAverage(background, image, x, y, radius);
             }
         });
         return blurredImage;
@@ -77,16 +79,15 @@ public class PostProcessor {
         return brightRegion;
     }
     /**
-     * Gets the box average of a color at (x, y) box average 
-     * because it's not a circular area to sample
+     * Gets the average of a color at (x, y) using a box area to sample
      * @param background    The color to ignore
-     * @param image         The image we are sampling
-     * @param x             Current x value
-     * @param y             Current y value
+     * @param image         The image we are using to sample
+     * @param x             The x value we are centered on
+     * @param y             The y value we are centered on
      * @param radius        How large of an area we are looking at
      * @return              The average color around (including) (x, y)
      */
-    private static Color boxAverage(Color background, Color[][] image, int x, int y, int radius) {
+    private static Color squareAverage(Color background, Color[][] image, int x, int y, int radius) {
         int r = 0, g = 0, b = 0, c = 0;     //Start rgb at 0 and the count (c)
         for (int dx = -radius; dx <= radius; dx++) {
             
@@ -110,6 +111,15 @@ public class PostProcessor {
         if (c == 0) return Color.BLACK;
         else return new Color(r / c, g / c, b / c);
     }
+    /**
+     * Gets the average of a color at (x, y) using a circular area to sample
+     * @param background    The color to ignore
+     * @param image         The image we are using to sample
+     * @param x             The x value we are centered on
+     * @param y             The y value we are centered on
+     * @param radius        How large of a circle we are looking at
+     * @return              The average color around (including) (x, y)
+     */
     private static Color circleAverage(Color background, Color[][] image, int x, int y, int radius) {
         int r = 0, g = 0, b = 0, c = 0,     //Start rgb at 0 and the count (c)
                 radiSqrd = radius * radius; //Radius sqaured

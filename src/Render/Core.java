@@ -63,8 +63,10 @@ public class Core extends JPanel {
         timer.start(); /* Start timer */
     }
     
-    private int bloomAmount = 150,
-                bloomRadius =  25;
+    //Postprocessing settings 
+    private int bloomAmount     = 150,
+                bloomRadius     =  25;
+    private boolean circleBlur  = true;
     
     /**
      * Calls the scenes raymarcher which will march
@@ -76,7 +78,8 @@ public class Core extends JPanel {
     private void renderScene() {
         Color[][] image = scene.renderScene(width, height);
               
-        image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius);
+        //Adds bloom to the image using the current settings
+        image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen
