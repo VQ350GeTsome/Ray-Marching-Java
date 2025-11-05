@@ -1,7 +1,7 @@
 package Render;
 
-import File.*;
 import Utility.*;
+import File.*;
 
 import java.io.File;
 import javax.swing.Box;
@@ -12,11 +12,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Window extends javax.swing.JFrame {
-    
-    private final int   LEFT    = 37,
-                        UP      = 38,
-                        RIGHT   = 39,
-                        DOWN    = 40;
+       
+    //Input constants
+    private final int   LEFT_ARROW    = 37,
+                        UP_ARROW      = 38,
+                        RIGHT_ARROW   = 39,
+                        DOWN_ARROW    = 40,
+                        LEFT_CLICK    =  1,
+                        MIDDLE_CLICK  =  2,
+                        RIGHT_CLICK   =  3;
 
     public Window() {
         initComponents();
@@ -42,10 +46,10 @@ public class Window extends javax.swing.JFrame {
     private void cameraRotater(int input) {
         float grain = Core.getCameraRotateGrain();
         switch (input) {
-            case UP:        core.scene.rotateCamera( 0.0f  , grain );    break;
-            case DOWN:      core.scene.rotateCamera( 0.0f  ,-grain );    break; 
-            case RIGHT:     core.scene.rotateCamera(-grain ,  0.0f );    break;  
-            case LEFT:      core.scene.rotateCamera( grain ,  0.0f );    break;  
+            case UP_ARROW:        core.scene.rotateCamera( 0.0f  , grain );    break;
+            case DOWN_ARROW:      core.scene.rotateCamera( 0.0f  ,-grain );    break; 
+            case RIGHT_ARROW:     core.scene.rotateCamera(-grain ,  0.0f );    break;  
+            case LEFT_ARROW:      core.scene.rotateCamera( grain ,  0.0f );    break;  
         }
     }
     private void cameraZoomer(char input) {
@@ -90,6 +94,13 @@ public class Window extends javax.swing.JFrame {
         
     }
     
+    private void rightClick(int x, int y, int w, int h) {
+        SDFs.SDF clickedObj = core.scene.getObject(x, y, w, h);
+        if (clickedObj != null) {
+            //TODO   
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -102,15 +113,22 @@ public class Window extends javax.swing.JFrame {
         objectsMenu = new javax.swing.JMenu();
         renderMenu = new javax.swing.JMenu();
         cameraMenu = new javax.swing.JMenu();
+        cameraPosition = new javax.swing.JMenuItem();
         cameraGrain = new javax.swing.JMenuItem();
         lightingMenu = new javax.swing.JMenu();
-        changeSceneLighitng = new javax.swing.JMenuItem();
-        changeAmbientLighting = new javax.swing.JMenuItem();
+        sceneLighitng = new javax.swing.JMenuItem();
+        ambientLighting = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
+            }
+        });
+
+        core.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                coreMouseClicked(evt);
             }
         });
 
@@ -155,6 +173,14 @@ public class Window extends javax.swing.JFrame {
 
         cameraMenu.setText("Camera");
 
+        cameraPosition.setText("Change Camera Position");
+        cameraPosition.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cameraPositionActionPerformed(evt);
+            }
+        });
+        cameraMenu.add(cameraPosition);
+
         cameraGrain.setText("Change Camera Grain");
         cameraGrain.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -167,21 +193,21 @@ public class Window extends javax.swing.JFrame {
 
         lightingMenu.setText("Lighting");
 
-        changeSceneLighitng.setText("Change Scene Lighting");
-        changeSceneLighitng.addActionListener(new java.awt.event.ActionListener() {
+        sceneLighitng.setText("Change Scene Lighting");
+        sceneLighitng.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeSceneLighitngActionPerformed(evt);
+                sceneLighitngActionPerformed(evt);
             }
         });
-        lightingMenu.add(changeSceneLighitng);
+        lightingMenu.add(sceneLighitng);
 
-        changeAmbientLighting.setText("Change Ambient Lighting");
-        changeAmbientLighting.addActionListener(new java.awt.event.ActionListener() {
+        ambientLighting.setText("Change Ambient Lighting");
+        ambientLighting.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeAmbientLightingActionPerformed(evt);
+                ambientLightingActionPerformed(evt);
             }
         });
-        lightingMenu.add(changeAmbientLighting);
+        lightingMenu.add(ambientLighting);
 
         menuBar.add(lightingMenu);
 
@@ -262,7 +288,7 @@ public class Window extends javax.swing.JFrame {
         
     }//GEN-LAST:event_cameraGrainActionPerformed
 
-    private void changeSceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeSceneLighitngActionPerformed
+    private void sceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sceneLighitngActionPerformed
         String[] options    = new String[] { "x: ", "y: ", "z: " };
         String[] defaultDir = core.scene.getSceneLighting().toStringArray();
         String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir);
@@ -270,9 +296,9 @@ public class Window extends javax.swing.JFrame {
         if (inputs == null) return; 
         
         core.scene.setSceneLighting(new vec3(inputs));
-    }//GEN-LAST:event_changeSceneLighitngActionPerformed
+    }//GEN-LAST:event_sceneLighitngActionPerformed
 
-    private void changeAmbientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeAmbientLightingActionPerformed
+    private void ambientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ambientLightingActionPerformed
         String[] options = new String[] { "New Level: " };
         String[] current = new String[] { ""+core.scene.getAmbientLighting() };
         String[] input  = createOptionsPane("Enter New Ambient Lighting Level", options, current);
@@ -284,7 +310,36 @@ public class Window extends javax.swing.JFrame {
         f = (f > 1) ? 1 : f;    //Clamp to [0, 1]
         
         core.scene.setAmbientLighting(f);
-    }//GEN-LAST:event_changeAmbientLightingActionPerformed
+    }//GEN-LAST:event_ambientLightingActionPerformed
+
+    private void cameraPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraPositionActionPerformed
+        String[] options    = new String[] { "x: ", "y: ", "z: " };
+        String[] defaultDir = core.scene.getCameraPos().toStringArray();
+        String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir);
+        
+        if (inputs == null) return; 
+        
+        vec3 input = new vec3(inputs);                      //Get where the user wants the camera
+        vec3 currentPos = core.scene.getCameraPos();        //Current camera position
+        core.scene.moveCamera(input.subtract(currentPos));  //Move the camera to the wanted position
+    }//GEN-LAST:event_cameraPositionActionPerformed
+
+    private void coreMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coreMouseClicked
+        int button  = evt.getButton(),
+                x   = evt.getX(),
+                y   = evt.getY(),
+                w   = core.getWidth(),
+                h   = core.getHeight();
+        switch (button) {
+            case LEFT_CLICK:
+                
+                break;
+            case RIGHT_CLICK:   rightClick(x, y, w, h);   break;
+            case MIDDLE_CLICK:
+                
+                break;
+        }
+    }//GEN-LAST:event_coreMouseClicked
 
     /**
      * @param args the command line arguments
@@ -322,10 +377,10 @@ public class Window extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem ambientLighting;
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
-    private javax.swing.JMenuItem changeAmbientLighting;
-    private javax.swing.JMenuItem changeSceneLighitng;
+    private javax.swing.JMenuItem cameraPosition;
     private Render.Core core;
     private javax.swing.JMenuItem exportScene;
     private javax.swing.JMenu fileMenu;
@@ -334,5 +389,6 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenu objectsMenu;
     private javax.swing.JMenuItem openScene;
     private javax.swing.JMenu renderMenu;
+    private javax.swing.JMenuItem sceneLighitng;
     // End of variables declaration//GEN-END:variables
 }

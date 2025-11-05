@@ -26,10 +26,11 @@ public class Core extends JPanel {
     private int width = 200, height = width;    //screens dimensions
     
     public Scene scene;
+    private Timer timer;
     
     public Core() {
         imageSizer();           //Size & initialize screen
-        scene = new Scene();    //Initialize scene
+        scene = new Scene(width, height);    //Initialize scene
         scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));  //Set the lighting
         scene.setAmbientLighting(0.05f);                        //Set the ambient lighting
         
@@ -55,7 +56,7 @@ public class Core extends JPanel {
      * what is on screen.
      */
     public void mainLoop(){
-        Timer timer = new Timer(33, new ActionListener() {
+        timer = new Timer(33, new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 renderScene();
             }
@@ -76,7 +77,7 @@ public class Core extends JPanel {
      * BufferedImage image ... and repaint it.
      */
     private void renderScene() {
-        Color[][] image = scene.renderScene(width, height);
+        Color[][] image = scene.renderScene();
               
         //Adds bloom to the image using the current settings
         image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);

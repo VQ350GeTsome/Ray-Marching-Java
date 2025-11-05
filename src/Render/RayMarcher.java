@@ -4,6 +4,7 @@ import SDFs.SDF;
 import Utility.*;
 import java.awt.Color;
 import java.util.stream.IntStream;
+import javax.swing.Timer;
 
 public class RayMarcher {
 
@@ -17,7 +18,7 @@ public class RayMarcher {
                   maxDist       =  128,
                   shadowSteps   =   64,
                   fogFalloff    =    5;
-
+    
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
         this.light      = light;
@@ -27,24 +28,31 @@ public class RayMarcher {
     public HitInfo marchRay(int x, int y, int w, int h) {
         float nx = (x + 0.5f) / (float) w;
         float ny = (y + 0.5f) / (float) h;
-        vec3 dir = camera.getRayDirection(nx, ny, w / (float)h);
+        vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
         vec3 pos = camera.getPosition();
         
         float totalDistance = 0.0f;
         for (int step = 0; step < maxSteps; step++) {
             float distance = sdfMgr.getClosestSDFDist(pos);        //Minimum distance we can step
 
-            if (distance < Core.getEps()) { return new HitInfo(pos, totalDistance); }
-            if (totalDistance > maxDist)  { return new HitInfo(pos, totalDistance); }
+            if (distance < Core.getEps() || totalDistance > maxDist) {
+                vec3 hitPos = pos.add(dir.multiply(distance));
+                return new HitInfo(hitPos, totalDistance + distance);
+            }
 
             pos =   pos
                     .add(   dir
                             .multiply( distance ) 
                     );
             totalDistance += distance;
-
         }
         return new HitInfo(pos, totalDistance);
+    }
+    
+    public SDF marchRayObj(int x, int y, int w, int h) {
+        HitInfo hit = marchRay(x, y, w, h);
+        if (hit == null) return null;
+        return sdfMgr.getSDFAtPos(hit.hit);
     }
 
     public Color[][] marchScreen(int w, int h) {
@@ -52,10 +60,9 @@ public class RayMarcher {
         
         IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
             for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
-                HitInfo hit = marchRay(x, y, w, h);
-                vec3 hitVec = hit.hit;                                      //March ray from pixel { x , y } and get the point it hits
-                SDF hitObj = sdfMgr.getSDFAtPos(hitVec);                    //Check to see if their is an SDF where the ray hit
-                if (hitObj == null) image[x][y] = background;              //If there is none, set the current pixel to the background color
+                HitInfo hit = marchRay(x, y, w, h);                         //March ray from pixel { x , y } and get the point it hits
+                SDF hitObj = sdfMgr.getSDFAtPos(hit.hit);                   //Check to see if their is an SDF where the ray hit
+                if (hitObj == null) image[x][y] = background;               //If there is none, set the current pixel to the background color
                 else {
                     Color color = shade(hitObj, hit);                       //Calculate the objects color depending on light
                     float fog       =  (hit.totalDist / maxDist);           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
@@ -119,8 +126,6 @@ public class RayMarcher {
         
         return result / (result + 1.0f);
     }
-    
-    
     
     /**
      * Estimates a normal based off of an SDF and a position.

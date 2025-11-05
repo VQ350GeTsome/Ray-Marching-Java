@@ -5,6 +5,7 @@ import SDFs.SDF;
 import Utility.vec3;
 import java.awt.Color;
 import java.util.Arrays;
+import javax.swing.Timer;
 
 public class Scene {
     
@@ -12,21 +13,24 @@ public class Scene {
     private SDFManager  sdfManager;
     private Camera      camera 
 		= new Camera(
-	  new vec3(-3.0f,  1.0f,  1.0f),        //Position in space
+	  //new vec3(-3.0f,  1.0f,  1.0f),        //Position in space
+                        new vec3(-5, 0, 0),
 	  new vec3( 0.0f,  0.0f,  0.0f),        //Where it is pointing
           new vec3( 0.0f,  0.0f,  1.0f),        //Up vector
           90                                    //Field of view
 	  );
     private RayMarcher  rayMarcher;
     
-    public Scene() {
+    private int w, h;
+    
+    public Scene(int width, int height) {
         light = new Light();                                    //Instatiate a new light
         sdfManager = new SDFManager();                          //Instatiate a new SDFManager
-        rayMarcher = new RayMarcher(camera, light, sdfManager); //Instatiate a new RayMarcher
-        
+        rayMarcher = new RayMarcher(camera, light, sdfManager); //Instatiate a new RayMarcher        
         FileManager.setScene(this);     //Send this scene to the file manager
+        w = width; h = height;
     }
-
+    
     public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
     public vec3 getSceneLighting()              { return light.getSceneLighting(); }
     public void setAmbientLighting(float k)     { light.setAmbientLight(k); }
@@ -36,11 +40,13 @@ public class Scene {
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
     
     public void moveCamera(vec3 m)              { camera.move(m); }
+    public vec3 getCameraPos()                  { return camera.getPosition(); }
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
     public void zoomCamera(float z)             { camera.zoom(z); }
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }
     
-    public Color[][] renderScene(int w, int h) { return rayMarcher.marchScreen(w, h); }
+    public SDF getObject(int x, int y, int w, int h) { return rayMarcher.marchRayObj(x, y, w, h); }
+    public Color[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public Color getBackground() { return rayMarcher.getBackground(); }
     public String packageScene() {
         return  camera.packageCamera() +

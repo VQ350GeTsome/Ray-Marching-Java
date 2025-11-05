@@ -47,6 +47,14 @@
             <Property name="text" type="java.lang.String" value="Camera"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="cameraPosition">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Camera Position"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cameraPositionActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="cameraGrain">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change Camera Grain"/>
@@ -62,20 +70,20 @@
             <Property name="text" type="java.lang.String" value="Lighting"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="changeSceneLighitng">
+            <MenuItem class="javax.swing.JMenuItem" name="sceneLighitng">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change Scene Lighting"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="changeSceneLighitngActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sceneLighitngActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="changeAmbientLighting">
+            <MenuItem class="javax.swing.JMenuItem" name="ambientLighting">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change Ambient Lighting"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="changeAmbientLightingActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ambientLightingActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -120,6 +128,9 @@
   </Layout>
   <SubComponents>
     <Container class="Render.Core" name="core">
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="coreMouseClicked"/>
+      </Events>
 
       <Layout>
         <DimensionLayout dim="0">
