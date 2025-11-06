@@ -36,7 +36,7 @@ public class BlendedSDF extends SDF {
         return new Material(blendedColor);
     }
     
-    public String getType() { return "bleneded"; }
+    public String getType() { return "blended"; }
     
     @Override
     public String toString() { 

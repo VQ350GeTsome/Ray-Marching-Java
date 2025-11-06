@@ -4,9 +4,8 @@ import Utility.*;
 import File.*;
 
 import java.io.File;
-import javax.swing.Box;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -71,7 +70,7 @@ public class Window extends javax.swing.JFrame {
             fields[i] = new JTextField(defaults[i], 10);
             panel.add(new JLabel(options[i]));
             panel.add(fields[i]);
-            panel.add(Box.createHorizontalStrut(10));
+            panel.add(javax.swing.Box.createHorizontalStrut(10));
         }
         
         int result = JOptionPane.showConfirmDialog(
@@ -96,9 +95,41 @@ public class Window extends javax.swing.JFrame {
     
     private void rightClick(int x, int y, int w, int h) {
         SDFs.SDF clickedObj = core.scene.getObject(x, y, w, h);
-        if (clickedObj != null) {
-            //TODO   
-        }
+        if (clickedObj == null) return; //If we didn't click an object just return
+            
+        javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
+
+        JMenuItem delete = new JMenuItem("Delete");     //Define a menu item    
+        delete.addActionListener(evt -> {               //Add an event on click
+            deleteClicked(clickedObj);
+        });
+        popup.add(delete);                              //Add the menu item to the popup menu
+        
+        JMenuItem edit = new JMenuItem("Edit Properties");
+        popup.add(edit);
+        
+        int nw = core.getWidth(),
+            nh = core.getHeight(),
+            nx = (int) Math.round((x + 0.5f) * (nw / (float) w)),
+            ny = (int) Math.round((y + 0.5f) * (nh / (float) h));
+
+        nx = Math.max(0, Math.min(nx, nw - 1));
+        ny = Math.max(0, Math.min(ny, nh - 1));
+
+        popup.show(core, nx, ny);
+    }
+    private void deleteClicked(SDFs.SDF obj) {
+        int confirm = JOptionPane.showConfirmDialog(
+            null,
+            "Are you sure you want " + obj.getType() + " to be deleted?",
+            "Confirmation",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+        
+        if (confirm != JOptionPane.YES_OPTION) return;  //If confirm wasn't pressed just return
+        
+        core.scene.removeSDF(obj);
     }
     
     @SuppressWarnings("unchecked")
@@ -245,14 +276,14 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_formKeyPressed
 
     private void openSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSceneActionPerformed
-        JFileChooser fileChooser = new JFileChooser();  //New file chooser 
+        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();  //New file chooser 
         
         File dir = FileManager.getCurrentDirectory();   //Get the current directory
         fileChooser.setCurrentDirectory(dir);           //Set the file choosers dir to the current dir
         
         int result = fileChooser.showOpenDialog(this);  //Display the chooser to the user   (OpenDialog)
 
-        if (result == JFileChooser.APPROVE_OPTION) {    //If the user ends up selecting a file
+        if (result == javax.swing.JFileChooser.APPROVE_OPTION) {    //If the user ends up selecting a file
             File selectedFile = fileChooser
                                 .getSelectedFile();     //Get the file the user picked
             FileManager.loadScene(selectedFile);
@@ -260,14 +291,14 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_openSceneActionPerformed
 
     private void exportSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportSceneActionPerformed
-        JFileChooser fileChooser = new JFileChooser();  //New file chooser 
+        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();  //New file chooser 
         
         File dir = FileManager.getCurrentDirectory();   //Get the current directory
         fileChooser.setCurrentDirectory(dir);           //Set the file choosers dir to the current dir
         
         int result = fileChooser.showSaveDialog(this);  //Display the chooser to the user   (SaveDialog)
 
-        if (result == JFileChooser.APPROVE_OPTION) {    //If the user ends up selecting a file 
+        if (result == javax.swing.JFileChooser.APPROVE_OPTION) {    //If the user ends up selecting a file 
             File selectedFile = fileChooser
                                 .getSelectedFile();     //Get the file the user picked
             FileManager.saveScene(selectedFile);
