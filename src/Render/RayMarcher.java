@@ -37,7 +37,7 @@ public class RayMarcher {
 
             if (distance < Core.getEps() || totalDistance > maxDist) {
                 vec3 hitPos = pos.add(dir.multiply(distance));
-                return new HitInfo(hitPos, totalDistance + distance);
+                return new HitInfo(hitPos, totalDistance + distance, sdfMgr.getSDFAtPos(pos));
             }
 
             pos =   pos
@@ -46,22 +46,16 @@ public class RayMarcher {
                     );
             totalDistance += distance;
         }
-        return new HitInfo(pos, totalDistance);
+        return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
     }
     
-    public SDF marchRayObj(int x, int y, int w, int h) {
-        HitInfo hit = marchRay(x, y, w, h);
-        if (hit == null) return null;
-        return sdfMgr.getSDFAtPos(hit.hit);
-    }
-
     public Color[][] marchScreen(int w, int h) {
         Color[][] image = new Color[w][h];                                 //2D array for image of size { width , height }
         
         IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
             for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
                 HitInfo hit = marchRay(x, y, w, h);                         //March ray from pixel { x , y } and get the point it hits
-                SDF hitObj = sdfMgr.getSDFAtPos(hit.hit);                   //Check to see if their is an SDF where the ray hit
+                SDF hitObj = hit.sdf;                                       //Check to see if their is an SDF where the ray hit
                 if (hitObj == null) image[x][y] = background;               //If there is none, set the current pixel to the background color
                 else {
                     Color color = shade(hitObj, hit);                       //Calculate the objects color depending on light

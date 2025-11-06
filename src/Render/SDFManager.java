@@ -48,6 +48,16 @@ public class SDFManager {
         return null;                                                //If no SDF is found return null
     }
     
+    public void gc() {
+        ArrayList<SDF> toRemove = new ArrayList<>();
+        for (SDF sdf : sdfs) {
+            if (sdf instanceof BlendedSDF && ((BlendedSDF) sdf).needsCollected()) {
+                toRemove.add(sdf);
+            }
+        }
+        sdfs.removeAll(toRemove);
+    }
+    
     public String packSDFs() {
         String str = "";
         for (SDF sdf : sdfs) {

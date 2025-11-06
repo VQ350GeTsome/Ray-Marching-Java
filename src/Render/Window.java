@@ -2,6 +2,7 @@ package Render;
 
 import Utility.*;
 import File.*;
+import SDFs.BlendedSDF;
 
 import java.io.File;
 import javax.swing.JLabel;
@@ -94,18 +95,22 @@ public class Window extends javax.swing.JFrame {
     }
     
     private void rightClick(int x, int y, int w, int h) {
-        SDFs.SDF clickedObj = core.scene.getObject(x, y, w, h);
+        HitInfo info = core.scene.marchRay(x, y, w, h);
+        SDFs.SDF clickedObj = info.sdf;
         if (clickedObj == null) return; //If we didn't click an object just return
             
         javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
 
         JMenuItem delete = new JMenuItem("Delete");     //Define a menu item    
         delete.addActionListener(evt -> {               //Add an event on click
-            deleteClicked(clickedObj);
+            deleteClicked(clickedObj, info.hit);
         });
         popup.add(delete);                              //Add the menu item to the popup menu
         
         JMenuItem edit = new JMenuItem("Edit Properties");
+        edit.addActionListener(evt -> {
+            editClicked(clickedObj, info.hit);
+        });
         popup.add(edit);
         
         int nw = core.getWidth(),
@@ -118,7 +123,14 @@ public class Window extends javax.swing.JFrame {
 
         popup.show(core, nx, ny);
     }
-    private void deleteClicked(SDFs.SDF obj) {
+    private void deleteClicked(SDFs.SDF obj, vec3 hit) {
+        boolean blended = false;
+        SDFs.SDF clone = obj;
+        if (obj instanceof SDFs.BlendedSDF) {           //If the object we clicked is a blended object
+            obj = ((BlendedSDF) obj).getClosest(hit);   //Gets the nearest object that we clicked in the blended group
+            blended = true;
+        }
+        
         int confirm = JOptionPane.showConfirmDialog(
             null,
             "Are you sure you want " + obj.getType() + " to be deleted?",
@@ -129,7 +141,15 @@ public class Window extends javax.swing.JFrame {
         
         if (confirm != JOptionPane.YES_OPTION) return;  //If confirm wasn't pressed just return
         
-        core.scene.removeSDF(obj);
+        if (!blended) core.scene.removeSDF(obj);
+        else ((BlendedSDF) clone).remove(obj);
+        
+    }
+    private void editClicked(SDFs.SDF obj, vec3 hit) {
+        
+        if (obj instanceof SDFs.BlendedSDF) {   //If the object we clicked is a blended object
+            ((BlendedSDF) obj).getClosest(hit); //Gets the nearest object that we clicked in the blended group
+        }
     }
     
     @SuppressWarnings("unchecked")

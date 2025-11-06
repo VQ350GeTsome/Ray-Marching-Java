@@ -14,7 +14,10 @@ public class BlendedSDF extends SDF {
         this.k = k;
     }
 
-    public float sdf(vec3 p) {
+    public float sdf(vec3 p) {      
+        if (a == null) return b.sdf(p);
+        if (b == null) return a.sdf(p);
+        
         float d1 = a.sdf(p);
         float d2 = b.sdf(p);
         float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;
@@ -22,6 +25,9 @@ public class BlendedSDF extends SDF {
     }
     
     public Material getMaterial(vec3 p) {
+        if (a == null) return b.material;
+        if (b == null) return a.material;
+        
         float d1 = a.sdf(p);
         float d2 = b.sdf(p);
         //float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;  //At seem coloring
@@ -34,6 +40,35 @@ public class BlendedSDF extends SDF {
         Color blendedColor = ColorMath.blend(c1, c2, h);
 
         return new Material(blendedColor);
+    }
+    
+    public SDF getClosest(vec3 p) {
+        if (a == null) return b;
+        if (b == null) return a;
+        
+        SDF closest = (a.sdf(p) > b.sdf(p)) ? b : a;        //Get closest SDF
+        if (closest instanceof BlendedSDF) {                //But if the closest SDF itself is also blended
+            return ((BlendedSDF) closest).getClosest(p);    //Recurse down until we get the closest component
+        }
+        return closest;                                     //Return the closest one
+    }
+    
+    public void remove(SDF t) {
+        if (a == t) {
+            a = null;
+        } else if (a instanceof BlendedSDF) {
+            ((BlendedSDF) a).remove(t);
+        }
+
+        if (b == t) {
+            b = null;
+        } else if (b instanceof BlendedSDF) {
+            ((BlendedSDF) b).remove(t);
+        }
+    }
+    
+    public boolean needsCollected() {
+        return (a == null & b == null);
     }
     
     public String getType() { return "blended"; }

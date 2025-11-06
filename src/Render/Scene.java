@@ -2,7 +2,7 @@ package Render;
 
 import File.FileManager;
 import SDFs.SDF;
-import Utility.vec3;
+import Utility.*;
 import java.awt.Color;
 import java.util.Arrays;
 import javax.swing.Timer;
@@ -31,6 +31,8 @@ public class Scene {
         w = width; h = height;
     }
     
+    public void collectGarbageSDFs() { sdfManager.gc(); }
+    
     public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
     public vec3 getSceneLighting()              { return light.getSceneLighting(); }
     public void setAmbientLighting(float k)     { light.setAmbientLight(k); }
@@ -45,7 +47,7 @@ public class Scene {
     public void zoomCamera(float z)             { camera.zoom(z); }
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }
     
-    public SDF getObject(int x, int y, int w, int h) { return rayMarcher.marchRayObj(x, y, w, h); }
+    public HitInfo marchRay(int x, int y, int w, int h) { return rayMarcher.marchRay(x, y, w, h); }
     public Color[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public Color getBackground() { return rayMarcher.getBackground(); }
     public String packageScene() {
