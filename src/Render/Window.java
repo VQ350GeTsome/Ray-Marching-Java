@@ -93,7 +93,18 @@ public class Window extends javax.swing.JFrame {
         }
         
     }
-    
+    private String[] createOptionsPane(String title, String[] both) {
+        int length = both.length;                       //Get the amount of settings (double the amount because the current values are stored too)
+        
+        String[] options  = new String[length / 2];     //Initialize the options  array
+        String[] defaults = new String[length / 2];     //Initialize the defaults array
+        
+        for (int i = 0; length / 2 > i; i++)  options[i] = both[i];                 //Fill the options  array
+        for (int i = 0; length / 2 > i; i++) defaults[i] = both[i + length / 2];    //Fill the defualts array
+        
+        return createOptionsPane(title, options, defaults);
+    }
+            
     private void rightClick(int x, int y, int w, int h) {
         HitInfo info = core.scene.marchRay(x, y, w, h);
         SDFs.SDF clickedObj = info.sdf;
@@ -112,6 +123,14 @@ public class Window extends javax.swing.JFrame {
             editClicked(clickedObj, info.hit);
         });
         popup.add(edit);
+        
+        if (clickedObj instanceof SDFs.BlendedSDF) {
+            JMenuItem blendedEdit = new JMenuItem("Edit Blended Properties");
+            blendedEdit.addActionListener(evt -> {
+            blendedEditClicked();
+            });
+            popup.add(blendedEdit);
+        }
         
         int nw = core.getWidth(),
             nh = core.getHeight(),
@@ -146,10 +165,15 @@ public class Window extends javax.swing.JFrame {
         
     }
     private void editClicked(SDFs.SDF obj, vec3 hit) {
-        
         if (obj instanceof SDFs.BlendedSDF) {   //If the object we clicked is a blended object
-            ((BlendedSDF) obj).getClosest(hit); //Gets the nearest object that we clicked in the blended group
+            obj = ((BlendedSDF) obj).getClosest(hit); //Gets the nearest object that we clicked in the blended group
         }
+        
+        String[] inputs = createOptionsPane("Enter New Settings: ", obj.getSettings());
+        
+    }
+    private void blendedEditClicked() {
+        
     }
     
     @SuppressWarnings("unchecked")

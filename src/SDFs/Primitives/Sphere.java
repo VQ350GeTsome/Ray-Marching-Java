@@ -16,6 +16,10 @@ public class Sphere extends SDF{
     
     public float sdf(vec3 point) { return point.getDist(center) - radius; }
     
+    public String[] getSettings() {
+        return new String[] { "Center: ", "Radius: ", center.toString(), ""+radius };
+    }
+    
     public String getType() { return "sphere"; }
     
     @Override

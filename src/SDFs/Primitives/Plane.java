@@ -21,6 +21,11 @@ public class Plane extends SDF {
     
     public String getType() { return "plane"; }
     
+    public String[] getSettings() {
+        return new String[] { "Position: ", "Normal: ", 
+            pos.toString(), normal.toString() };
+    }
+    
     public String toString() {
         return super.toString() + pos.toString() + "," + normal.toString() + ",";
     }

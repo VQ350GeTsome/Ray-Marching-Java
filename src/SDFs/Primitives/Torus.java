@@ -24,6 +24,11 @@ public class Torus extends SDF{
 
     public String getType() { return "torus"; }
     
+    public String[] getSettings() {
+        return new String[] { "Center: ", "Radius Major: ", "Radius Minor: ",
+            center.toString(), ""+majorR, ""+minorR };
+    }
+    
     @Override
     public String toString() {
         return super.toString() + center.toString() + "," + majorR + "," + minorR + ",\n";

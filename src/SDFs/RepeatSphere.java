@@ -8,6 +8,12 @@ public class RepeatSphere extends SDF{
     private vec3 center;
     private float radius, spacing;
     
+    public RepeatSphere(float radius, float spacing, Color color) {
+        this.radius = radius; this.spacing = spacing;
+        center = new vec3();
+        material = new Material(color);
+    }
+    
     public RepeatSphere(vec3 center, float radius, float spacing, Color color) { 
         this.radius = radius; this.spacing = spacing; this.center = center; 
         material = new Material(color);
@@ -25,7 +31,13 @@ public class RepeatSphere extends SDF{
         return (local.length() - radius);
     }
     
+    public String[] getSettings() {
+        return new String[] { "Center: ", "Radius: ", "Spacing: ",
+            center.toString(), ""+radius, ""+spacing };
+    }
+    
     public String getType() { return "repeatsphere"; }
+    
     
     @Override
     public String toString() {

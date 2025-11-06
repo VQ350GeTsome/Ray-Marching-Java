@@ -71,6 +71,10 @@ public class BlendedSDF extends SDF {
         return (a == null & b == null);
     }
     
+    public String[] getSettings() {
+        return new String[] { "Blending Amount: ", ""+k };
+    }
+    
     public String getType() { return "blended"; }
     
     @Override
