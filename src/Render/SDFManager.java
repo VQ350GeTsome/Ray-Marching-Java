@@ -21,6 +21,7 @@ public class SDFManager {
      * @return If the operation was completed.
      */
     public boolean removeSDF(SDF sdf)   { return sdfs.remove(sdf); }
+    
     /**
      * Returns the closest surface of the SDFs contained
      * from the input vector.
@@ -42,12 +43,16 @@ public class SDFManager {
      * @return An SDF is one is found ... else null.
      */
     public SDF getSDFAtPos(vec3 pos) {
-        for (SDF sdf : sdfs) {                                      //For each SDF
+        for (SDF sdf : sdfs) {                                   //For each SDF
             if (sdf.sdf(pos) <= Core.getEps() * 100) { return sdf; }      //If the SDF is within epsilon, return that sdf
         }
         return null;                                                //If no SDF is found return null
     }
     
+    /**
+     * Garbage collector. Checks if any blended SDFs
+     * need to be collected and trashed.
+     */
     public void gc() {
         ArrayList<SDF> toRemove = new ArrayList<>();
         for (SDF sdf : sdfs) {
@@ -58,6 +63,11 @@ public class SDFManager {
         sdfs.removeAll(toRemove);
     }
     
+    /**
+     * Packs SDFs into one big String
+     * using their .toString()
+     * @return 
+     */
     public String packSDFs() {
         String str = "";
         for (SDF sdf : sdfs) {
@@ -65,10 +75,20 @@ public class SDFManager {
         }
         return str;
     }
+    /**
+     * Unpacks SDFs in the format made in packSDFs()
+     * @param s String array that contains packed SDFs
+     */
     public void unpackSDFs(String[] s) { 
         
         sdfs.clear();       //Clear all current SDFs to load the new scene
+        unpack(s);
         
+        System.out.println("Unpacked SDFs:\n");
+        for (SDF sdf : sdfs) System.out.println(sdf);
+    }
+    
+    private void unpack(String[] s) {
         IntRef i = new IntRef(0);               //Create a integer referance 
         while (i.i < s.length) {                //Loop through all SDF tokens
             String type = s[i.i++].trim();      //Get the type of SDF

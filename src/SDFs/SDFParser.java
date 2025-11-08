@@ -16,17 +16,17 @@ public class SDFParser {
         Color color = new Color(r, g, b);
         
         switch (type) {
-                case "sphere":
-                    return SDFParser.parseSphere(info, color, i);
-                case "cube":
-                    return SDFParser.parseCube(info, color, i);
-                case "torus":
-                    return SDFParser.parseTorus(info, color, i);      
-                case "plane":
-                    return SDFParser.parsePlane(info, color, i);
-                default:
-                    System.err.println("Unknown SDF type: " + type);
-                    break;
+            case "sphere":
+                return parseSphere(info, color, i);
+            case "cube":
+                return parseCube(info, color, i);
+            case "torus":
+                return parseTorus(info, color, i);      
+            case "plane":
+                return parsePlane(info, color, i);
+            default:
+                System.err.println("Unknown SDF type: " + type);
+                break;
         }
         return null;
     }
@@ -40,32 +40,34 @@ public class SDFParser {
             }     
             sdfsToBlend.add(getSDF(type, info, i));
         }
-        return null; //BLEND SDFs AND RETURN THEMMM
+        return mergeBlended(sdfsToBlend);
+    }
+    private static SDF mergeBlended(ArrayList<SDF> sdfs) {
+        
     }
     
-    public static SDF parseSphere(String[] info, Color c, IntRef i) {
+    private static SDF parseSphere(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float radius = Float.parseFloat(info[i.i++].trim());
         return new Sphere(center, radius, c);
     }
     
-    public static SDF parseCube(String[] info, Color c, IntRef i) {
+    private static SDF parseCube(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
         return new Cube(center, size, c);
     }
     
-    public static SDF parseTorus(String[] info, Color c, IntRef i) {
+    private static SDF parseTorus(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float majorR = Float.parseFloat(info[i.i++].trim());
         float minorR = Float.parseFloat(info[i.i++].trim());
         return new Torus(center, majorR, minorR, c);
     }
     
-    public static SDF parsePlane(String[] info, Color c, IntRef i) {
+    private static SDF parsePlane(String[] info, Color c, IntRef i) {
         vec3 pos = new vec3(info[i.i++]);
         vec3 normal = new vec3(info[i.i++]);
-        System.out.println(i.i);
         return new Plane(pos, normal, c);
     }
 }
