@@ -39,6 +39,7 @@ public class Scene {
     
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
+    public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
     
     public void moveCamera(vec3 m)              { camera.move(m); }
     public vec3 getCameraPos()                  { return camera.getPosition(); }

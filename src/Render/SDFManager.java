@@ -21,6 +21,10 @@ public class SDFManager {
      * @return If the operation was completed.
      */
     public boolean removeSDF(SDF sdf)   { return sdfs.remove(sdf); }
+    public boolean setSDF(SDF s, SDF n) {
+        return sdfs.remove(s) &&
+               sdfs.add(n);
+    }
     
     /**
      * Returns the closest surface of the SDFs contained

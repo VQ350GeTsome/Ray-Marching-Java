@@ -43,6 +43,7 @@ public class BlendedSDF extends SDF {
     }
     
     public float getK() { return k; }
+    public void  setK(float k) { this.k = k; }
     
     public SDF getClosest(vec3 p) {
         if (a == null) return b;

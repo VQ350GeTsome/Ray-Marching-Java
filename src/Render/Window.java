@@ -120,14 +120,14 @@ public class Window extends javax.swing.JFrame {
         
         JMenuItem edit = new JMenuItem("Edit Properties");
         edit.addActionListener(evt -> {
-            editClicked(clickedObj, info.hit);
+            editClicked(clickedObj, info.hit, true);
         });
         popup.add(edit);
         
         if (clickedObj instanceof SDFs.BlendedSDF) {
             JMenuItem blendedEdit = new JMenuItem("Edit Blended Properties");
             blendedEdit.addActionListener(evt -> {
-                blendedEditClicked(clickedObj, info.hit);
+                editClicked(clickedObj, info.hit, false);
             });
             popup.add(blendedEdit);
         }
@@ -143,10 +143,12 @@ public class Window extends javax.swing.JFrame {
         popup.show(core, nx, ny);
     }
     private void deleteClicked(SDFs.SDF obj, vec3 hit) {
-        boolean blended = false;
-        SDFs.SDF parent = obj;                          //Keep track of the parent incase it's blended
+        boolean blended = false;                        //This will keep track if our object is blended
+        SDFs.SDF parent = null;                         //This will keep track of the parent incase it's blended
+        
         if (obj instanceof SDFs.BlendedSDF) {           //If the object we clicked is a blended object
-            obj = ((BlendedSDF) obj).getClosest(hit);   //Gets the nearest object that we clicked in the blended group
+            parent = obj;                               //Save the parent
+            obj = ((BlendedSDF) obj).getClosest(hit);   //Gets the child that we clicked in the blended group
             blended = true;
         }
         
@@ -164,28 +166,47 @@ public class Window extends javax.swing.JFrame {
         else ((BlendedSDF) parent).remove(obj);
         
     }
-    private void editClicked(SDFs.SDF obj, vec3 hit) {
-        boolean blended = false;
-        SDFs.SDF parent = obj;  
-        if (obj instanceof SDFs.BlendedSDF) {   //If the object we clicked is a blended object
-            blended = true;
-            obj = ((BlendedSDF) obj).getClosest(hit); //Gets the nearest object that we clicked in the blended group
+    private void editClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
+        boolean blended = false;                        //This will keep track if our object is blended
+        SDFs.SDF parent = null;                         //This will keep track of the parent incase it's blended
+        
+        //If the object we clicked is a blended object & we aren't skipping isolating the child
+        if (obj instanceof SDFs.BlendedSDF) {
+            parent = obj;                               //Save the parent
+            obj = (isolateChild) ? ((BlendedSDF) obj).getClosest(hit) : obj;   //Gets the child that we clicked in the blended group
+            blended = true;                             //Turn blended to true
         }
         
+        //Get the new settings 
         String[] inputs = createOptionsPane("Enter New Settings: ", obj.getSettings());
-        IntRef i = new IntRef(0);
-        SDFs.SDF newObj = SDFs.SDFParser.getSDF(obj.getType(), inputs, i);
+        if (inputs == null) return;
         
-        if (!blended) {
-            core.scene.removeSDF(obj);
-            core.scene.addSDF(newObj);
-        } else {
+        //Parse the settings into a new SDF (newObj)
+        IntRef i = new IntRef(0);
+        SDFs.SDF newObj = null;
+        try { newObj = SDFs.SDFParser.getSDF(obj.getType(), inputs, i); }
+        catch (Exception e) { ; }
+        
+        /*  
+        If the object we pressed was blended, and we're trying to alter the 
+            properties of it, and not the individual children of that BlendedSDF,
+            just pass in the new settings to the BlendedSDF.
+        Else we check if it's just an individual SDF we are trying to edit, if so
+            we use the new SDF we had made with the new settings and replace the
+            old one with it.
+        Then finally, if it's neither of those, we can conclude it's a BlenedSDF
+            where we are trying to alter one of it's children. We had previously 
+            gotten its child and set it to obj, so we remove obj from the parent
+            and add the newObj.
+        */
+        if (!isolateChild && blended) {
+            ((BlendedSDF) parent).setK(Float.parseFloat(inputs[0]));
+        } else if (!blended) { 
+            core.scene.setSDF(obj, newObj);
+        } else {        
             ((BlendedSDF) parent).remove(obj);
             ((BlendedSDF) parent).addChild(newObj);
         }
-        
-    }
-    private void blendedEditClicked(SDFs.SDF obj, vec3 hit) {
         
     }
     
@@ -377,13 +398,13 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_cameraGrainActionPerformed
 
     private void sceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sceneLighitngActionPerformed
-        String[] options    = new String[] { "x: ", "y: ", "z: " };
-        String[] defaultDir = core.scene.getSceneLighting().toStringArray();
+        String[] options    = new String[] { "Scene Light Direction: " };
+        String[] defaultDir = new String[] { core.scene.getSceneLighting().toStringParen() };
         String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir);
         
         if (inputs == null) return; 
         
-        core.scene.setSceneLighting(new vec3(inputs));
+        core.scene.setSceneLighting(new vec3(inputs[0]));
     }//GEN-LAST:event_sceneLighitngActionPerformed
 
     private void ambientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ambientLightingActionPerformed
@@ -401,13 +422,13 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_ambientLightingActionPerformed
 
     private void cameraPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraPositionActionPerformed
-        String[] options    = new String[] { "x: ", "y: ", "z: " };
-        String[] defaultDir = core.scene.getCameraPos().toStringArray();
+        String[] options    = new String[] { "New Camera Position: " };
+        String[] defaultDir = new String[] { core.scene.getCameraPos().toStringParen() };
         String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir);
         
         if (inputs == null) return; 
         
-        vec3 input = new vec3(inputs);                      //Get where the user wants the camera
+        vec3 input = new vec3(inputs[0]);                   //Get where the user wants the camera
         vec3 currentPos = core.scene.getCameraPos();        //Current camera position
         core.scene.moveCamera(input.subtract(currentPos));  //Move the camera to the wanted position
     }//GEN-LAST:event_cameraPositionActionPerformed
