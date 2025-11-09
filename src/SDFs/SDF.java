@@ -46,10 +46,7 @@ public abstract class SDF {
      * saved & parsed later
      * @return The String, i.e., "255:50:150" (Mageneta)
      */
-    public String colorString() {
-        Color c = material.color;
-        return c.getRed() + ":" + c.getGreen() + ":" + c.getBlue();
-    }
+    public String colorString() { return material.colorString(); }
     /**
      * Default toString method, returns the type & color
      * @return 

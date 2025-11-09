@@ -56,13 +56,21 @@ public class Core extends JPanel {
      * what is on screen.
      */
     public void mainLoop(){
-        timer = new Timer(33, new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                scene.collectGarbageSDFs(); //Deletes any SDFs that need to be 
-                renderScene();
-            }
-        });
+        int wait = 33;
+        timer = 
+            new Timer(wait, 
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) { 
+                        run(); 
+                    }
+                }
+            );
         timer.start(); /* Start timer */
+    }
+    
+    private void run() {
+        scene.collectGarbageSDFs(); //Deletes any SDFs that need to be 
+        renderScene();
     }
     
     //Postprocessing settings 

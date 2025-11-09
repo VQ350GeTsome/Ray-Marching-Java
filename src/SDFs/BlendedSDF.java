@@ -57,7 +57,7 @@ public class BlendedSDF extends SDF {
     
     public void remove(SDF t) {
         if (a == t) {       //If t is a set a to null
-            a = null;   
+            a = null;  
             return;
         } else if (a instanceof BlendedSDF) {   //Else check if t is a child of a
             ((BlendedSDF) a).remove(t);         //If so remove it
@@ -71,6 +71,17 @@ public class BlendedSDF extends SDF {
             ((BlendedSDF) b).remove(t);
             return;
         }
+    }
+    
+    /**
+     * If there is an empty child
+     * we set n (new SDF) to the null
+     * or empty one
+     * @param n The child to add
+     */
+    public void addChild(SDF n) {
+        if (a == null) a = n;
+        if (b == null) b = n;
     }
     
     /**

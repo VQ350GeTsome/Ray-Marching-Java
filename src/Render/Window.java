@@ -127,7 +127,7 @@ public class Window extends javax.swing.JFrame {
         if (clickedObj instanceof SDFs.BlendedSDF) {
             JMenuItem blendedEdit = new JMenuItem("Edit Blended Properties");
             blendedEdit.addActionListener(evt -> {
-            blendedEditClicked();
+                blendedEditClicked(clickedObj, info.hit);
             });
             popup.add(blendedEdit);
         }
@@ -144,7 +144,7 @@ public class Window extends javax.swing.JFrame {
     }
     private void deleteClicked(SDFs.SDF obj, vec3 hit) {
         boolean blended = false;
-        SDFs.SDF clone = obj;
+        SDFs.SDF parent = obj;                          //Keep track of the parent incase it's blended
         if (obj instanceof SDFs.BlendedSDF) {           //If the object we clicked is a blended object
             obj = ((BlendedSDF) obj).getClosest(hit);   //Gets the nearest object that we clicked in the blended group
             blended = true;
@@ -161,18 +161,31 @@ public class Window extends javax.swing.JFrame {
         if (confirm != JOptionPane.YES_OPTION) return;  //If confirm wasn't pressed just return
         
         if (!blended) core.scene.removeSDF(obj);
-        else ((BlendedSDF) clone).remove(obj);
+        else ((BlendedSDF) parent).remove(obj);
         
     }
     private void editClicked(SDFs.SDF obj, vec3 hit) {
+        boolean blended = false;
+        SDFs.SDF parent = obj;  
         if (obj instanceof SDFs.BlendedSDF) {   //If the object we clicked is a blended object
+            blended = true;
             obj = ((BlendedSDF) obj).getClosest(hit); //Gets the nearest object that we clicked in the blended group
         }
         
         String[] inputs = createOptionsPane("Enter New Settings: ", obj.getSettings());
+        IntRef i = new IntRef(0);
+        SDFs.SDF newObj = SDFs.SDFParser.getSDF(obj.getType(), inputs, i);
+        
+        if (!blended) {
+            core.scene.removeSDF(obj);
+            core.scene.addSDF(newObj);
+        } else {
+            ((BlendedSDF) parent).remove(obj);
+            ((BlendedSDF) parent).addChild(newObj);
+        }
         
     }
-    private void blendedEditClicked() {
+    private void blendedEditClicked(SDFs.SDF obj, vec3 hit) {
         
     }
     

@@ -9,4 +9,8 @@ public class Material {
     public Material(Color c) {
         color = c;
     }
+    
+    public String colorString() {
+        return color.getRed() + ":" + color.getGreen() + ":" + color.getBlue();
+    }
 }
