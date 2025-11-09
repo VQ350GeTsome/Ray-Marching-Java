@@ -22,8 +22,8 @@ public class Plane extends SDF {
     public String getType() { return "plane"; }
     
     public String[] getSettings() {
-        return new String[] { "Position: ", "Normal: ", 
-            pos.toString(), normal.toString() };
+        return new String[] { "Color: ", "Position: ", "Normal: ", 
+            material.colorString(), pos.toStringParen(), normal.toStringParen() };
     }
     
     public String toString() {

@@ -18,7 +18,7 @@ public class Sphere extends SDF{
     
     public String[] getSettings() {
         return new String[] { "Color: ", "Center: ", "Radius: ",
-            material.colorString(), center.toString(), ""+radius };
+            material.colorString(), center.toStringParen(), ""+radius };
     }
     
     public String getType() { return "sphere"; }

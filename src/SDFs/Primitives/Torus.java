@@ -25,8 +25,8 @@ public class Torus extends SDF{
     public String getType() { return "torus"; }
     
     public String[] getSettings() {
-        return new String[] { "Center: ", "Radius Major: ", "Radius Minor: ",
-            center.toString(), ""+majorR, ""+minorR };
+        return new String[] { "Color:", "Center: ", "Radius Major: ", "Radius Minor: ",
+            material.colorString(), center.toStringParen(), ""+majorR, ""+minorR };
     }
     
     @Override

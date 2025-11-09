@@ -70,19 +70,17 @@ public class vec3 {
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
     @Override
-    public String toString() {
-        return "{ " + x + " | " + y + " | " + z + " }";
-    }
-    public String[] toStringArray() {
-        return new String[] { ""+x, ""+y, ""+z };
-    }
+    public String toString() { return "{" + x + ":" + y + ":" + z + "}"; }
+    public String toStringParen() { return "(" + x + ", " + y + ", " + z + ")"; }
+    public String[] toStringArray() { return new String[] { ""+x, ""+y, ""+z }; }
     /**
      * Turns the .toString() method back into a vec3 object
-     * @param vector A String in the form { x | y | z }
+     * @param vector A String in the form {x:y:z} or (x, y, z)
      */
     public vec3(String vector) {
-        vector = vector.trim().substring(2, vector.length() - 2);
-        String[] componenets = vector.split("\\|");
+        vector = vector.trim().substring(1, vector.length() - 2);   //Trim off grouping character
+        String[] componenets = vector.split("[,\\:]");              //Split by , or :
+        
         
         if (componenets.length != 3) {
             throw new IllegalArgumentException("Invalid vec3 format: " + vector);

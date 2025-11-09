@@ -32,8 +32,8 @@ public class RepeatSphere extends SDF{
     }
     
     public String[] getSettings() {
-        return new String[] { "Center: ", "Radius: ", "Spacing: ",
-            center.toString(), ""+radius, ""+spacing };
+        return new String[] { "Color: ", "Center: ", "Radius: ", "Spacing: ",
+            material.colorString(), center.toStringParen(), ""+radius, ""+spacing };
     }
     
     public String getType() { return "repeatsphere"; }

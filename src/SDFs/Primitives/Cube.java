@@ -27,7 +27,8 @@ public class Cube extends SDF {
     }
     
     public String[] getSettings() {
-        return new String[] { "Center: ", "Size: ", center.toString(), ""+size };
+        return new String[] { "Color: ", "Center: ", "Size: ", 
+            material.colorString(), center.toStringParen(), ""+size };
     }
     
     public String getType() { return "cube"; }
