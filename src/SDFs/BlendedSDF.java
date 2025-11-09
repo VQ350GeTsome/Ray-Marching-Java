@@ -42,6 +42,8 @@ public class BlendedSDF extends SDF {
         return new Material(blendedColor);
     }
     
+    public float getK() { return k; }
+    
     public SDF getClosest(vec3 p) {
         if (a == null) return b;
         if (b == null) return a;
@@ -54,31 +56,44 @@ public class BlendedSDF extends SDF {
     }
     
     public void remove(SDF t) {
-        if (a == t) {
-            a = null;
-        } else if (a instanceof BlendedSDF) {
-            ((BlendedSDF) a).remove(t);
+        if (a == t) {       //If t is a set a to null
+            a = null;   
+            return;
+        } else if (a instanceof BlendedSDF) {   //Else check if t is a child of a
+            ((BlendedSDF) a).remove(t);         //If so remove it
+            return;
         }
 
-        if (b == t) {
+        if (b == t) {       //Do the same as above, just with b
             b = null;
-        } else if (b instanceof BlendedSDF) {
+            return;
+        } else if (b instanceof BlendedSDF) { 
             ((BlendedSDF) b).remove(t);
+            return;
         }
     }
     
-    public boolean needsCollected() {
-        return (a == null & b == null);
-    }
+    /**
+     * Checks if the blended SDFs components
+     * have both been deleted
+     * @return True if it needs to be collected
+     */
+    public boolean needsCollected() { return (a == null  & b == null); }
+    /**
+     * Checks if either of the two child SDFs are null
+     * if so we can pack it non-blended
+     * @return True if either a or b are null
+     */
+    public boolean needsUnblended() { return (a == null || b == null); }
     
-    public String[] getSettings() {
-        return new String[] { "Blending Amount: ", ""+k };
-    }
+    public String[] getSettings() { return new String[] { "Blending Amount: ", ""+k }; }
     
     public String getType() { return "blended"; }
     
     @Override
     public String toString() { 
-        return "blended" + ",\n" + a.toString() + b.toString() + "endblend,\n";
+        if (a == null) return b.toString();
+        if (b == null) return a.toString();
+        return a.toString() + b.toString(); 
     }
 }

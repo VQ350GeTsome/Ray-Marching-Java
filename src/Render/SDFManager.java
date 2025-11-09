@@ -71,30 +71,39 @@ public class SDFManager {
     public String packSDFs() {
         String str = "";
         for (SDF sdf : sdfs) {
-            str += sdf.toString();
+            if (sdf instanceof BlendedSDF) {    //If of type blended append the blended tag
+                float k = ((BlendedSDF) sdf).getK();    //Blending factor
+                boolean needsTagged = !((BlendedSDF) sdf).needsUnblended(); //If we need to tag the new SDF as blended
+                if (needsTagged) str += "blended," + k + ",\n";
+                str += sdf.toString();
+                if (needsTagged) str += "endblend,\n";
+            } else {
+                str += sdf.toString();
+            }
         }
         return str;
     }
     /**
-     * Unpacks SDFs in the format made in packSDFs()
+     * Unpacks multiple SDFs in the format used by unpack()
      * @param s String array that contains packed SDFs
      */
     public void unpackSDFs(String[] s) { 
-        
         sdfs.clear();       //Clear all current SDFs to load the new scene
-        unpack(s);
-        
-        System.out.println("Unpacked SDFs:\n");
-        for (SDF sdf : sdfs) System.out.println(sdf);
+        unpack(s);          //Unpack all the SDFs in s 
     }
     
+    /**
+     * Parses through a String array
+     * @param String array that contains packed SDFs
+     */
     private void unpack(String[] s) {
         IntRef i = new IntRef(0);               //Create a integer referance 
         while (i.i < s.length) {                //Loop through all SDF tokens
             String type = s[i.i++].trim();      //Get the type of SDF
             
             if (type.equals("blended")) {       //If the type is special ie, "blended"
-                sdfs.add(SDFParser.parseBlended(s, i));
+                float k = Float.parseFloat(s[i.i++].trim());
+                sdfs.add(SDFParser.parseBlended(s, k, i));
             } else {                            //Else just parse the regular SDF
                 sdfs.add(SDFParser.getSDF(type, s, i));
             }

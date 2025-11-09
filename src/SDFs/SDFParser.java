@@ -31,7 +31,7 @@ public class SDFParser {
         return null;
     }
     
-    public static SDF parseBlended(String[] info, IntRef i) {
+    public static SDF parseBlended(String[] info, float k, IntRef i) {
         ArrayList<SDF> sdfsToBlend = new ArrayList<>(2);
         while (true) {
             String type = info[i.i++].trim(); //Read the type
@@ -40,10 +40,13 @@ public class SDFParser {
             }     
             sdfsToBlend.add(getSDF(type, info, i));
         }
-        return mergeBlended(sdfsToBlend);
+        return mergeBlended(sdfsToBlend, k);
     }
-    private static SDF mergeBlended(ArrayList<SDF> sdfs) {
-        
+    private static SDF mergeBlended(ArrayList<SDF> sdfs, float k) {
+        if (sdfs.size() == 1) return sdfs.get(0);   //Base case
+        SDF a = sdfs.get(0);    //Get the next SDF
+        sdfs.remove(a);         //Then remove it
+        return new BlendedSDF(a, mergeBlended(sdfs, k), k);
     }
     
     private static SDF parseSphere(String[] info, Color c, IntRef i) {
