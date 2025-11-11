@@ -1,14 +1,12 @@
 package SDFs.Primitives;
 
-import SDFs.SDF;
 import Utility.*;
-import java.awt.Color;
 
-public class Plane extends SDF {
+public class Plane extends SDFs.SDF {
     
     private vec3 pos, normal;
     
-    public Plane(vec3 pos, vec3 normal, Color c) {
+    public Plane(vec3 pos, vec3 normal, java.awt.Color c) {
         material = new Material(c);
         this.pos = pos;
         this.normal = normal;
@@ -21,7 +19,7 @@ public class Plane extends SDF {
     
     public String getType() { return "plane"; }
     
-    public String[] getSettings() {
+    public String[] getSettingsAndCurrent() {
         return new String[] { "Color: ", "Position: ", "Normal: ", 
             material.colorString(), pos.toStringParen(), normal.toStringParen() };
     }

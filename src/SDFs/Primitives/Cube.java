@@ -1,16 +1,14 @@
 package SDFs.Primitives;
 
-import SDFs.SDF;
 import Utility.*;
-import java.awt.Color;
 
-public class Cube extends SDF {
+public class Cube extends SDFs.SDF {
     
     private vec3 center;
     private float size;
     
    
-    public Cube(vec3 center, float size, Color color) { 
+    public Cube(vec3 center, float size, java.awt.Color color) { 
         this.center = center; this.size = size; 
         material = new Material(color);
     }
@@ -26,7 +24,7 @@ public class Cube extends SDF {
         return (float)(outsideDist + Math.min(insideDist, 0.0));
     }
     
-    public String[] getSettings() {
+    public String[] getSettingsAndCurrent() {
         return new String[] { "Color: ", "Center: ", "Size: ", 
             material.colorString(), center.toStringParen(), ""+size };
     }

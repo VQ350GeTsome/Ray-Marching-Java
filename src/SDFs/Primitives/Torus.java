@@ -1,15 +1,13 @@
 package SDFs.Primitives;
 
-import SDFs.SDF;
 import Utility.*;
-import java.awt.Color;
 
-public class Torus extends SDF{
+public class Torus extends SDFs.SDF{
     
     private vec3 center;
     private float majorR, minorR;
     
-    public Torus(vec3 center, float majorR, float minorR, Color color) { 
+    public Torus(vec3 center, float majorR, float minorR, java.awt.Color color) { 
         this.center = center; this.majorR = majorR; this.minorR = minorR;
         material = new Material(color);
     }
@@ -24,7 +22,7 @@ public class Torus extends SDF{
 
     public String getType() { return "torus"; }
     
-    public String[] getSettings() {
+    public String[] getSettingsAndCurrent() {
         return new String[] { "Color:", "Center: ", "Radius Major: ", "Radius Minor: ",
             material.colorString(), center.toStringParen(), ""+majorR, ""+minorR };
     }

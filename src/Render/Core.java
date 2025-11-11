@@ -40,11 +40,11 @@ public class Core extends JPanel {
         SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, Color.GRAY);
         
         SDF blend = new BlendedSDF(sphere, cube, 0.25f);
-        
+        blend.setName("Blended Sphere & Cube");
         scene.addSDF(blend);
         
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), Color.DARK_GRAY);
-        
+        floor.setName("Scene Floor");
         scene.addSDF(floor);
         
         /* Finish adding SDFs */

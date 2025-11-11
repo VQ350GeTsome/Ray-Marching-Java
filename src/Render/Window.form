@@ -36,6 +36,16 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Objects"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="addNewObj">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Add New Object"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addNewObjActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="renderMenu">
           <Properties>

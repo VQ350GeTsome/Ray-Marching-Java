@@ -33,7 +33,7 @@ public class BlendedSDF extends SDF {
         //float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;  //At seem coloring
         
         float total = Math.abs(d2) + Math.abs(d1);
-        float h = total == 0 ? 0.5f : Math.abs(d1) / total;
+        float h = (total == 0) ? 0.5f : Math.abs(d1) / total;
 
         Color c1 = a.getMaterial(p).color;
         Color c2 = b.getMaterial(p).color;

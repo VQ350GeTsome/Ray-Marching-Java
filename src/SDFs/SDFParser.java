@@ -31,6 +31,13 @@ public class SDFParser {
         return null;
     }
     
+    public static String[] getTypes() {
+        return new String[] { "Primitive", "Repeating" };
+    }
+    public static String[] getPrimitives() {
+        return new String[] { "Sphere", "Cube", "Torus", "Plane" };
+    }
+    
     public static SDF parseBlended(String[] info, float k, IntRef i) {
         ArrayList<SDF> sdfsToBlend = new ArrayList<>(2);
         while (true) {
@@ -54,20 +61,17 @@ public class SDFParser {
         float radius = Float.parseFloat(info[i.i++].trim());
         return new Sphere(center, radius, c);
     }
-    
     private static SDF parseCube(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
         return new Cube(center, size, c);
     }
-    
     private static SDF parseTorus(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float majorR = Float.parseFloat(info[i.i++].trim());
         float minorR = Float.parseFloat(info[i.i++].trim());
         return new Torus(center, majorR, minorR, c);
     }
-    
     private static SDF parsePlane(String[] info, Color c, IntRef i) {
         vec3 pos = new vec3(info[i.i++]);
         vec3 normal = new vec3(info[i.i++]);

@@ -5,6 +5,7 @@ import File.*;
 import SDFs.BlendedSDF;
 
 import java.io.File;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -103,6 +104,21 @@ public class Window extends javax.swing.JFrame {
         for (int i = 0; length / 2 > i; i++) defaults[i] = both[i + length / 2];    //Fill the defualts array
         
         return createOptionsPane(title, options, defaults);
+    }
+    
+    private int createButtonsPane(String prompt, String[] options) {
+        int choice = JOptionPane.showOptionDialog(
+            null,
+            prompt,
+            "Selector...",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+        if (choice >= 0) return choice;
+        else return -1;
     }
             
     private void rightClick(int x, int y, int w, int h) {
@@ -210,6 +226,31 @@ public class Window extends javax.swing.JFrame {
         
     }
     
+    private void addSDF(int type) {
+        final int   SPHERE = 0, CUBE = 1, TORUS = 2,
+                    PLANE  = 3;
+        
+        //This will be applicable for primitives & repeating
+        String[] choices = SDFs.SDFParser.getPrimitives();  
+        int choice = createButtonsPane("Choose an SDF...", choices);
+        
+        String[] options, placeHolder;
+        switch (choice) {
+            case SPHERE:
+                if (type == 0) {
+                    options = SDFs.Primitives.Sphere.getSettings();
+                    
+                }
+                break;
+            case CUBE:
+                break;
+            case TORUS:
+                break;
+            case PLANE:
+                break;
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -220,6 +261,7 @@ public class Window extends javax.swing.JFrame {
         openScene = new javax.swing.JMenuItem();
         exportScene = new javax.swing.JMenuItem();
         objectsMenu = new javax.swing.JMenu();
+        addNewObj = new javax.swing.JMenuItem();
         renderMenu = new javax.swing.JMenu();
         cameraMenu = new javax.swing.JMenu();
         cameraPosition = new javax.swing.JMenuItem();
@@ -275,6 +317,15 @@ public class Window extends javax.swing.JFrame {
         menuBar.add(fileMenu);
 
         objectsMenu.setText("Objects");
+
+        addNewObj.setText("Add New Object");
+        addNewObj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addNewObjActionPerformed(evt);
+            }
+        });
+        objectsMenu.add(addNewObj);
+
         menuBar.add(objectsMenu);
 
         renderMenu.setText("Render");
@@ -450,6 +501,17 @@ public class Window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_coreMouseClicked
 
+    private void addNewObjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewObjActionPerformed
+        final int PRIMITIVE = 0,
+                  REPEATING = 1;
+        
+        String[] options = SDFs.SDFParser.getTypes();                       //Get the currently implemented SDFs
+        int typeChoice = createButtonsPane("Choose a type...", options);    //Prompt the user with which type they want
+        if (typeChoice == -1) return;   //The user chose nothing
+        
+        addSDF(typeChoice);
+    }//GEN-LAST:event_addNewObjActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -486,6 +548,7 @@ public class Window extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem addNewObj;
     private javax.swing.JMenuItem ambientLighting;
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;

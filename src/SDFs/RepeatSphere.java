@@ -1,23 +1,18 @@
 package SDFs;
 
 import Utility.*;
-import java.awt.Color;
 
 public class RepeatSphere extends SDF{
 
-    private vec3 center;
+    private vec3 center = new vec3(0.0f, 0.0f, 0.0f);
     private float radius, spacing;
     
-    public RepeatSphere(float radius, float spacing, Color color) {
+    public RepeatSphere(float radius, float spacing, java.awt.Color color) {
         this.radius = radius; this.spacing = spacing;
         center = new vec3();
         material = new Material(color);
     }
-    
-    public RepeatSphere(vec3 center, float radius, float spacing, Color color) { 
-        this.radius = radius; this.spacing = spacing; this.center = center; 
-        material = new Material(color);
-    }
+
     
     public float sdf(vec3 point) {
         vec3 worldP = point.subtract(center); // move into object space
@@ -31,7 +26,7 @@ public class RepeatSphere extends SDF{
         return (local.length() - radius);
     }
     
-    public String[] getSettings() {
+    public String[] getSettingsAndCurrent() {
         return new String[] { "Color: ", "Center: ", "Radius: ", "Spacing: ",
             material.colorString(), center.toStringParen(), ""+radius, ""+spacing };
     }
