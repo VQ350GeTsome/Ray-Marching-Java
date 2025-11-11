@@ -238,7 +238,7 @@ public class Window extends javax.swing.JFrame {
         switch (choice) {
             case SPHERE:
                 if (type == 0) {
-                    options = SDFs.Primitives.Sphere.getSettings();
+                    options = SDFs.SDFParser.sphereSettings();
                     
                 }
                 break;

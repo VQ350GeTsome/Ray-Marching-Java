@@ -20,8 +20,8 @@ public class Plane extends SDFs.SDF {
     public String getType() { return "plane"; }
     
     public String[] getSettingsAndCurrent() {
-        return new String[] { "Color: ", "Position: ", "Normal: ", 
-            material.colorString(), pos.toStringParen(), normal.toStringParen() };
+        String[] current = new String[] { material.colorString(), pos.toStringParen(), normal.toStringParen() };
+        return ArrayMath.add(SDFs.SDFParser.planeSettings(), current);
     }
     
     public String toString() {

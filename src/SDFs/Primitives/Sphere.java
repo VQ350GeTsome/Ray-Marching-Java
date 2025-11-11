@@ -3,9 +3,7 @@ package SDFs.Primitives;
 import Utility.*;
 
 public class Sphere extends SDFs.SDF{
-    
-    private static String[] settings = new String[] { "Color: ", "Center: ", "Radius: " };
-    
+        
     private vec3 center;
     private float radius;
 
@@ -18,10 +16,9 @@ public class Sphere extends SDFs.SDF{
     
     public String[] getSettingsAndCurrent() {
         String[] current = new String[] { material.colorString(), center.toStringParen(), ""+radius };
-        return ArrayMath.add(settings, current);
+        return ArrayMath.add(SDFs.SDFParser.sphereSettings(), current);
         
     }
-    public static String[] getSettings() { return settings; } 
     
     public String getType() { return "sphere"; }
     

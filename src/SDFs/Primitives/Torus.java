@@ -23,8 +23,8 @@ public class Torus extends SDFs.SDF{
     public String getType() { return "torus"; }
     
     public String[] getSettingsAndCurrent() {
-        return new String[] { "Color:", "Center: ", "Radius Major: ", "Radius Minor: ",
-            material.colorString(), center.toStringParen(), ""+majorR, ""+minorR };
+        String[] current = new String[] { material.colorString(), center.toStringParen(), ""+majorR, ""+minorR };
+        return ArrayMath.add(SDFs.SDFParser.torusSettings(), current);
     }
     
     @Override

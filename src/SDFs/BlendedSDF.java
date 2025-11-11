@@ -98,7 +98,7 @@ public class BlendedSDF extends SDF {
      */
     public boolean needsUnblended() { return (a == null || b == null); }
     
-    public String[] getSettings() { return new String[] { "Blending Amount: ", ""+k }; }
+    public String[] getSettingsAndCurrent() { return new String[] { "Blending Amount: ", ""+k }; }
     
     public String getType() { return "blended"; }
     
