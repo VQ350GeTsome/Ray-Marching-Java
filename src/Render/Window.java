@@ -194,7 +194,7 @@ public class Window extends javax.swing.JFrame {
         }
         
         //Get the new settings 
-        String[] inputs = createOptionsPane("Enter New Settings: ", obj.getSettings());
+        String[] inputs = createOptionsPane("Enter New Settings: ", obj.getSettingsAndCurrent());
         if (inputs == null) return;
         
         //Parse the settings into a new SDF (newObj)
@@ -234,21 +234,50 @@ public class Window extends javax.swing.JFrame {
         String[] choices = SDFs.SDFParser.getPrimitives();  
         int choice = createButtonsPane("Choose an SDF...", choices);
         
-        String[] options, placeHolder;
+        String[] options;
+        java.util.ArrayList<String> placeHolder = new java.util.ArrayList<>(3);
+        placeHolder.add("255:0:0");     //We can fill the place holder with a color, as it always come first
+        
+        //Gets the cameras orientation and uses the forward & positon vectors to get a 
+        //vector n units infront of the camera
+        int n = 25;
+        vec3[] camOrien = core.scene.getCameraOrien();  
+        vec3 forward    = camOrien[0];
+        vec3 pos        = camOrien[3];
+        placeHolder.add(vec3.round(pos.add(forward.multiply(n))).toStringParen());
+
+        //Now we fill the placeholder with more values and prompt the user for any changes
+        String[] inputs = null;
         switch (choice) {
             case SPHERE:
-                if (type == 0) {
-                    options = SDFs.SDFParser.sphereSettings();
-                    
-                }
+                placeHolder.add("1.0"); //Radius
+                inputs = createOptionsPane("New Sphere...", SDFs.SDFParser.sphereSettings(), placeHolder.toArray(String[]::new));
+                safeAddSDF("sphere", inputs);
                 break;
             case CUBE:
+                placeHolder.add("1.0"); //Size
+                inputs = createOptionsPane("New Cube...", SDFs.SDFParser.cubeSettings(), placeHolder.toArray(String[]::new));
+                safeAddSDF("cube", inputs);
                 break;
             case TORUS:
+                placeHolder.add("1.0"); //Major Radius
+                placeHolder.add("0.5"); //Minor Radius
+                inputs = createOptionsPane("New Torus...", SDFs.SDFParser.torusSettings(), placeHolder.toArray(String[]::new));
+                safeAddSDF("torus", inputs);
                 break;
             case PLANE:
-                break;
+                placeHolder.add("(0.0, 0.0, 1.0)"); //Normal vector
+                inputs = createOptionsPane("New Plane...", SDFs.SDFParser.planeSettings(), placeHolder.toArray(String[]::new));
+                safeAddSDF("plane", inputs);
+                break;        
         }
+        if (inputs == null) return;
+    }
+    
+    //Helper method to just parse an SDF safely using a try catch
+    private void safeAddSDF(String type, String[] inputs) {
+        try { core.scene.addSDF(SDFs.SDFParser.getSDF(type, inputs)); }
+        catch (Exception e) { System.err.print(e.getMessage()); }
     }
     
     @SuppressWarnings("unchecked")

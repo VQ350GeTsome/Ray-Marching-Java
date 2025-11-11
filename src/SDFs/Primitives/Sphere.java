@@ -4,18 +4,18 @@ import Utility.*;
 
 public class Sphere extends SDFs.SDF{
         
-    private vec3 center;
-    private float radius;
+    private vec3 c;
+    private float r;
 
     public Sphere(vec3 center, float radius, java.awt.Color color) { 
-        this.radius = radius; this.center = center; 
+        r = radius; c = center; 
         material = new Material(color);
     }
     
-    public float sdf(vec3 point) { return point.getDist(center) - radius; }
+    public float sdf(vec3 point) { return point.getDist(c) - r; }
     
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { material.colorString(), center.toStringParen(), ""+radius };
+        String[] current = new String[] { material.colorString(), c.toStringParen(), ""+r };
         return ArrayMath.add(SDFs.SDFParser.sphereSettings(), current);
         
     }
@@ -24,6 +24,6 @@ public class Sphere extends SDFs.SDF{
     
     @Override
     public String toString() {
-        return super.toString() + center.toString() + "," + radius + ",\n";
+        return super.toString() + c.toString() + "," + r + ",\n";
     }
  }

@@ -2,33 +2,33 @@ package SDFs;
 
 import Utility.*;
 
-public class RepeatSphere extends SDF{
+public class RepeatSphere extends SDFs.SDF{
 
-    private vec3 center = new vec3(0.0f, 0.0f, 0.0f);
-    private float radius, spacing;
+    private vec3 c;
+    private float r, s;
     
-    public RepeatSphere(float radius, float spacing, java.awt.Color color) {
-        this.radius = radius; this.spacing = spacing;
-        center = new vec3();
+    public RepeatSphere(vec3 center, float radius, float spacing, java.awt.Color color) {
+        r = radius; s = spacing; c = center;
+        
         material = new Material(color);
     }
 
     
     public float sdf(vec3 point) {
-        vec3 worldP = point.subtract(center); // move into object space
+        vec3 worldP = point.subtract(c); // move into object space
 
         // Wrap each coordinate into a cell centered at 0
-        float rx = ((worldP.x % spacing) + spacing) % spacing - spacing * 0.5f;
-        float ry = ((worldP.y % spacing) + spacing) % spacing - spacing * 0.5f;
-        float rz = ((worldP.z % spacing) + spacing) % spacing - spacing * 0.5f;
+        float rx = ((worldP.x % s) + s) % s - s * 0.5f;
+        float ry = ((worldP.y % s) + s) % s - s * 0.5f;
+        float rz = ((worldP.z % s) + s) % s - s * 0.5f;
 
         vec3 local = new vec3(rx, ry, rz);
-        return (local.length() - radius);
+        return (local.length() - r);
     }
     
     public String[] getSettingsAndCurrent() {
-        return new String[] { "Color: ", "Center: ", "Radius: ", "Spacing: ",
-            material.colorString(), center.toStringParen(), ""+radius, ""+spacing };
+        String[] current = new String[] { material.colorString(), c.toStringParen(), ""+r, ""+s };
+        return ArrayMath.add(SDFs.SDFParser.repeatSphereSettings(), current);
     }
     
     public String getType() { return "repeatsphere"; }
@@ -36,7 +36,7 @@ public class RepeatSphere extends SDF{
     
     @Override
     public String toString() {
-        return super.toString() + center.toString() + "," + radius + ",\n";
+        return super.toString() + c.toString() + "," + r + ",\n";
     }
       
 }

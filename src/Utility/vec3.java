@@ -68,6 +68,19 @@ public class vec3 {
         x * other.y - y * other.x);
     }
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
+    public static vec3 round(vec3 other, int places) {
+        int q = 1;
+        for (int i = 0; places > i; i++) q *= 10;
+        
+        float nx = other.x, ny = other.y, nz = other.z;
+        
+        nx = Math.round(nx * q) / (float) q;
+        ny = Math.round(ny * q) / (float) q;
+        nz = Math.round(nz * q) / (float) q;
+        
+        return new vec3(nx, ny, nz);
+    }
+    public static vec3 round(vec3 o) { return round(o, 0); }
     
     @Override
     public String toString() { return "{" + x + ":" + y + ":" + z + "}"; }

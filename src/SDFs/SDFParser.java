@@ -30,6 +30,7 @@ public class SDFParser {
         }
         return null;
     }
+    public static SDF getSDF(String type, String[] info) { return getSDF(type, info, new IntRef(0)); }
     
     public static String[] getTypes() {
         return new String[] { "Primitive", "Repeating" };
@@ -58,6 +59,9 @@ public class SDFParser {
     
     public static String[] sphereSettings() { 
         return new String[] { "Color: ", "Center: ", "Radius: " };
+    }
+    public static String[] repeatSphereSettings() {
+        return null;
     }
     private static SDF parseSphere(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);

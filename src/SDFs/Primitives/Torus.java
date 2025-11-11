@@ -16,7 +16,7 @@ public class Torus extends SDFs.SDF{
         point = point.subtract(center);
         
         float radial = (float)Math.sqrt(point.x * point.x + point.y * point.y) - majorR;
-        float tubeDist = (float)Math.sqrt((radial * radial + point.z) * point.z);
+        float tubeDist = (float)Math.sqrt(radial * radial + point.z * point.z);
         return tubeDist - minorR;
     }
 

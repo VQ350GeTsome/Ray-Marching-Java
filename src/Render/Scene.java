@@ -42,7 +42,7 @@ public class Scene {
     public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
     
     public void moveCamera(vec3 m)              { camera.move(m); }
-    public vec3 getCameraPos()                  { return camera.getPosition(); }
+    public vec3 getCameraPos()                  { return camera.getOrientation()[0]; }
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
     public void zoomCamera(float z)             { camera.zoom(z); }
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }

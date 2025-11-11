@@ -29,7 +29,7 @@ public class RayMarcher {
         float nx = (x + 0.5f) / (float) w;
         float ny = (y + 0.5f) / (float) h;
         vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
-        vec3 pos = camera.getPosition();
+        vec3 pos = camera.getOrientation()[3];
         
         float totalDistance = 0.0f;
         for (int step = 0; step < maxSteps; step++) {

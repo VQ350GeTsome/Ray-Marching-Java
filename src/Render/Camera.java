@@ -100,16 +100,16 @@ public class Camera {
         updateFov(newFov); 
     }
     
-    public vec3 getPosition() { return pos; }
     /**
-     * Packages the forward, up, & right vectors into an array
+     * Packages the forward, up, right vectors into an array
      * @return The array of size 3
      */
     public vec3[] getOrientation() {
-        vec3[] arr = new vec3[3];
+        vec3[] arr = new vec3[4];
         arr[0] = forward;
         arr[1] = right;
         arr[2] = up;
+        arr[3] = pos;
         return arr;
     }
     
