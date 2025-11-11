@@ -298,6 +298,7 @@ public class Window extends javax.swing.JFrame {
         lightingMenu = new javax.swing.JMenu();
         sceneLighitng = new javax.swing.JMenuItem();
         ambientLighting = new javax.swing.JMenuItem();
+        bloomToggle = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -397,6 +398,15 @@ public class Window extends javax.swing.JFrame {
             }
         });
         lightingMenu.add(ambientLighting);
+
+        bloomToggle.setSelected(true);
+        bloomToggle.setText("Toggle Bloom");
+        bloomToggle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bloomToggleActionPerformed(evt);
+            }
+        });
+        lightingMenu.add(bloomToggle);
 
         menuBar.add(lightingMenu);
 
@@ -541,6 +551,11 @@ public class Window extends javax.swing.JFrame {
         addSDF(typeChoice);
     }//GEN-LAST:event_addNewObjActionPerformed
 
+    private void bloomToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomToggleActionPerformed
+        boolean selected = bloomToggle.getState();
+        core.bloom = selected;
+    }//GEN-LAST:event_bloomToggleActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -579,6 +594,7 @@ public class Window extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addNewObj;
     private javax.swing.JMenuItem ambientLighting;
+    private javax.swing.JCheckBoxMenuItem bloomToggle;
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
     private javax.swing.JMenuItem cameraPosition;

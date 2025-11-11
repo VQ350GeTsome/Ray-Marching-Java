@@ -22,6 +22,8 @@ public class Core extends JPanel {
     public static float getCameraRotateGrain()  { return cameraRotateGrain; }
     public static void  setCameraRotateGrain(float f)  { cameraRotateGrain = f; }
     
+    public boolean bloom = true;
+    
     private BufferedImage screen;               //What we will use as the screen
     private int width = 200, height = width;    //screens dimensions
     
@@ -89,7 +91,7 @@ public class Core extends JPanel {
         Color[][] image = scene.renderScene();
               
         //Adds bloom to the image using the current settings
-        image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);
+        image = (bloom) ? PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur) : image;
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen
