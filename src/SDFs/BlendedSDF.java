@@ -24,6 +24,7 @@ public class BlendedSDF extends SDF {
         return Math.min(d1, d2) - h * h * k * 0.25f;
     }
     
+    @Override
     public Material getMaterial(vec3 p) {
         if (a == null) return b.material;
         if (b == null) return a.material;

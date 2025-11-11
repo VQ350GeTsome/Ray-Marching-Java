@@ -1,6 +1,7 @@
 package Render;
 
 import SDFs.Primitives.*;
+import SDFs.Special.*;
 import SDFs.*;
 import Utility.*;
 import java.awt.Color;
@@ -91,7 +92,9 @@ public class Core extends JPanel {
         Color[][] image = scene.renderScene();
               
         //Adds bloom to the image using the current settings
-        image = (bloom) ? PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur) : image;
+        if (bloom) {
+            PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);
+        }
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen
