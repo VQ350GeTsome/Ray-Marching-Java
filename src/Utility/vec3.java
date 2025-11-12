@@ -40,6 +40,8 @@ public class vec3 {
     
     public vec3 multiply(float p) { return new vec3(x * p, y * p, z * p); } 
     
+    public vec3 divide(float f) { return new vec3(x / f, y / f, z / f); }
+    
     public vec3 modulo(float m) { return new vec3(x % m, y % m, z % m); }
     
     public float getDist(vec3 other) { return (float)Math.sqrt(Math.pow(other.x - x, 2) + Math.pow(other.y - y, 2) + Math.pow(other.z - z, 2)); }

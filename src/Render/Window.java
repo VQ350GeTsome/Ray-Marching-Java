@@ -15,21 +15,17 @@ import javax.swing.JTextField;
 public class Window extends javax.swing.JFrame {
        
     //Input constants
-    private final int   SPACE_BAR     = 32,
-                        LEFT_ARROW    = 37,
-                        UP_ARROW      = 38,
-                        RIGHT_ARROW   = 39,
-                        DOWN_ARROW    = 40,
-                        LEFT_CLICK    =  1,
-                        MIDDLE_CLICK  =  2,
-                        RIGHT_CLICK   =  3;
+    private final int   SPACE_BAR     = 32, LEFT_ARROW    = 37, UP_ARROW      = 38, RIGHT_ARROW   = 39,
+                        DOWN_ARROW    = 40, LEFT_CLICK    =  1, MIDDLE_CLICK  =  2, RIGHT_CLICK   =  3,
+                        W_KEY         = 87, A_KEY         = 65, S_KEY         = 73, D_KEY         = 68,
+                        Q_KEY         = 81, E_KEY         = 69, R_KEY         = 82;
 
     public Window() {
         initComponents();
         core.mainLoop();
     }
     
-    private void cameraMover(char input, boolean shift) {
+    private void cameraMover(int input, boolean shift) {
         float   grain = Core.getCameraMoveGrain();          //Get the current camera grain (sensitivity)
         vec3[]  orien = core.scene.getCameraOrien();        //Get the three orientation vectors
         vec3    forward = orien[0],
@@ -38,10 +34,10 @@ public class Window extends javax.swing.JFrame {
                 move    = new vec3();                       //Initalize what will be the move vector
        
         switch (input) { 
-            case 'w':   move = (shift) ? up.multiply(  grain ) : forward.multiply(  grain );    break;  //Move forward ... unless shift is held, then move up
-            case 's':   move = (shift) ? up.multiply( -grain ) : forward.multiply( -grain );    break;  //Move down ... unless shift is held, then move down
-            case 'a':   move = right.multiply( -grain );    break;  //Move left
-            case 'd':   move = right.multiply(  grain );    break;  //Move right
+            case W_KEY:   move = (shift) ? up.multiply(  grain ) : forward.multiply(  grain );    break;  //Move forward ... unless shift is held, then move up
+            case S_KEY:   move = (shift) ? up.multiply( -grain ) : forward.multiply( -grain );    break;  //Move down ... unless shift is held, then move down
+            case A_KEY:   move = right.multiply( -grain );    break;  //Move left
+            case D_KEY:   move = right.multiply(  grain );    break;  //Move right
         }
         core.scene.moveCamera(move); //Call the core that'll move the camera
     }
@@ -54,8 +50,8 @@ public class Window extends javax.swing.JFrame {
             case LEFT_ARROW:      core.scene.rotateCamera( grain ,  0.0f );    break;  
         }
     }
-    private void cameraZoomer(char input) {
-        if (input == 'q') {
+    private void cameraZoomer(int input) {
+        if (input == Q_KEY) {
             core.scene.zoomCamera( 0.033f );
         } else {
             core.scene.zoomCamera(-0.033f );
@@ -451,20 +447,33 @@ public class Window extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-        char inputC = Character.toLowerCase(evt.getKeyChar());      //Char key input
-        int  inputI = (int)evt.getKeyCode();                        //Keycode input
+        int  input = (int)evt.getKeyCode();                        //Keycode input
         
-        if (inputC == 'w' || inputC == 'a' || inputC == 's' || inputC == 'd') { //If input relates to movement keys
-            cameraMover(inputC, evt.isShiftDown());
-        }
-        else if (inputI == RIGHT_ARROW || inputI == LEFT_ARROW || inputI == UP_ARROW || inputI == DOWN_ARROW) {
-            cameraRotater(inputI);
-        }        
-        else if (inputC == 'q' || inputC == 'e') {      //Call cameraZoomer if keypress relates to zoom buttons
-            cameraZoomer(inputC);
-        }
-        else if (inputI == SPACE_BAR) {
-            core.startStopTimer();
+        System.out.println(evt);
+        
+        switch (input) {
+            case W_KEY:
+            case A_KEY:
+            case S_KEY:
+            case D_KEY:
+                cameraMover(input, evt.isShiftDown());
+                break;
+            case RIGHT_ARROW:
+            case LEFT_ARROW:
+            case UP_ARROW:
+            case DOWN_ARROW:
+                cameraRotater(input);
+                break;
+            case Q_KEY:
+            case E_KEY:
+                cameraZoomer(input);
+                break;
+            case SPACE_BAR: 
+                core.startStopTimer();
+                break;
+            case R_KEY:
+                core.refresh();
+                break;
         }
     }//GEN-LAST:event_formKeyPressed
 

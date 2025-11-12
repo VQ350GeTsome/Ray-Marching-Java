@@ -96,4 +96,8 @@ public class SDFParser {
         vec3 normal = new vec3(info[i.i++]);
         return new Plane(pos, normal, c);
     }
+    
+    public static String[] hollowCCSettings() {
+        return new String[] { "Color: ", "Center: ", "Scale: " };
+    }
 }
