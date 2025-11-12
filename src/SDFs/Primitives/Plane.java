@@ -7,6 +7,8 @@ public class Plane extends SDFs.SDF {
     private vec3 pos, normal;
     
     public Plane(vec3 pos, vec3 normal, java.awt.Color c) {
+        type = "plane";
+        
         material = new Material(c);
         this.pos = pos;
         this.normal = normal;
@@ -21,7 +23,7 @@ public class Plane extends SDFs.SDF {
     
     public String[] getSettingsAndCurrent() {
         String[] current = new String[] { material.colorString(), pos.toStringParen(), normal.toStringParen() };
-        return ArrayMath.add(SDFs.SDFParser.planeSettings(), current);
+        return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     
     public String toString() {

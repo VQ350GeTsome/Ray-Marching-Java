@@ -11,7 +11,7 @@ package SDFs;
 public abstract class SDF {
     
     protected Utility.Material  material;
-    protected String    name;
+    protected String name, type;
     
     /**
      * Takes in a point and returns the distance 
@@ -29,7 +29,7 @@ public abstract class SDF {
      * the current argument for that setting
      * @return 
      */
-    public abstract String[] getSettingsAndCurrent();
+    public String[] getSettingsAndCurrent() { return SDFParser.getSettings(type); }
     /**
      * Returns the material of the SDF object
      * @param p The position of the vector
@@ -40,7 +40,7 @@ public abstract class SDF {
      * Gets the type of SDF as a String
      * @return The type, i.e., "sphere"
      */
-    public abstract String getType();
+    public String getType() { return type; }
     /**
      * Turns the color into a String that can be 
      * saved & parsed later

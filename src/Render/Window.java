@@ -17,7 +17,7 @@ public class Window extends javax.swing.JFrame {
     //Input constants
     private final int   SPACE_BAR     = 32, LEFT_ARROW    = 37, UP_ARROW      = 38, RIGHT_ARROW   = 39,
                         DOWN_ARROW    = 40, LEFT_CLICK    =  1, MIDDLE_CLICK  =  2, RIGHT_CLICK   =  3,
-                        W_KEY         = 87, A_KEY         = 65, S_KEY         = 73, D_KEY         = 68,
+                        W_KEY         = 87, A_KEY         = 65, S_KEY         = 83, D_KEY         = 68,
                         Q_KEY         = 81, E_KEY         = 69, R_KEY         = 82;
 
     public Window() {
@@ -231,9 +231,9 @@ public class Window extends javax.swing.JFrame {
         String[] choices = SDFs.SDFParser.getPrimitives();  
         int choice = createButtonsPane("Choose an SDF...", choices);
         
-        String[] options;
         java.util.ArrayList<String> placeHolder = new java.util.ArrayList<>(3);
-        placeHolder.add("255:0:0");     //We can fill the place holder with a color, as it always come first
+        int r = (int) (Math.random() * 255), g = (int) (Math.random() * 255), b = (int) (Math.random() * 255);
+        placeHolder.add(r + ":" + g + ":" + b);     //We can fill the place holder with a color, as it always come first
         
         //Gets the cameras orientation and uses the forward & positon vectors to get a 
         //vector n units infront of the camera
@@ -244,31 +244,29 @@ public class Window extends javax.swing.JFrame {
         placeHolder.add(vec3.round(pos.add(forward.multiply(n))).toStringParen());
 
         //Now we fill the placeholder with more values and prompt the user for any changes
-        String[] inputs = null;
+        String t = "";
         switch (choice) {
             case SPHERE:
                 placeHolder.add("1.0"); //Radius
-                inputs = createOptionsPane("New Sphere...", SDFs.SDFParser.sphereSettings(), placeHolder.toArray(String[]::new));
-                safeAddSDF("sphere", inputs);
+                t = "sphere";
                 break;
             case CUBE:
                 placeHolder.add("1.0"); //Size
-                inputs = createOptionsPane("New Cube...", SDFs.SDFParser.cubeSettings(), placeHolder.toArray(String[]::new));
-                safeAddSDF("cube", inputs);
+                t = "cube";
                 break;
             case TORUS:
                 placeHolder.add("1.0"); //Major Radius
                 placeHolder.add("0.5"); //Minor Radius
-                inputs = createOptionsPane("New Torus...", SDFs.SDFParser.torusSettings(), placeHolder.toArray(String[]::new));
-                safeAddSDF("torus", inputs);
+                t = "torus";
                 break;
             case PLANE:
                 placeHolder.add("(0.0, 0.0, 1.0)"); //Normal vector
-                inputs = createOptionsPane("New Plane...", SDFs.SDFParser.planeSettings(), placeHolder.toArray(String[]::new));
-                safeAddSDF("plane", inputs);
+                t = "plane";
                 break;        
         }
+        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new));
         if (inputs == null) return;
+        safeAddSDF(t, inputs);
     }
     
     //Helper method to just parse an SDF safely using a try catch
@@ -448,8 +446,6 @@ public class Window extends javax.swing.JFrame {
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         int  input = (int)evt.getKeyCode();                        //Keycode input
-        
-        System.out.println(evt);
         
         switch (input) {
             case W_KEY:

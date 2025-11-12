@@ -11,5 +11,14 @@ public class ArrayMath {
         for (int i = 0; l > i; i++) k[i] = (a.length > i) ? a[i] : b[i - a.length];
         return k;
     }
+    public static String[] subArray(String[] a, int s, int e) {
+        if (s < 0 || e < s) return new String[] {};
+
+        String[] result = new String[e - s];
+        for (int i = s; i < e; i++) {
+            result[i - s] = a[i];
+        }
+        return result;
+    }
     
 }

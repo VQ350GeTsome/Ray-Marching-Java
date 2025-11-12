@@ -8,22 +8,21 @@ public class Sphere extends SDFs.SDF{
     private float r;
 
     public Sphere(vec3 center, float radius, java.awt.Color color) { 
+        type = "sphere";
+        
         r = radius; c = center; 
         material = new Material(color);
     }
-    
+
+    @Override
     public float sdf(vec3 point) { return point.getDist(c) - r; }
     
+    @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { material.colorString(), c.toStringParen(), ""+r };
-        return ArrayMath.add(SDFs.SDFParser.sphereSettings(), current);
-        
+        String[] current = ArrayMath.subArray(toString().split(","), 1, 4);
+        return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
-    
-    public String getType() { return "sphere"; }
     
     @Override
-    public String toString() {
-        return super.toString() + c.toString() + "," + r + ",\n";
-    }
+    public String toString() { return super.toString() + c.toString() + "," + r + ",\n"; }
  }

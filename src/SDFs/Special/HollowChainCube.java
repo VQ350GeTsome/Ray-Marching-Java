@@ -4,19 +4,21 @@ import Utility.*;
 
 public class HollowChainCube extends SDFs.SDF {
 
-    private vec3 c;
+    private vec3    c;
     private float   scale,
                     iterations = 10,
                     n;
     
     
-    public HollowChainCube(java.awt.Color color, vec3 center, float scale, float n) {
+    public HollowChainCube(vec3 center, float scale, float n, java.awt.Color color) {
         c = center;       
         this.n = n;
         this.scale = scale;
         material = new Material(color);
+        type = "hollowcc";
     }
     
+    @Override
     public float sdf(vec3 p) {
         p = p.subtract(c).divide(scale);  
         p = p.abs();
@@ -36,9 +38,12 @@ public class HollowChainCube extends SDFs.SDF {
         return (dist / s) - 0.003f;
     }
     
-    public String getType() { return "twisted"; }
+    @Override
     public String[] getSettingsAndCurrent() { 
         String[] current = { material.colorString(), c.toStringParen(), ""+scale };
-        return ArrayMath.add(SDFs.SDFParser.hollowCCSettings(), current);
+        return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
+    
+    @Override
+    public String toString() { return super.toString() + c.toString() + "," + scale + "," + n + ",\n"; }
 }

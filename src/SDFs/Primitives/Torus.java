@@ -4,31 +4,31 @@ import Utility.*;
 
 public class Torus extends SDFs.SDF{
     
-    private vec3 center;
-    private float majorR, minorR;
+    private vec3 c;
+    private float r1, r2;
     
     public Torus(vec3 center, float majorR, float minorR, java.awt.Color color) { 
-        this.center = center; this.majorR = majorR; this.minorR = minorR;
+        type = "torus";
+        
+        this.c = center; this.r1 = majorR; this.r2 = minorR;
         material = new Material(color);
     }
     
+    @Override
     public float sdf(vec3 point){
-        point = point.subtract(center);
+        point = point.subtract(c);
         
-        float radial = (float)Math.sqrt(point.x * point.x + point.y * point.y) - majorR;
+        float radial = (float)Math.sqrt(point.x * point.x + point.y * point.y) - r1;
         float tubeDist = (float)Math.sqrt(radial * radial + point.z * point.z);
-        return tubeDist - minorR;
-    }
-
-    public String getType() { return "torus"; }
-    
-    public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { material.colorString(), center.toStringParen(), ""+majorR, ""+minorR };
-        return ArrayMath.add(SDFs.SDFParser.torusSettings(), current);
+        return tubeDist - r2;
     }
     
     @Override
-    public String toString() {
-        return super.toString() + center.toString() + "," + majorR + "," + minorR + ",\n";
+    public String[] getSettingsAndCurrent() {
+        String[] current = new String[] { material.colorString(), c.toStringParen(), ""+r1, ""+r2 };
+        return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
+    
+    @Override
+    public String toString() { return super.toString() + c.toString() + "," + r1 + "," + r2 + ",\n"; }
 }

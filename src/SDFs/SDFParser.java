@@ -1,6 +1,8 @@
 package SDFs;
 
 import SDFs.Primitives.*;
+import SDFs.Repeating.*;
+import SDFs.Special.*;
 import Utility.*;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -24,6 +26,14 @@ public class SDFParser {
                 return parseTorus(info, color, i);      
             case "plane":
                 return parsePlane(info, color, i);
+                
+            case "repeatsphere":
+                SDF s = parseSphere(info, color, i);
+                return new RepeatSphere((Sphere) s, Float.parseFloat(info[i.i++]));
+                
+            case "hollowcc":
+                return parseHollowCC(info, color, i);
+                
             default:
                 System.err.println("Unknown SDF type: " + type);
                 break;
@@ -37,6 +47,22 @@ public class SDFParser {
     }
     public static String[] getPrimitives() {
         return new String[] { "Sphere", "Cube", "Torus", "Plane" };
+    }
+    public static String[] getSettings(String type) { return getSettings(type, false); }
+    public static String[] getSettings(String type, boolean repeat) {
+        switch (type.toLowerCase()) {
+            case "sphere": 
+            case "cube":
+                return new String[] { "Color: ", "Center: ", "Size: " };    
+            case "torus":
+                return new String[] { "Color: ", "Center: ", "Radius Major: ", "Radius Minor: " };
+            case "plane":
+                return new String[] { "Color: ", "Position: ", "Normal: " };
+                
+            case "hollowcc":
+                return new String[] { "Color: ", "Center: ", "Scale: ", "n: " };
+        }
+        return new String[] {};
     }
     
     public static SDF parseBlended(String[] info, float k, IntRef i) {
@@ -57,30 +83,18 @@ public class SDFParser {
         return new BlendedSDF(a, mergeBlended(sdfs, k), k);
     }
     
-    public static String[] sphereSettings() { 
-        return new String[] { "Color: ", "Center: ", "Radius: " };
-    }
-    public static String[] repeatSphereSettings() {
-        return null;
-    }
     private static SDF parseSphere(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float radius = Float.parseFloat(info[i.i++].trim());
         return new Sphere(center, radius, c);
     }
     
-    public static String[] cubeSettings() {
-        return new String[] { "Color: ", "Center: ", "Size: " };
-    }
     private static SDF parseCube(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
         return new Cube(center, size, c);
     }
     
-    public static String[] torusSettings() {
-        return new String[] { "Color:", "Center: ", "Radius Major: ", "Radius Minor: " };
-    }
     private static SDF parseTorus(String[] info, Color c, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float majorR = Float.parseFloat(info[i.i++].trim());
@@ -88,16 +102,16 @@ public class SDFParser {
         return new Torus(center, majorR, minorR, c);
     }
     
-    public static String[] planeSettings() {
-        return new String[] { "Color: ", "Position: ", "Normal: " };
-    }
     private static SDF parsePlane(String[] info, Color c, IntRef i) {
         vec3 pos = new vec3(info[i.i++]);
         vec3 normal = new vec3(info[i.i++]);
         return new Plane(pos, normal, c);
     }
     
-    public static String[] hollowCCSettings() {
-        return new String[] { "Color: ", "Center: ", "Scale: " };
+    private static SDF parseHollowCC(String[] info, Color c, IntRef i) {
+        vec3 center = new vec3(info[i.i++]);
+        float scale = Float.parseFloat(info[i.i++]);
+        float n     = Float.parseFloat(info[i.i++]);
+        return new HollowChainCube(center, scale, n, c);
     }
 }

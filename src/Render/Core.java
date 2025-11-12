@@ -2,6 +2,7 @@ package Render;
 
 import SDFs.Primitives.*;
 import SDFs.Special.*;
+import SDFs.Repeating.*;
 import SDFs.*;
 import Utility.*;
 import java.awt.Color;
@@ -26,7 +27,7 @@ public class Core extends JPanel {
     public boolean bloom = true;
     
     private BufferedImage screen;               //What we will use as the screen
-    private int width = 500, height = width;    //screens dimensions
+    private int width = 200, height = width;    //screens dimensions
     
     public Scene scene;
     private Timer timer;
@@ -50,8 +51,11 @@ public class Core extends JPanel {
         floor.setName("Scene Floor");
         //scene.addSDF(floor);
         
-        SDF twisted = new HollowChainCube(Color.RED, new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f);
-        scene.addSDF(twisted);
+        SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, Color.RED);
+        //scene.addSDF(chainCube);
+        
+        SDF repeatSphere = new RepeatSphere(new vec3(0.0f), 1.0f, 10.0f, Color.RED);
+        scene.addSDF(repeatSphere);
         
         /* Finish adding SDFs */
         
