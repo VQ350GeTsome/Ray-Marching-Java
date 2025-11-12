@@ -15,7 +15,8 @@ import javax.swing.JTextField;
 public class Window extends javax.swing.JFrame {
        
     //Input constants
-    private final int   LEFT_ARROW    = 37,
+    private final int   SPACE_BAR     = 32,
+                        LEFT_ARROW    = 37,
                         UP_ARROW      = 38,
                         RIGHT_ARROW   = 39,
                         DOWN_ARROW    = 40,
@@ -298,6 +299,7 @@ public class Window extends javax.swing.JFrame {
         lightingMenu = new javax.swing.JMenu();
         sceneLighitng = new javax.swing.JMenuItem();
         ambientLighting = new javax.swing.JMenuItem();
+        backgroundColor = new javax.swing.JMenuItem();
         bloomToggle = new javax.swing.JCheckBoxMenuItem();
         bloomTypeToggle = new javax.swing.JCheckBoxMenuItem();
         bloomSettings = new javax.swing.JMenuItem();
@@ -401,6 +403,9 @@ public class Window extends javax.swing.JFrame {
         });
         lightingMenu.add(ambientLighting);
 
+        backgroundColor.setText("Change Background Colors");
+        lightingMenu.add(backgroundColor);
+
         bloomToggle.setSelected(true);
         bloomToggle.setText("Toggle Bloom");
         bloomToggle.addActionListener(new java.awt.event.ActionListener() {
@@ -419,7 +424,7 @@ public class Window extends javax.swing.JFrame {
         });
         lightingMenu.add(bloomTypeToggle);
 
-        bloomSettings.setText("jMenuItem1");
+        bloomSettings.setText("Bloom Settings");
         bloomSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bloomSettingsActionPerformed(evt);
@@ -447,19 +452,20 @@ public class Window extends javax.swing.JFrame {
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         char inputC = Character.toLowerCase(evt.getKeyChar());      //Char key input
-        int     inputI = (int)evt.getKeyCode();                     //Keycode input
+        int  inputI = (int)evt.getKeyCode();                        //Keycode input
         
         if (inputC == 'w' || inputC == 'a' || inputC == 's' || inputC == 'd') { //If input relates to movement keys
             cameraMover(inputC, evt.isShiftDown());
         }
-        //note ... left = 37, up = 38, right = 39, down = 40 
-        else if (inputI == 37 || inputI == 38 || inputI == 39 || inputI == 40) {
+        else if (inputI == RIGHT_ARROW || inputI == LEFT_ARROW || inputI == UP_ARROW || inputI == DOWN_ARROW) {
             cameraRotater(inputI);
         }        
         else if (inputC == 'q' || inputC == 'e') {      //Call cameraZoomer if keypress relates to zoom buttons
             cameraZoomer(inputC);
         }
-        
+        else if (inputI == SPACE_BAR) {
+            core.startStopTimer();
+        }
     }//GEN-LAST:event_formKeyPressed
 
     private void openSceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSceneActionPerformed
@@ -622,6 +628,7 @@ public class Window extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addNewObj;
     private javax.swing.JMenuItem ambientLighting;
+    private javax.swing.JMenuItem backgroundColor;
     private javax.swing.JMenuItem bloomSettings;
     private javax.swing.JCheckBoxMenuItem bloomToggle;
     private javax.swing.JCheckBoxMenuItem bloomTypeToggle;

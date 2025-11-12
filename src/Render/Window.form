@@ -96,6 +96,11 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ambientLightingActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="backgroundColor">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Background Colors"/>
+              </Properties>
+            </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="bloomToggle">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
@@ -116,7 +121,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="bloomSettings">
               <Properties>
-                <Property name="text" type="java.lang.String" value="jMenuItem1"/>
+                <Property name="text" type="java.lang.String" value="Bloom Settings"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bloomSettingsActionPerformed"/>

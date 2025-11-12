@@ -9,16 +9,10 @@ public class vec3 {
      */
     public vec3()                           { x = 0.0f; y = 0.0f; z = 0.0f; }
     /**
-     * Constructor with just x component { x, 0.0, 0.0 } .
+     * Constructor with just x component { x, x, x } .
      * @param x The x component.
      */
-    public vec3(float x)                    { this.x = x; y = 0.0f; z = 0.0f; }
-    /**
-     * Constructor with only x & y components { x , y , 0.0 } .
-     * @param x The x component.
-     * @param y The y component.
-     */
-    public vec3(float x, float y)           { this.x = x; this.y = y; z = 0.0f; }
+    public vec3(float x) { this.x = x; y = x; z = x; }
     /**
      * Full constructor with x , y , & z components { x , y , z } .
      * @param x The x component.
@@ -74,6 +68,13 @@ public class vec3 {
         return new vec3(y * other.z - z * other.y,
         z * other.x - x * other.z,
         x * other.y - y * other.x);
+    }
+    public static vec3 cross(vec3 p, vec3 q) {
+        return new vec3(
+            p.y * q.z - p.z * q.y,
+            p.z * q.x - p.x * q.z,
+            p.x * q.y - p.y * q.x
+            );
     }
     
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 

@@ -12,7 +12,7 @@ public class RayMarcher {
     private Light       light;
     private SDFManager  sdfMgr;
     
-    private Color background    = Color.BLUE;//new Color(135, 205, 235);
+    private Color background    = Color.BLACK;//new Color(135, 205, 235);
     public Color getBackground() { return background; }
     private int   maxSteps      = 1024,
                   maxDist       =  128,

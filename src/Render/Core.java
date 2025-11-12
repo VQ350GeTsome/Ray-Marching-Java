@@ -44,11 +44,14 @@ public class Core extends JPanel {
         
         SDF blend = new BlendedSDF(sphere, cube, 0.25f);
         blend.setName("Blended Sphere & Cube");
-        scene.addSDF(blend);
+        //scene.addSDF(blend);
         
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), Color.DARK_GRAY);
         floor.setName("Scene Floor");
-        scene.addSDF(floor);
+        //scene.addSDF(floor);
+        
+        SDF twisted = new HollowChainCube(Color.RED, new vec3(0.0f, 0.0f, 0.0f), 1.0f);
+        scene.addSDF(twisted);
         
         /* Finish adding SDFs */
         
@@ -69,6 +72,10 @@ public class Core extends JPanel {
                 }
             );
         timer.start(); /* Start timer */
+    }
+    public void startStopTimer() {
+        if (timer.isRunning()) timer.stop();
+        else timer.start();
     }
     
     private void run() {

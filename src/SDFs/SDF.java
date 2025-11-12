@@ -32,6 +32,7 @@ public abstract class SDF {
     public abstract String[] getSettingsAndCurrent();
     /**
      * Returns the material of the SDF object
+     * @param p The position of the vector
      * @return The material.
      */
     public Utility.Material getMaterial(Utility.vec3 p) { return material; }
