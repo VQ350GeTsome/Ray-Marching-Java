@@ -27,7 +27,7 @@ public class Core extends JPanel {
     public boolean bloom = true;
     
     private BufferedImage screen;               //What we will use as the screen
-    private int width = 200, height = width;    //screens dimensions
+    private int width = 1000, height = width;    //screens dimensions
     
     public Scene scene;
     private Timer timer;
@@ -52,23 +52,23 @@ public class Core extends JPanel {
         //scene.addSDF(floor);
         
         SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, Color.RED);
-        //scene.addSDF(chainCube);
-        
-        SDF repeatSphere = new RepeatSphere(new vec3(0.0f), 1.0f, 10.0f, Color.RED);
-        scene.addSDF(repeatSphere);
+        scene.addSDF(chainCube);
         
         /* Finish adding SDFs */
         
         PostProcessor.initalize(width, height); //Initalize the post processor
     }
+
+    public void setWait(int w) { timer.setDelay(w); }
+    public int  getWait() { return timer.getDelay(); }
+    
     /**
      * Main loop ... we are constantly updating
      * what is on screen.
      */
     public void mainLoop(){
-        int wait = 33;
         timer = 
-            new Timer(wait, 
+            new Timer(42, //About 24 fps
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) { 
                         run(); 
@@ -115,5 +115,8 @@ public class Core extends JPanel {
         
     public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
     @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
+    public void screenShot() {
+        File.ScreenShot.exportCurrentImage(screen);
+    }
     
 }

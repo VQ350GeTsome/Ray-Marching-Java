@@ -15,10 +15,10 @@ import javax.swing.JTextField;
 public class Window extends javax.swing.JFrame {
        
     //Input constants
-    private final int   SPACE_BAR     = 32, LEFT_ARROW    = 37, UP_ARROW      = 38, RIGHT_ARROW   = 39,
-                        DOWN_ARROW    = 40, LEFT_CLICK    =  1, MIDDLE_CLICK  =  2, RIGHT_CLICK   =  3,
-                        W_KEY         = 87, A_KEY         = 65, S_KEY         = 83, D_KEY         = 68,
-                        Q_KEY         = 81, E_KEY         = 69, R_KEY         = 82;
+    private final int   SPACE_BAR     =  32, LEFT_ARROW    =  37, UP_ARROW      =  38, RIGHT_ARROW   =  39,
+                        DOWN_ARROW    =  40, LEFT_CLICK    =   1, MIDDLE_CLICK  =   2, RIGHT_CLICK   =   3,
+                        W_KEY         =  87, A_KEY         =  65, S_KEY         =  83, D_KEY         =  68,
+                        Q_KEY         =  81, E_KEY         =  69, R_KEY         =  82, F1_KEY        = 112;
 
     public Window() {
         initComponents();
@@ -264,9 +264,10 @@ public class Window extends javax.swing.JFrame {
                 t = "plane";
                 break;        
         }
+        if (type == 1) t = "repeat" + t;
         String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new));
         if (inputs == null) return;
-        safeAddSDF(t, inputs);
+        safeAddSDF(t, inputs); 
     }
     
     //Helper method to just parse an SDF safely using a try catch
@@ -287,6 +288,8 @@ public class Window extends javax.swing.JFrame {
         objectsMenu = new javax.swing.JMenu();
         addNewObj = new javax.swing.JMenuItem();
         renderMenu = new javax.swing.JMenu();
+        changeRender = new javax.swing.JMenuItem();
+        changeFPS = new javax.swing.JMenuItem();
         cameraMenu = new javax.swing.JMenu();
         cameraPosition = new javax.swing.JMenuItem();
         cameraGrain = new javax.swing.JMenuItem();
@@ -357,6 +360,23 @@ public class Window extends javax.swing.JFrame {
         menuBar.add(objectsMenu);
 
         renderMenu.setText("Render");
+
+        changeRender.setText("Change Render Settings");
+        changeRender.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeRenderActionPerformed(evt);
+            }
+        });
+        renderMenu.add(changeRender);
+
+        changeFPS.setText("Change FPS Cap");
+        changeFPS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeFPSActionPerformed(evt);
+            }
+        });
+        renderMenu.add(changeFPS);
+
         menuBar.add(renderMenu);
 
         cameraMenu.setText("Camera");
@@ -446,7 +466,7 @@ public class Window extends javax.swing.JFrame {
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         int  input = (int)evt.getKeyCode();                        //Keycode input
-        
+
         switch (input) {
             case W_KEY:
             case A_KEY:
@@ -469,6 +489,9 @@ public class Window extends javax.swing.JFrame {
                 break;
             case R_KEY:
                 core.refresh();
+                break;
+            case F1_KEY:
+                core.screenShot();
                 break;
         }
     }//GEN-LAST:event_formKeyPressed
@@ -595,6 +618,20 @@ public class Window extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_bloomSettingsActionPerformed
 
+    private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed
+        
+    }//GEN-LAST:event_changeRenderActionPerformed
+
+    private void changeFPSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeFPSActionPerformed
+        String[] options = new String[] { "Enter new FPS Target: " };
+        String[] current = new String[] { ""+core.getWait() };
+        
+        String input = createOptionsPane("New FPS Cap...", options, current)[0];
+        
+        try { core.setWait(Integer.parseInt(input)); }
+        catch (Exception e) { ; }
+    }//GEN-LAST:event_changeFPSActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -640,6 +677,8 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
     private javax.swing.JMenuItem cameraPosition;
+    private javax.swing.JMenuItem changeFPS;
+    private javax.swing.JMenuItem changeRender;
     private Render.Core core;
     private javax.swing.JMenuItem exportScene;
     private javax.swing.JMenu fileMenu;

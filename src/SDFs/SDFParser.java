@@ -59,6 +59,9 @@ public class SDFParser {
             case "plane":
                 return new String[] { "Color: ", "Position: ", "Normal: " };
                 
+            case "repeatsphere":
+                return new String[] { "Color: ", "Center: ", "Size: ", "Spacing: " };     
+                
             case "hollowcc":
                 return new String[] { "Color: ", "Center: ", "Scale: ", "n: " };
         }

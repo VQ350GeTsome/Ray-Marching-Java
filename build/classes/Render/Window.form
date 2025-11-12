@@ -51,6 +51,24 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Render"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="changeRender">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Render Settings"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="changeRenderActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="changeFPS">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change FPS Cap"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="changeFPSActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="cameraMenu">
           <Properties>

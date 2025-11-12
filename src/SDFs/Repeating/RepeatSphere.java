@@ -9,13 +9,13 @@ public class RepeatSphere extends SDFs.SDF{
     SDFs.Primitives.Sphere sphere;
     
     public RepeatSphere(vec3 center, float radius, float spacing, java.awt.Color color) {
-        type = "sphere";
+        type = "repeatsphere";
         s = spacing;
         sphere = new SDFs.Primitives.Sphere(center, radius, color);
     }
     
     public RepeatSphere(SDFs.Primitives.Sphere sphere, float spacing) {
-        type = "sphere";
+        type = "repeatsphere";
         s = spacing;
         this.sphere = sphere;
     }
