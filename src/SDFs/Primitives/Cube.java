@@ -7,11 +7,10 @@ public class Cube extends SDFs.SDF {
     private vec3 c;
     private float s;
    
-    public Cube(vec3 center, float size, java.awt.Color color) { 
+    public Cube(vec3 center, float size, Material material) { 
         type = "cube";
         
-        c = center; s = size; 
-        material = new Material(color);
+        c = center; s = size; m = material;
     }
         
     @Override
@@ -28,7 +27,7 @@ public class Cube extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { material.colorString(), c.toStringParen(), ""+s };
+        String[] current = new String[] { m.toString(), c.toStringParen(), ""+s };
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

@@ -27,7 +27,7 @@ public class Core extends JPanel {
     public boolean bloom = true;
     
     private BufferedImage screen;               //What we will use as the screen
-    private int width = 1000, height = width;    //screens dimensions
+    private int width = 200, height = width;    //screens dimensions
     
     public Scene scene;
     private Timer timer;
@@ -40,19 +40,21 @@ public class Core extends JPanel {
         
         /* Add some SDFs */
         
-        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, Color.CYAN);
-        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, Color.GRAY);
+        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(Color.CYAN));
+        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(Color.GRAY));
         
         SDF blend = new BlendedSDF(sphere, cube, 0.25f);
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
         
-        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), Color.DARK_GRAY);
+        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(Color.DARK_GRAY));
         floor.setName("Scene Floor");
         //scene.addSDF(floor);
         
-        SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, Color.RED);
-        scene.addSDF(chainCube);
+        SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(Color.RED));
+        //scene.addSDF(chainCube);
+        
+        scene.addSDF(sphere);
         
         /* Finish adding SDFs */
         

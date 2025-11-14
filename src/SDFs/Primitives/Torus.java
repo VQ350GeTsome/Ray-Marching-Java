@@ -7,11 +7,11 @@ public class Torus extends SDFs.SDF{
     private vec3 c;
     private float r1, r2;
     
-    public Torus(vec3 center, float majorR, float minorR, java.awt.Color color) { 
+    public Torus(vec3 center, float majorR, float minorR, Material material) { 
         type = "torus";
         
-        this.c = center; this.r1 = majorR; this.r2 = minorR;
-        material = new Material(color);
+        c = center; r1 = majorR; r2 = minorR;
+        m = material;
     }
     
     @Override
@@ -25,7 +25,7 @@ public class Torus extends SDFs.SDF{
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { material.colorString(), c.toStringParen(), ""+r1, ""+r2 };
+        String[] current = new String[] { m.colorString(), c.toStringParen(), ""+r1, ""+r2 };
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

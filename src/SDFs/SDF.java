@@ -10,9 +10,9 @@ package SDFs;
  */
 public abstract class SDF {
     
-    protected Utility.Material  material;
+    protected Utility.Material m;
     protected String name, type;
-    
+       
     /**
      * Takes in a point and returns the distance 
      * to the surface of the object.
@@ -35,20 +35,21 @@ public abstract class SDF {
      * @param p The position of the vector
      * @return The material.
      */
-    public Utility.Material getMaterial(Utility.vec3 p) { return material; }
+    public Utility.Material getMaterial(Utility.vec3 p) { return m; }
     /**
      * Gets the type of SDF as a String
      * @return The type, i.e., "sphere"
      */
     public String getType() { return type; }
     /**
-     * Turns the color into a String that can be 
-     * saved & parsed later
-     * @return The String, i.e., "255:50:150" (Mageneta)
+     * Gets and returns the name of this SDF
+     * @return The name of it
      */
-    public String colorString() { return material.colorString(); }
-    
     public String getName() { return name; }
+    /**
+     * Sets the name of this SDF
+     * @param n The new name
+     */
     public void setName(String n) { name = n; }
     /**
      * Default toString method, returns the type & color
@@ -56,6 +57,6 @@ public abstract class SDF {
      */
     @Override
     public String toString() {
-        return getType() + "," + colorString() + ",";
+        return getType() + "," + m.toString() + ",";
     }
 }

@@ -17,22 +17,26 @@ public class SDFParser {
             b = (int) Float.parseFloat(rgb[2].trim());
         Color color = new Color(r, g, b);
         
+        float reflect = Float.parseFloat(info[i.i++].trim());
+        
+        Material mat = new Material(color, reflect);
+        
         switch (type) {
             case "sphere":
-                return parseSphere(info, color, i);
+                return parseSphere(info, mat, i);
             case "cube":
-                return parseCube(info, color, i);
+                return parseCube(info, mat, i);
             case "torus":
-                return parseTorus(info, color, i);      
+                return parseTorus(info, mat, i);      
             case "plane":
-                return parsePlane(info, color, i);
+                return parsePlane(info, mat, i);
                 
             case "repeatsphere":
-                SDF s = parseSphere(info, color, i);
+                SDF s = parseSphere(info, mat, i);
                 return new RepeatSphere((Sphere) s, Float.parseFloat(info[i.i++]));
                 
             case "hollowcc":
-                return parseHollowCC(info, color, i);
+                return parseHollowCC(info, mat, i);
                 
             default:
                 System.err.println("Unknown SDF type: " + type);
@@ -86,35 +90,35 @@ public class SDFParser {
         return new BlendedSDF(a, mergeBlended(sdfs, k), k);
     }
     
-    private static SDF parseSphere(String[] info, Color c, IntRef i) {
+    private static SDF parseSphere(String[] info, Material m, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float radius = Float.parseFloat(info[i.i++].trim());
-        return new Sphere(center, radius, c);
+        return new Sphere(center, radius, m);
     }
     
-    private static SDF parseCube(String[] info, Color c, IntRef i) {
+    private static SDF parseCube(String[] info, Material m, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
-        return new Cube(center, size, c);
+        return new Cube(center, size, m);
     }
     
-    private static SDF parseTorus(String[] info, Color c, IntRef i) {
+    private static SDF parseTorus(String[] info, Material m, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float majorR = Float.parseFloat(info[i.i++].trim());
         float minorR = Float.parseFloat(info[i.i++].trim());
-        return new Torus(center, majorR, minorR, c);
+        return new Torus(center, majorR, minorR, m);
     }
     
-    private static SDF parsePlane(String[] info, Color c, IntRef i) {
+    private static SDF parsePlane(String[] info, Material m, IntRef i) {
         vec3 pos = new vec3(info[i.i++]);
         vec3 normal = new vec3(info[i.i++]);
-        return new Plane(pos, normal, c);
+        return new Plane(pos, normal, m);
     }
     
-    private static SDF parseHollowCC(String[] info, Color c, IntRef i) {
+    private static SDF parseHollowCC(String[] info, Material m, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float scale = Float.parseFloat(info[i.i++]);
         float n     = Float.parseFloat(info[i.i++]);
-        return new HollowChainCube(center, scale, n, c);
+        return new HollowChainCube(center, scale, n, m);
     }
 }

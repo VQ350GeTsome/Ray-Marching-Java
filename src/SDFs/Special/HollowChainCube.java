@@ -10,12 +10,12 @@ public class HollowChainCube extends SDFs.SDF {
                     n;
     
     
-    public HollowChainCube(vec3 center, float scale, float n, java.awt.Color color) {
-        c = center;       
+    public HollowChainCube(vec3 center, float scale, float n, Material material) {
+        type = "hollowcc";
+        
+        c = center; m = material;      
         this.n = n;
         this.scale = scale;
-        material = new Material(color);
-        type = "hollowcc";
     }
     
     @Override
@@ -40,7 +40,7 @@ public class HollowChainCube extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() { 
-        String[] current = { material.colorString(), c.toStringParen(), ""+scale };
+        String[] current = { m.colorString(), c.toStringParen(), ""+scale };
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

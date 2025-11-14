@@ -7,11 +7,10 @@ public class Sphere extends SDFs.SDF{
     private vec3 c;
     private float r;
 
-    public Sphere(vec3 center, float radius, java.awt.Color color) { 
+    public Sphere(vec3 center, float radius, Material material) { 
         type = "sphere";
         
-        r = radius; c = center; 
-        material = new Material(color);
+        r = radius; c = center; m = material;
     }
 
     @Override

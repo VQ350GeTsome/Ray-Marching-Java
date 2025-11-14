@@ -6,18 +6,12 @@ public class RepeatSphere extends SDFs.SDF{
 
     private float s;
     
-    SDFs.Primitives.Sphere sphere;
+    SDFs.SDF p;
     
-    public RepeatSphere(vec3 center, float radius, float spacing, java.awt.Color color) {
+    public RepeatSphere(SDFs.SDF primitive, float spacing) {
         type = "repeatsphere";
         s = spacing;
-        sphere = new SDFs.Primitives.Sphere(center, radius, color);
-    }
-    
-    public RepeatSphere(SDFs.Primitives.Sphere sphere, float spacing) {
-        type = "repeatsphere";
-        s = spacing;
-        this.sphere = sphere;
+        p = primitive;
     }
 
     @Override
@@ -29,11 +23,11 @@ public class RepeatSphere extends SDFs.SDF{
         float rz = pos.z - s * (float)Math.floor(pos.z / s + 0.5f);
 
         vec3 local = new vec3(rx, ry, rz);
-        return sphere.sdf(local); //Query SDF of the primitive Sphere in local wrapped space
+        return p.sdf(local); //Query SDF of the p in local wrapped space
     }
     
     @Override
-    public Material getMaterial(vec3 p) { return sphere.getMaterial(p); }
+    public Material getMaterial(vec3 p) { return this.p.getMaterial(p); }
     
     @Override
     public String[] getSettingsAndCurrent() {
@@ -43,7 +37,7 @@ public class RepeatSphere extends SDFs.SDF{
     
     @Override
     public String toString() { 
-        String temp = "repeat" + sphere.toString();
+        String temp = "repeat" + p.toString();
         int length = temp.length();
         temp = temp.substring(0, length - 1);
         return temp + s + "\n";

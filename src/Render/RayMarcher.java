@@ -56,9 +56,9 @@ public class RayMarcher {
             for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
                 HitInfo hit = marchRay(x, y, w, h);                         //March ray from pixel { x , y } and get the point it hits
                 SDF hitObj = hit.sdf;                                       //Check to see if their is an SDF where the ray hit
-                if (hitObj == null) image[x][y] = background;               //If there is none, set the current pixel to the background color
+                if (hitObj == null) image[x][y] = background;               //If there is none, set the current pixel to the background c
                 else {
-                    Color color = shade(hitObj, hit);                       //Calculate the objects color depending on light
+                    Color color = shade(hitObj, hit);                       //Calculate the objects c depending on light
                     float fog       =  (hit.totalDist / maxDist);           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
                     fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
                                                           
@@ -81,7 +81,7 @@ public class RayMarcher {
         brightness = customClamp(brightness, 5);
 
         
-        Color finalColor = ColorMath.blend(obj.getMaterial(hit.hit).color , Color.WHITE, brightness);
+        Color finalColor = ColorMath.blend(obj.getMaterial(hit.hit).c , Color.WHITE, brightness);
               finalColor = ColorMath.scale(finalColor, shadow);
               
         return finalColor;
