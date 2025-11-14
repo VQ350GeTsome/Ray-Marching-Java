@@ -54,22 +54,32 @@ public class SDFParser {
     }
     public static String[] getSettings(String type) { return getSettings(type, false); }
     public static String[] getSettings(String type, boolean repeat) {
-        switch (type.toLowerCase()) {
+        
+        final String[] universal = { "Color: ", "Shinyness: " };
+        String[] objDependant = null;
+        
+        switch (type.toLowerCase()) {           
             case "sphere": 
-            case "cube":
-                return new String[] { "Color: ", "Center: ", "Size: " };    
+            case  "cube" :
+                objDependant = new String[] { "Center: ", "Size: " };    
+                break;
             case "torus":
-                return new String[] { "Color: ", "Center: ", "Radius Major: ", "Radius Minor: " };
+                objDependant = new String[] { "Center: ", "Radius Major: ", "Radius Minor: " };
+                break;
             case "plane":
-                return new String[] { "Color: ", "Position: ", "Normal: " };
-                
-            case "repeatsphere":
-                return new String[] { "Color: ", "Center: ", "Size: ", "Spacing: " };     
+                objDependant = new String[] { "Position: ", "Normal: " };
+                break;
                 
             case "hollowcc":
-                return new String[] { "Color: ", "Center: ", "Scale: ", "n: " };
+                objDependant = new String[] { "Center: ", "Scale: ", "n: " };
+                break;
         }
-        return new String[] {};
+        
+        //Create the return array which is the material settings + object dependant settings
+        //And if it's a repeating SDF + the extra settings.
+        String[] returnArr = ArrayMath.add(universal, objDependant);
+        return (!repeat) ? 
+                returnArr : ArrayMath.add(returnArr, new String[] { "Spacing: " } );
     }
     
     public static SDF parseBlended(String[] info, float k, IntRef i) {

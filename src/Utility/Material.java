@@ -17,6 +17,9 @@ public class Material {
                    ""+r; 
         return str;
     }
+    public String[] toStringArray() {
+        return new String[] { colorString(), ""+r };
+    }
     
     public String colorString() {
         return c.getRed() + ":" + c.getGreen() + ":" + c.getBlue();

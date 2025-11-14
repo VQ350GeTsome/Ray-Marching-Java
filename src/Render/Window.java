@@ -232,8 +232,14 @@ public class Window extends javax.swing.JFrame {
         int choice = createButtonsPane("Choose an SDF...", choices);
         
         java.util.ArrayList<String> placeHolder = new java.util.ArrayList<>(3);
+        
+        //We can fill the place holder with a color, as it always come first
         int r = (int) (Math.random() * 255), g = (int) (Math.random() * 255), b = (int) (Math.random() * 255);
-        placeHolder.add(r + ":" + g + ":" + b);     //We can fill the place holder with a color, as it always come first
+        placeHolder.add(r + ":" + g + ":" + b);     
+        
+        //Then we can fill it with a random float for the shinyness
+        float shiny = ((int) ((Math.random() * 1000))) / 1000.0f;
+        placeHolder.add(""+shiny);
         
         //Gets the cameras orientation and uses the forward & positon vectors to get a 
         //vector n units infront of the camera
