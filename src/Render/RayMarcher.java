@@ -25,12 +25,17 @@ public class RayMarcher {
         this.sdfMgr     = sdfMgr;
     }
         
-    public HitInfo marchRay(int x, int y, int w, int h) {
-        float nx = (x + 0.5f) / (float) w;
-        float ny = (y + 0.5f) / (float) h;
-        vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
-        vec3 pos = camera.getOrientation()[3];
-        
+    /**
+     * Marches a ray starting at pos in the direction ( dir )
+     * until it hits something, or we take maxStep steps.
+     * @param pos The starting position of the ray.
+     * @param dir The direction it'll march.
+     * @return The position we stopped at
+     * ( collision or maxDist ), the distance traveled,
+     * and the object hit ( SDF ) if any. All that 
+     * packed into a HitInfo object.
+     */
+    public HitInfo marchRay(vec3 pos, vec3 dir) {
         float totalDistance = 0.0f;
         for (int step = 0; step < maxSteps; step++) {
             float distance = sdfMgr.getClosestSDFDist(pos);        //Minimum distance we can step
@@ -49,12 +54,38 @@ public class RayMarcher {
         return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
     }
     
+    /**
+     * Marches a ray, but instead of feeding the method a 
+     * starting position, and direction. We give it the x & y 
+     * on the screen, and the width & height to then calculate
+     * the direction, and the position is the camera position.
+     * @param x on the screen.
+     * @param y on the screen.
+     * @param w Width of the screen.
+     * @param h Height of the screen.
+     * @return marchRay( camera position , calculated direction )
+     */
+    public HitInfo marchRay(int x, int y, int w, int h) {
+        float nx = (x + 0.5f) / (float) w;
+        float ny = (y + 0.5f) / (float) h;
+        vec3 pos = camera.getOrientation()[3];
+        vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
+        
+        return marchRay(pos, dir);
+    }
+    
     public Color[][] marchScreen(int w, int h) {
         Color[][] image = new Color[w][h];                                 //2D array for image of size { width , height }
         
         IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
             for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
-                HitInfo hit = marchRay(x, y, w, h);                         //March ray from pixel { x , y } and get the point it hits
+                
+                float nx = (x + 0.5f) / (float) w;
+                float ny = (y + 0.5f) / (float) h;
+                vec3 pos = camera.getOrientation()[3];
+                vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
+                                
+                HitInfo hit = marchRay(pos, dir);                     //March ray from pixel { x , y } and get the point it hits
                 SDF hitObj = hit.sdf;                                       //Check to see if their is an SDF where the ray hit
                 if (hitObj == null) image[x][y] = background;               //If there is none, set the current pixel to the background c
                 else {
@@ -72,15 +103,15 @@ public class RayMarcher {
     }
     
     private Color shade(SDF obj, HitInfo hit) {
-        float shadow = getShadow(hit.hit);              //Get shadow amount
+        float shadow = getShadow(hit.hit); //Get shadow amount
         
-        vec3 normal = estimateNormal(obj, hit.hit);     //Get the ~normal
-        vec3 sceneLight = light.getSceneLighting().multiply(-1);    //Invert the scene lighting
+        //Get an estimated normal & invert the lighting direction
+        vec3 normal = estimateNormal(obj, hit.hit);   
+        vec3 sceneLight = light.getSceneLighting().multiply(-1);   
         
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
         brightness = customClamp(brightness, 5);
 
-        
         Color finalColor = ColorMath.blend(obj.getMaterial(hit.hit).c , Color.WHITE, brightness);
               finalColor = ColorMath.scale(finalColor, shadow);
               

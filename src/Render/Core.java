@@ -54,7 +54,9 @@ public class Core extends JPanel {
         SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(Color.RED));
         //scene.addSDF(chainCube);
         
+        SDF sphere2  = new Sphere(    new vec3( 2.0f , -1.0f,  3.0f ), 1.0f, new Material(Color.WHITE, 0.50f));
         scene.addSDF(sphere);
+        scene.addSDF(sphere2);
         
         /* Finish adding SDFs */
         

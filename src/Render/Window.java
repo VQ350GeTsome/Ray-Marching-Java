@@ -5,7 +5,6 @@ import File.*;
 import SDFs.BlendedSDF;
 
 import java.io.File;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
