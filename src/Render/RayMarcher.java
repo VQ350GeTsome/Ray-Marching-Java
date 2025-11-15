@@ -100,7 +100,7 @@ public class RayMarcher {
                     Color finalColor = null;
                     
                     if (reflectiveness > 0) {
-                        Color reflectionColor = reflect(hitObj, hit, dir, 1);
+                        Color reflectionColor = reflect(hitObj, hit, dir, 3);
                         finalColor = ColorMath.blend(shadedColor, reflectionColor , reflectiveness);
                     } else {
                         finalColor = shadedColor;
@@ -123,7 +123,7 @@ public class RayMarcher {
         
         vec3 normal = estimateNormal(obj, hit.hit).normalize();
         vec3 reflected = dir.subtract(normal.multiply(2.0f * dir.dot(normal))).normalize();
-        vec3 origin = hit.hit.add(normal.multiply(Core.getEps() * 2)); 
+        vec3 origin = hit.hit.add(normal.multiply(Core.getEps() * 1.10f)); 
         
         HitInfo info = marchRay(origin, reflected);
         if (info.sdf == null) return background;
@@ -131,8 +131,8 @@ public class RayMarcher {
         Color shadedColor = shade(info.sdf, info);
         Color recursiveReflection = reflect(info.sdf, info, reflected, depth - 1);
         
-        float reflectivity = obj.getMaterial(hit.hit).r;
-        Color combined = ColorMath.blend(recursiveReflection, shadedColor, reflectivity);
+        float reflectivity = info.sdf.getMaterial(info.hit).r;
+        Color combined = ColorMath.blend(shadedColor, recursiveReflection, reflectivity);
 
         float fog = (info.totalDist / maxDist);
         fog = (float) Math.pow(fog, fogFalloff);
@@ -198,10 +198,10 @@ public class RayMarcher {
      * @return      A normalized vec3 that it about the normal
      */
     private vec3 estimateNormal(SDF obj, vec3 p) {
-        float eps = Core.getEps();
-        float x = obj.sdf(p.add(new vec3(eps, 0.0f, 0.0f))) - obj.sdf(p.subtract(new vec3(eps, 0.0f, 0.0f)));
-        float y = obj.sdf(p.add(new vec3(0.0f, eps, 0.0f))) - obj.sdf(p.subtract(new vec3(0.0f, eps, 0.0f)));
-        float z = obj.sdf(p.add(new vec3(0.0f, 0.0f, eps))) - obj.sdf(p.subtract(new vec3(0.0f, 0.0f, eps)));
+        float e = Core.getEps();
+        float x = obj.sdf(p.add(new vec3(e, 0.0f, 0.0f))) - obj.sdf(p.subtract(new vec3(e, 0.0f, 0.0f)));
+        float y = obj.sdf(p.add(new vec3(0.0f, e, 0.0f))) - obj.sdf(p.subtract(new vec3(0.0f, e, 0.0f)));
+        float z = obj.sdf(p.add(new vec3(0.0f, 0.0f, e))) - obj.sdf(p.subtract(new vec3(0.0f, 0.0f, e)));
         return new vec3(x, y, z).normalize();
     }
     

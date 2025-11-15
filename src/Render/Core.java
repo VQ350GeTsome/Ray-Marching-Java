@@ -45,18 +45,14 @@ public class Core extends JPanel {
         
         SDF blend = new BlendedSDF(sphere, cube, 0.25f);
         blend.setName("Blended Sphere & Cube");
-        //scene.addSDF(blend);
+        scene.addSDF(blend);
         
-        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(Color.DARK_GRAY));
+        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(Color.DARK_GRAY, 0.33f));
         floor.setName("Scene Floor");
         scene.addSDF(floor);
         
         SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(Color.RED));
         //scene.addSDF(chainCube);
-        
-        SDF sphere2  = new Sphere(    new vec3( 2.0f , -5.0f,  2.0f ), 1.0f, new Material(Color.RED, 0.50f));
-        scene.addSDF(sphere);
-        scene.addSDF(sphere2);
         
         /* Finish adding SDFs */
         
