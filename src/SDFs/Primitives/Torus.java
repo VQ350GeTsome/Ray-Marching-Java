@@ -25,7 +25,7 @@ public class Torus extends SDFs.SDF{
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { m.colorString(), c.toStringParen(), ""+r1, ""+r2 };
+        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 6);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

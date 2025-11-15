@@ -1,7 +1,6 @@
 package SDFs;
 
 import SDFs.Primitives.*;
-import SDFs.Repeating.*;
 import SDFs.Special.*;
 import Utility.*;
 import java.awt.Color;
@@ -33,7 +32,7 @@ public class SDFParser {
                 
             case "repeatsphere":
                 SDF s = parseSphere(info, mat, i);
-                return new RepeatSphere((Sphere) s, Float.parseFloat(info[i.i++]));
+                return new Repeating((Sphere) s, Float.parseFloat(info[i.i++]));
                 
             case "hollowcc":
                 return parseHollowCC(info, mat, i);

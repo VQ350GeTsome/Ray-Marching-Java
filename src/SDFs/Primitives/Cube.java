@@ -27,7 +27,7 @@ public class Cube extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { m.toString(), c.toStringParen(), ""+s };
+        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 5);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

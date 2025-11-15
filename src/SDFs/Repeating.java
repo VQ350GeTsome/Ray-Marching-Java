@@ -1,14 +1,14 @@
-package SDFs.Repeating;
+package SDFs;
 
 import Utility.*;
 
-public class RepeatSphere extends SDFs.SDF{
+public class Repeating extends SDFs.SDF{
 
     private float s;
     
     SDFs.SDF p;
     
-    public RepeatSphere(SDFs.SDF primitive, float spacing) {
+    public Repeating(SDFs.SDF primitive, float spacing) {
         type = "repeatsphere";
         s = spacing;
         p = primitive;

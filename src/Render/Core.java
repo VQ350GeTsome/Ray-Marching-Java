@@ -2,7 +2,6 @@ package Render;
 
 import SDFs.Primitives.*;
 import SDFs.Special.*;
-import SDFs.Repeating.*;
 import SDFs.*;
 import Utility.*;
 import java.awt.Color;

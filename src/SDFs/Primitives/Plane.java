@@ -20,7 +20,7 @@ public class Plane extends SDFs.SDF {
     public String getType() { return "plane"; }
     
     public String[] getSettingsAndCurrent() {
-        String[] current = new String[] { m.colorString(), c.toStringParen(), n.toStringParen() };
+        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 5);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     
