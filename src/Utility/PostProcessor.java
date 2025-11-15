@@ -16,10 +16,11 @@ public class PostProcessor {
     
     /**
      * Isolates the brightest areas, blurs them, then adds them back on to image
-     * @param background        The background color (what to ignore)
-     * @param image             The base image
-     * @param bloomSensitivity  How bright a color must be for it to be isolated
+     * @param background        The background color ( what to ignore ).
+     * @param image             The image we're adding bloom to.
+     * @param bloomSensitivity  How bright a color must be for it to be isolated.
      * @param blurRadius        How much to blur by
+     * @param circle            What type of blur we are using
      * @return                  The final image
      */
     public static Color[][] addBloom(Color background, Color[][] image, int bloomSensitivity, int blurRadius, boolean circle) {
@@ -28,7 +29,7 @@ public class PostProcessor {
         
         Color[][] blurredBright = blur(background, brightRegions, blurRadius, circle);  //Blur those bright regions using the settings
         
-        Color[][] finalImage = new Color[width][height];                            
+        Color[][] finalImage = new Color[width][height];                                //Initalize a new screen that we'll end up returning               
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)                //Loop the image & add the isolated bright regions
             finalImage[x][y] = ColorMath.add(image[x][y], blurredBright[x][y]);         //that we blurred back to the original image
@@ -99,10 +100,14 @@ public class PostProcessor {
                     
                     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
                         Color color = image[nx][ny];
-                        if (background.equals(color)) color = Color.BLACK;
-                        r += color.getRed();
-                        g += color.getGreen();
-                        b += color.getBlue();
+                        //If the color isn't the background color we will add it 
+                        //to the total to be averaged, else it's not added by c
+                        //is still incremented.
+                        if (!background.equals(color)) {
+                            r += color.getRed();
+                            g += color.getGreen();
+                            b += color.getBlue();
+                        }
                         c++;
                         
                     }
@@ -137,10 +142,14 @@ public class PostProcessor {
                 if (ny < 0 || ny >= height) continue;       //Check if ny is a valid pixel
 
                 Color color = image[nx][ny];
-                if (background.equals(color)) color = Color.BLACK;
-                r += color.getRed();
-                g += color.getGreen();
-                b += color.getBlue();
+                //If the color isn't the background color we will add it 
+                //to the total to be averaged, else it's not added by c
+                //is still incremented.
+                if (!background.equals(color)) {
+                    r += color.getRed();
+                    g += color.getGreen();
+                    b += color.getBlue();
+                }
                 c++;
             }
         }

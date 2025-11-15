@@ -38,13 +38,18 @@ public class RayMarcher {
     public HitInfo marchRay(vec3 pos, vec3 dir) {
         float totalDistance = 0.0f;
         for (int step = 0; step < maxSteps; step++) {
-            float distance = sdfMgr.getClosestSDFDist(pos);        //Minimum distance we can step
-
+            //Get the closest SDFs distance
+            float distance = sdfMgr.getClosestSDFDist(pos);        
+            //If the distance is less than our epsilon, or we go past our max distance,
+            //increment the hit position & total distance, get the SDF at the hit pos,
+            //if any, and return all that in a HitInfo object.
             if (distance < Core.getEps() || totalDistance > maxDist) {
                 vec3 hitPos = pos.add(dir.multiply(distance));
-                return new HitInfo(hitPos, totalDistance + distance, sdfMgr.getSDFAtPos(pos));
+                totalDistance += distance;
+                return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(pos));
             }
-
+            //If we weren't close enought to hit an object, march forward by the 
+            //minimum distance we calculated earlier ( distance )
             pos =   pos
                     .add(   dir
                             .multiply( distance ) 
@@ -89,17 +94,51 @@ public class RayMarcher {
                 SDF hitObj = hit.sdf;                                       //Check to see if their is an SDF where the ray hit
                 if (hitObj == null) image[x][y] = background;               //If there is none, set the current pixel to the background c
                 else {
-                    Color color = shade(hitObj, hit);                       //Calculate the objects c depending on light
+                    Color shadedColor = shade(hitObj, hit);                       //Calculate the objects c depending on light
+                    
+                    float reflectiveness = hitObj.getMaterial(pos).r;
+                    Color finalColor = null;
+                    
+                    if (reflectiveness > 0) {
+                        Color reflectionColor = reflect(hitObj, hit, dir, 1);
+                        finalColor = ColorMath.blend(shadedColor, reflectionColor , reflectiveness);
+                    } else {
+                        finalColor = shadedColor;
+                    }
+
                     float fog       =  (hit.totalDist / maxDist);           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
                     fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
                                                           
-                    Color finalColor =  ColorMath
-                                        .blend(color, background, fog);
+                    finalColor =  ColorMath
+                                        .blend(finalColor, background, fog);
                     image[x][y] = finalColor;
                 }
             }
         });
         return image;
+    }
+    
+    private Color reflect(SDF obj, HitInfo hit, vec3 dir, int depth) {
+        if (depth <= 0) return background;
+        
+        vec3 normal = estimateNormal(obj, hit.hit).normalize();
+        vec3 reflected = dir.subtract(normal.multiply(2.0f * dir.dot(normal))).normalize();
+        vec3 origin = hit.hit.add(normal.multiply(Core.getEps() * 2)); 
+        
+        HitInfo info = marchRay(origin, reflected);
+        if (info.sdf == null) return background;
+                
+        Color shadedColor = shade(info.sdf, info);
+        Color recursiveReflection = reflect(info.sdf, info, reflected, depth - 1);
+        
+        float reflectivity = obj.getMaterial(hit.hit).r;
+        Color combined = ColorMath.blend(recursiveReflection, shadedColor, reflectivity);
+
+        float fog = (info.totalDist / maxDist);
+        fog = (float) Math.pow(fog, fogFalloff);
+        
+        return ColorMath
+                .blend(combined, background, fog);
     }
     
     private Color shade(SDF obj, HitInfo hit) {

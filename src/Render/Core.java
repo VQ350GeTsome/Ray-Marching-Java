@@ -15,10 +15,10 @@ import javax.swing.Timer;
 
 public class Core extends JPanel {
 
-    private static float eps = 0.000001f;
+    private static float eps = 1e-4f;
     public static float getEps() { return eps; }
     
-    private static float cameraMoveGrain = 0.5f, cameraRotateGrain = 0.5f;
+    private static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
     public static float getCameraMoveGrain()    { return cameraMoveGrain; }
     public static void  setCameraMoveGrain(float f) { cameraMoveGrain = f; }
     public static float getCameraRotateGrain()  { return cameraRotateGrain; }
@@ -49,12 +49,12 @@ public class Core extends JPanel {
         
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(Color.DARK_GRAY));
         floor.setName("Scene Floor");
-        //scene.addSDF(floor);
+        scene.addSDF(floor);
         
         SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(Color.RED));
         //scene.addSDF(chainCube);
         
-        SDF sphere2  = new Sphere(    new vec3( 2.0f , -1.0f,  3.0f ), 1.0f, new Material(Color.WHITE, 0.50f));
+        SDF sphere2  = new Sphere(    new vec3( 2.0f , -5.0f,  2.0f ), 1.0f, new Material(Color.RED, 0.50f));
         scene.addSDF(sphere);
         scene.addSDF(sphere2);
         
@@ -98,18 +98,18 @@ public class Core extends JPanel {
     private boolean circleBlur  = true;
     
     /**
-     * Calls the scenes raymarcher which will march
+     * Calls the scenes ray marcher which will march
      * the entire screen and return a 2D array of
      * Colors to the scene ... and then return that
      * to this to then finally write it to the
-     * BufferedImage image ... and repaint it.
+     * image ... and repaint it.
      */
     private void renderScene() {
         Color[][] image = scene.renderScene();
               
         //Adds bloom to the image using the current settings
         if (bloom) {
-            PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);
+            image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);
         }
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
