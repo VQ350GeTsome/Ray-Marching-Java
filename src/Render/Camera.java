@@ -68,8 +68,8 @@ public class Camera {
     public vec3 getRayDirection(float x, float y, float aspectRatio) {
         float px = (float)((2.0f * x - 1.0f) * tanOfHalfFov * aspectRatio);
         float py = (float)((1.0f - 2.0f * y) * tanOfHalfFov);
-        return  right.multiply( px )
-                .add ( up.multiply( py ) )
+        return  right.scale( px )
+                .add ( up.scale( py ) )
                 .add ( forward )
                 .normalize();
     }
@@ -90,9 +90,9 @@ public class Camera {
         float angleRad = angleDeg * DEG_TO_RAD;
         float cos = (float)Math.cos(angleRad);
         float sin = (float)Math.sin(angleRad);
-        return v.multiply(cos)
-                .add(axis.cross(v).multiply(sin))
-                .add(axis.multiply(axis.dot(v) * (1 - cos)));
+        return v.scale(cos)
+                .add(axis.cross(v).scale(sin))
+                .add(axis.scale(axis.dot(v) * (1 - cos)));
     }
     public void zoom(float zoom) { 
         float newFov = fov * (1 + zoom);

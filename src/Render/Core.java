@@ -17,11 +17,7 @@ public class Core extends JPanel {
     private static float eps = 1e-4f;
     public static float getEps() { return eps; }
     
-    private static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
-    public static float getCameraMoveGrain()    { return cameraMoveGrain; }
-    public static void  setCameraMoveGrain(float f) { cameraMoveGrain = f; }
-    public static float getCameraRotateGrain()  { return cameraRotateGrain; }
-    public static void  setCameraRotateGrain(float f)  { cameraRotateGrain = f; }
+    public static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
     
     public boolean bloom = true;
     
@@ -42,7 +38,7 @@ public class Core extends JPanel {
         SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(Color.CYAN));
         SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(Color.GRAY));
         
-        SDF blend = new BlendedSDF(sphere, cube, 0.25f);
+        SDF blend = new BlendedSDF(sphere, cube, 1.0f);
         blend.setName("Blended Sphere & Cube");
         scene.addSDF(blend);
         
@@ -51,7 +47,11 @@ public class Core extends JPanel {
         scene.addSDF(floor);
         
         SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(Color.RED));
+        chainCube.setName("Chain Cube");
         //scene.addSDF(chainCube);
+        
+        SDF cube2 = new Cube(      new vec3( 0.0f , -4.0f, 2.0f ), 1.0f, new Material(Color.GREEN, 0.80f));
+        scene.addSDF(cube2);
         
         /* Finish adding SDFs */
         

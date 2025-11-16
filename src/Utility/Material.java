@@ -8,7 +8,10 @@ public class Material {
     public float r = 0.0f;
     
     public Material(Color color) { c = color; }
-    public Material(Color color, float reflect) { c = color; r = reflect; }
+    public Material(Color color, float reflect) { 
+        c = color; 
+        r = Math.min(Math.max(reflect, 0.0f), 1.0f); //Lock reflectivtiy to [0, 1]
+    }
     
     @Override
     public String toString() {

@@ -44,7 +44,7 @@ public class RayMarcher {
             //increment the hit position & total distance, get the SDF at the hit pos,
             //if any, and return all that in a HitInfo object.
             if (distance < Core.getEps() || totalDistance > maxDist) {
-                vec3 hitPos = pos.add(dir.multiply(distance));
+                vec3 hitPos = pos.add(dir.scale(distance));
                 totalDistance += distance;
                 return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(pos));
             }
@@ -52,7 +52,7 @@ public class RayMarcher {
             //minimum distance we calculated earlier ( distance )
             pos =   pos
                     .add(   dir
-                            .multiply( distance ) 
+                            .scale( distance ) 
                     );
             totalDistance += distance;
         }
@@ -121,9 +121,10 @@ public class RayMarcher {
     private Color reflect(SDF obj, HitInfo hit, vec3 dir, int depth) {
         if (depth <= 0) return background;
         
+        //Calculate the normal, and use that to calculate a new ray that's reflected off of the surface
         vec3 normal = estimateNormal(obj, hit.hit).normalize();
-        vec3 reflected = dir.subtract(normal.multiply(2.0f * dir.dot(normal))).normalize();
-        vec3 origin = hit.hit.add(normal.multiply(Core.getEps() * 1.10f)); 
+        vec3 reflected = dir.subtract(normal.scale(2.0f * dir.dot(normal))).normalize();
+        vec3 origin = hit.hit.add(normal.scale(Core.getEps() * 1.25f)); 
         
         HitInfo info = marchRay(origin, reflected);
         if (info.sdf == null) return background;
@@ -146,7 +147,7 @@ public class RayMarcher {
         
         //Get an estimated normal & invert the lighting direction
         vec3 normal = estimateNormal(obj, hit.hit);   
-        vec3 sceneLight = light.getSceneLighting().multiply(-1);   
+        vec3 sceneLight = light.getSceneLighting().scale(-1);   
         
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
         brightness = customClamp(brightness, 5);
@@ -164,11 +165,11 @@ public class RayMarcher {
         float t = 0.1f;                                     //Start slightly off the surface ... this must be greater than epsilon
         final float softness = 1.0f;                        //Penumbra width ... i think
         vec3 lightDir = light.getSceneLighting()
-                        .multiply(-1.0f);                   //Flip lighting around
+                        .scale(-1.0f);                   //Flip lighting around
         for (int i = 0; shadowSteps > i; i++) {
             vec3 pos =  orgin
                         .add(   lightDir 
-                                .multiply(t)
+                                .scale(t)
                         );
             float minDist = sdfMgr.getClosestSDFDist(pos);
             if (minDist < Core.getEps()) { return ambientLight; }
@@ -182,7 +183,7 @@ public class RayMarcher {
     /**
      * A custom clamp for lighting.
      * @param f What will be exponentiated
-     * @param n Hoe many times to multiply
+     * @param n Hoe many times to scale
      * @return ( ( f^n ) / ( f^n + 1 ) )
      */
     private float customClamp(float f, int n) {

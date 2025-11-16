@@ -29,18 +29,26 @@ public class BlendedSDF extends SDF {
         if (a == null) return b.m;
         if (b == null) return a.m;
         
-        float d1 = a.sdf(p);
-        float d2 = b.sdf(p);
-        //float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;  //At seem coloring
+        float da = a.sdf(p),    //Distance of a
+              db = b.sdf(p);    //Distance of b
         
-        float total = Math.abs(d2) + Math.abs(d1);
-        float h = (total == 0) ? 0.5f : Math.abs(d1) / total;
+        float total = Math.abs(db) + Math.abs(da),
+              h = (total == 0) ? 0.5f : Math.abs(da) / total;
+        
+        //a & b's materials
+        Material aMat = a.getMaterial(p), bMat = b.getMaterial(p);
 
-        Color c1 = a.getMaterial(p).c;
-        Color c2 = b.getMaterial(p).c;
+        //Use a & b's colors ( from material ) to blend the 
+        //two in order to get a nice gradient between the two.
+        Color c1 = aMat.c, c2 = bMat.c;
         Color blendedColor = ColorMath.blend(c1, c2, h);
-
-        return new Material(blendedColor);
+        
+        //Use a & b's reflectivness ( from material ) to
+        //blend the two just like the color.
+        float ra = aMat.r, rb = bMat.r;
+        float blendedR = (ra * h) + (rb * (1.0f-h));
+        
+        return new Material(blendedColor, blendedR);
     }
     
     public float getK() { return k; }

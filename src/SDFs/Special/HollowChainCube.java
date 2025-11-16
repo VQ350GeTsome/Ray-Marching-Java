@@ -28,7 +28,7 @@ public class HollowChainCube extends SDFs.SDF {
             vec3 one = new vec3(n);
             p = one.subtract(p.subtract(one).abs());
             r2 = 1.20f / p.dot(p); 
-            p = p.multiply(r2);     
+            p = p.scale(r2);     
             s *= r2;                
         }
         vec3 one = new vec3(1.0f);
@@ -40,7 +40,7 @@ public class HollowChainCube extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() { 
-        String[] current = { m.colorString(), c.toStringParen(), ""+scale };
+        String[] current = ArrayMath.subArray(this.toString().split(","),1, 6);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

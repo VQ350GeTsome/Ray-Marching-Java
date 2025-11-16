@@ -20,25 +20,76 @@ public class vec3 {
      * @param z The z component.
      */
     public vec3(float x, float y, float z)  { this.x = x; this.y = y; this.z = z; }
+    /**
+     * Copy constructor
+     * @param copy The vec3 to be copied
+     */
     public vec3(vec3 copy) {
         x = copy.x;
         y = copy.y;
         z = copy.z;
     }
  
+    /**
+     * Adds two vectors together per component.
+     * @param o The other vector to add to this vector.
+     * @return A new vector that's the sum of this & other.
+     */
+    public vec3 add(vec3 o) { 
+        return new vec3
+            (
+                    x + o.x, 
+                    y + o.y, 
+                    z + o.z
+            ); 
+    }
+    /**
+     * Static version of .add( vec3 ).
+     * @param p A vector.
+     * @param q Another vector to add to p.
+     * @return The sum of p & q.
+     */
+    public static vec3 add(vec3 p, vec3 q) { return p.add(q); }
+    /**
+     * Adds a scalar to each component of this vector.
+     * @param f The scalar to add.
+     * @return The new vector that has the scalar added.
+     */
+    public vec3 add(float f) {
+        return new vec3
+            (
+                    x + f,
+                    y + f,
+                    z + f
+            );
+    }
+    /**
+     * Static version of .add ( float ) 
+     * @param o The vector.
+     * @param f The scalar.
+     * @return The vector with the scalar added
+     */
+    public static vec3 add(vec3 o, float f) { return o.add(f); }
     
-    public vec3 add(vec3 other) { return new vec3(x + other.x, y + other.y, z + other.z); }
     
-    public vec3 subtract(vec3 other) { return new vec3(x - other.x, y - other.y, z - other.z); }
+    public vec3 subtract(vec3 other) { 
+        return new vec3
+            (
+                    x - other.x, 
+                    y - other.y, 
+                    z - other.z
+            ); 
+    }
     public vec3 subtract(float f) {
-        return new vec3(
+        return new vec3
+            (
                 x - f,
                 y - f,
                 z - f
-        );
+            );
     }
     
-    public vec3 multiply(float p) { return new vec3(x * p, y * p, z * p); } 
+    public vec3 scale(float p) { return new vec3(x * p, y * p, z * p); } 
     
     public vec3 divide(float f) { return new vec3(x / f, y / f, z / f); }
     
@@ -94,6 +145,19 @@ public class vec3 {
         return new vec3(nx, ny, nz);
     }
     public static vec3 round(vec3 o) { return round(o, 0); }
+    public vec3 round(int places) {
+        int q = 1;
+        for (int i = 0; places > i; i++) q *= 10;
+        
+        float nx = x, ny = y, nz = z;
+        
+        nx = Math.round(nx * q) / (float) q;
+        ny = Math.round(ny * q) / (float) q;
+        nz = Math.round(nz * q) / (float) q;
+        
+        return new vec3(nx, ny, nz);
+    }
+    public vec3 round() { return this.round(0); }
     
     @Override
     public String toString() { return "{" + x + ":" + y + ":" + z + "}"; }

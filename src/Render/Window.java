@@ -25,7 +25,7 @@ public class Window extends javax.swing.JFrame {
     }
     
     private void cameraMover(int input, boolean shift) {
-        float   grain = Core.getCameraMoveGrain();          //Get the current camera grain (sensitivity)
+        float   grain = Core.cameraMoveGrain;               //Get the current camera grain (sensitivity)
         vec3[]  orien = core.scene.getCameraOrien();        //Get the three orientation vectors
         vec3    forward = orien[0],
                 right   = orien[1],
@@ -33,15 +33,15 @@ public class Window extends javax.swing.JFrame {
                 move    = new vec3();                       //Initalize what will be the move vector
        
         switch (input) { 
-            case W_KEY:   move = (shift) ? up.multiply(  grain ) : forward.multiply(  grain );    break;  //Move forward ... unless shift is held, then move up
-            case S_KEY:   move = (shift) ? up.multiply( -grain ) : forward.multiply( -grain );    break;  //Move down ... unless shift is held, then move down
-            case A_KEY:   move = right.multiply( -grain );    break;  //Move left
-            case D_KEY:   move = right.multiply(  grain );    break;  //Move right
+            case W_KEY:   move = (shift) ? up.scale(  grain ) : forward.scale(  grain );    break;  //Move forward ... unless shift is held, then move up
+            case S_KEY:   move = (shift) ? up.scale( -grain ) : forward.scale( -grain );    break;  //Move down ... unless shift is held, then move down
+            case A_KEY:   move = right.scale( -grain );    break;  //Move left
+            case D_KEY:   move = right.scale(  grain );    break;  //Move right
         }
         core.scene.moveCamera(move); //Call the core that'll move the camera
     }
     private void cameraRotater(int input) {
-        float grain = Core.getCameraRotateGrain();
+        float grain = Core.cameraRotateGrain;
         switch (input) {
             case UP_ARROW:        core.scene.rotateCamera( 0.0f  , grain );    break;
             case DOWN_ARROW:      core.scene.rotateCamera( 0.0f  ,-grain );    break; 
@@ -166,7 +166,7 @@ public class Window extends javax.swing.JFrame {
         
         int confirm = JOptionPane.showConfirmDialog(
             null,
-            "Are you sure you want " + obj.getType() + " to be deleted?",
+            "Are you sure you want " + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " to be deleted?",
             "Confirmation",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE
@@ -190,14 +190,19 @@ public class Window extends javax.swing.JFrame {
         }
         
         //Get the new settings 
-        String[] inputs = createOptionsPane("Enter New Settings: ", obj.getSettingsAndCurrent());
+        String[] inputs = createOptionsPane("Enter New Settings for " + 
+                 ((obj.getName() == null) ? obj.getType() : obj.getName()) 
+                 + ": ", obj.getSettingsAndCurrent());
         if (inputs == null) return;
         
-        //Parse the settings into a new SDF (newObj)
-        IntRef i = new IntRef(0);
+        //Parse the settings into a new SDF ( newObj ).
+        //Note that we check if inputs.length > 2, this is 
+        //because if it's > 2 we know it's an SDF, if it's
+        //<= 2, we know it's not and SDF, ie maybe we're
+        //altering a k on a blendedSDF.
         SDFs.SDF newObj = null;
-        try { newObj = SDFs.SDFParser.getSDF(obj.getType(), inputs, i); }
-        catch (Exception e) { ; }
+        if (inputs.length > 2) 
+            newObj = SDFs.SDFParser.getSDF(obj.getType(), inputs, new IntRef(0)); 
         
         /*  
         If the object we pressed was blended, and we're trying to alter the 
@@ -212,7 +217,11 @@ public class Window extends javax.swing.JFrame {
             and add the newObj.
         */
         if (!isolateChild && blended) {
-            ((BlendedSDF) parent).setK(Float.parseFloat(inputs[0]));
+            try { 
+                float k = Float.parseFloat(inputs[0]);
+                ((BlendedSDF) parent).setK((k <= 0) ? Core.getEps() : k);
+            } catch (Exception e) { System.err.println(e.getMessage()); }
+            
         } else if (!blended) { 
             core.scene.setSDF(obj, newObj);
         } else {        
@@ -246,7 +255,7 @@ public class Window extends javax.swing.JFrame {
         vec3[] camOrien = core.scene.getCameraOrien();  
         vec3 forward    = camOrien[0];
         vec3 pos        = camOrien[3];
-        placeHolder.add(vec3.round(pos.add(forward.multiply(n))).toStringParen());
+        placeHolder.add(vec3.round(pos.add(forward.scale(n))).toStringParen());
 
         //Now we fill the placeholder with more values and prompt the user for any changes
         String t = "";
@@ -533,15 +542,17 @@ public class Window extends javax.swing.JFrame {
 
     private void cameraGrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraGrainActionPerformed
         String[] options    = new String[] { "Movement Grain: " , "Pan Grain: " };
-        String defaultMove  = String.valueOf(Core.getCameraMoveGrain());
-        String defaultPan   = String.valueOf(Core.getCameraRotateGrain());
+        String defaultMove  = String.valueOf(Core.cameraMoveGrain);
+        String defaultPan   = String.valueOf(Core.cameraRotateGrain);
         String[] defaults   = new String[] { defaultMove, defaultPan };
         String[] inputs = createOptionsPane("Enter new grains: ", options, defaults);
         
         if (inputs == null) return;
         
-        Core.setCameraMoveGrain(Float.parseFloat(inputs[0]));
-        Core.setCameraRotateGrain(Float.parseFloat(inputs[1]));        
+        try {
+            Core.cameraMoveGrain = Float.parseFloat(inputs[0]);
+            Core.cameraRotateGrain = Float.parseFloat(inputs[1]);   
+        } catch (Exception e) { System.err.println("Error in parsing new grains: " + e.getMessage()); }
         
     }//GEN-LAST:event_cameraGrainActionPerformed
 
@@ -552,7 +563,8 @@ public class Window extends javax.swing.JFrame {
         
         if (inputs == null) return; 
         
-        core.scene.setSceneLighting(new vec3(inputs[0]));
+        try { core.scene.setSceneLighting(new vec3(inputs[0])); }
+        catch (Exception e) { System.err.println(e.getMessage()); }
     }//GEN-LAST:event_sceneLighitngActionPerformed
 
     private void ambientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ambientLightingActionPerformed
@@ -571,7 +583,7 @@ public class Window extends javax.swing.JFrame {
 
     private void cameraPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraPositionActionPerformed
         String[] options    = new String[] { "New Camera Position: " };
-        String[] defaultDir = new String[] { core.scene.getCameraPos().toStringParen() };
+        String[] defaultDir = new String[] { core.scene.getCameraPos().round(1).toStringParen() };
         String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir);
         
         if (inputs == null) return; 
