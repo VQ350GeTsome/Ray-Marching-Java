@@ -50,6 +50,11 @@ public class Window extends javax.swing.JFrame {
             case LEFT_ARROW:      core.scene.rotateCamera( grain ,  0.0f );    break;  
         }
     }
+    private void cameraRotater(int dx, int dy) {
+        float cameraDYaw = dx * 0.1f;   // sensitivity factor
+        float cameraDPitch = dy * 0.1f;
+        core.scene.rotateCamera( -cameraDYaw,  -cameraDPitch );
+    }
     private void cameraZoomer(int input) {
         float zoom = 0.0f;
         switch (input) {
@@ -330,6 +335,11 @@ public class Window extends javax.swing.JFrame {
             }
         });
 
+        core.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                coreMouseDragged(evt);
+            }
+        });
         core.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
                 coreMouseWheelMoved(evt);
@@ -338,6 +348,9 @@ public class Window extends javax.swing.JFrame {
         core.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 coreMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                coreMousePressed(evt);
             }
         });
 
@@ -666,6 +679,21 @@ public class Window extends javax.swing.JFrame {
         //Pass in the direction of the mouse wheel rotation
         cameraZoomer(evt.getWheelRotation());
     }//GEN-LAST:event_coreMouseWheelMoved
+
+    private int mouseLastX=0, mouseLastY=0;   //Initialize mouse last position
+    private void coreMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coreMouseDragged
+        int dx = evt.getX() - mouseLastX,
+            dy = evt.getY() - mouseLastY; //Get the delta x & y.
+        
+        cameraRotater(dx, dy);
+        
+        mouseLastX = evt.getX(); mouseLastY = evt.getY();
+    }//GEN-LAST:event_coreMouseDragged
+
+    private void coreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coreMousePressed
+        //Update the mouse starting positon x & y.
+        mouseLastX = evt.getX(); mouseLastY = evt.getY();
+    }//GEN-LAST:event_coreMousePressed
 
     /**
      * @param args the command line arguments
