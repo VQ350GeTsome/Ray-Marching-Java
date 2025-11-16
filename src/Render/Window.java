@@ -17,7 +17,8 @@ public class Window extends javax.swing.JFrame {
     private final int   SPACE_BAR     =  32, LEFT_ARROW    =  37, UP_ARROW      =  38, RIGHT_ARROW   =  39,
                         DOWN_ARROW    =  40, LEFT_CLICK    =   1, MIDDLE_CLICK  =   2, RIGHT_CLICK   =   3,
                         W_KEY         =  87, A_KEY         =  65, S_KEY         =  83, D_KEY         =  68,
-                        Q_KEY         =  81, E_KEY         =  69, R_KEY         =  82, F1_KEY        = 112;
+                        Q_KEY         =  81, E_KEY         =  69, R_KEY         =  82, F1_KEY        = 112,
+                        M_WHEEL_UP    = - 1, M_WHEEL_DOWN  =   1;
 
     public Window() {
         initComponents();
@@ -50,11 +51,18 @@ public class Window extends javax.swing.JFrame {
         }
     }
     private void cameraZoomer(int input) {
-        if (input == Q_KEY) {
-            core.scene.zoomCamera( 0.033f );
-        } else {
-            core.scene.zoomCamera(-0.033f );
+        float zoom = 0.0f;
+        switch (input) {
+            case M_WHEEL_DOWN:
+            case Q_KEY:
+                zoom = 0.033f;
+                break;
+            case M_WHEEL_UP:
+            case E_KEY:
+                zoom = -0.033f;
+                break;
         }
+        core.scene.zoomCamera(zoom);
     }
     
     private String[] createOptionsPane(String title, String[] options, String[] defaults) {
@@ -322,6 +330,11 @@ public class Window extends javax.swing.JFrame {
             }
         });
 
+        core.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                coreMouseWheelMoved(evt);
+            }
+        });
         core.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 coreMouseClicked(evt);
@@ -648,6 +661,11 @@ public class Window extends javax.swing.JFrame {
         try { core.setWait(Integer.parseInt(input)); }
         catch (Exception e) { ; }
     }//GEN-LAST:event_changeFPSActionPerformed
+
+    private void coreMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_coreMouseWheelMoved
+        //Pass in the direction of the mouse wheel rotation
+        cameraZoomer(evt.getWheelRotation());
+    }//GEN-LAST:event_coreMouseWheelMoved
 
     /**
      * @param args the command line arguments

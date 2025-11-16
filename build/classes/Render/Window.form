@@ -188,6 +188,7 @@
   <SubComponents>
     <Container class="Render.Core" name="core">
       <Events>
+        <EventHandler event="mouseWheelMoved" listener="java.awt.event.MouseWheelListener" parameters="java.awt.event.MouseWheelEvent" handler="coreMouseWheelMoved"/>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="coreMouseClicked"/>
       </Events>
 
