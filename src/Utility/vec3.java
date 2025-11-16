@@ -5,23 +5,25 @@ public class vec3 {
     public float x, y, z;
 
     /**
-     * Default constructor. { 0.0 , 0.0 , 0.0 }
+     * Default constructor. { 0.0 , 0.0 , 0.0 } .
      */
-    public vec3()                           { x = 0.0f; y = 0.0f; z = 0.0f; }
+    public vec3() { x = 0.0f; y = 0.0f; z = 0.0f; }
     /**
      * Constructor with just x component { x, x, x } .
+     * 
      * @param x The x component.
      */
     public vec3(float x) { this.x = x; y = x; z = x; }
     /**
      * Full constructor with x , y , & z components { x , y , z } .
+     * 
      * @param x The x component.
      * @param y The y component.
      * @param z The z component.
      */
     public vec3(float x, float y, float z)  { this.x = x; this.y = y; this.z = z; }
     /**
-     * Copy constructor
+     * Copy constructor.
      * @param copy The vec3 to be copied
      */
     public vec3(vec3 copy) {
@@ -31,9 +33,10 @@ public class vec3 {
     }
  
     /**
-     * Adds two vectors together per component.
-     * @param o The other vector to add to this vector.
-     * @return A new vector that's the sum of this & other.
+     * Component wise addition.
+     * 
+     * @param o The other vector to add.
+     * @return A new vector equal to ( x + o.x , y + o.y , z + o.z ) .
      */
     public vec3 add(vec3 o) { 
         return new vec3
@@ -44,16 +47,18 @@ public class vec3 {
             ); 
     }
     /**
-     * Static version of .add( vec3 ).
-     * @param p A vector.
-     * @param q Another vector to add to p.
-     * @return The sum of p & q.
+     * Component wise addition.
+     * 
+     * @param p The first addend vector.
+     * @param q The second addend vector.
+     * @return A new vector equal to ( p.x + q.x , p.y + q.y , p.z + q.z ) .
      */
     public static vec3 add(vec3 p, vec3 q) { return p.add(q); }
     /**
-     * Adds a scalar to each component of this vector.
+     * Adds a scalar to each component.
+     * 
      * @param f The scalar to add.
-     * @return The new vector that has the scalar added.
+     * @return A new vector equal to ( x + f , y + f , z + f ) .
      */
     public vec3 add(float f) {
         return new vec3
@@ -64,30 +69,44 @@ public class vec3 {
             );
     }
     /**
-     * Static version of .add ( float ) 
+     * Adds a scalar to each component.
+     * 
      * @param o The vector.
      * @param f The scalar.
-     * @return The vector with the scalar added
+     * @return A new vector equal to ( o.x + f , o.y + f , o.z f ) .
      */
     public static vec3 add(vec3 o, float f) { return o.add(f); }
     
-    
-    public vec3 subtract(vec3 other) { 
-        return new vec3
-            (
-                    x - other.x, 
-                    y - other.y, 
-                    z - other.z
-            ); 
-    }
-    public vec3 subtract(float f) {
-        return new vec3
-            (
-                x - f,
-                y - f,
-                z - f
-            );
-    }
+    /**
+     * Component wise subtraction.
+     * 
+     * @param o The subtrahend vector.
+     * @return A new vector equal to ( x - o.x , y - o.y , z - o.z ) .
+     */
+    public vec3 subtract(vec3 o) { return this.add(o.scale(-1.0f)); }
+    /**
+     * Component wise subtraction.
+     * 
+     * @param p The minuend vector.
+     * @param q The subtrahend vector. 
+     * @return A new vector equal to ( p.x - q.x , p.y - q.y , p.z - q.z ) .
+     */
+    public static vec3 subtract(vec3 p, vec3 q) { return p.add(q.scale(-1.0f)); }
+    /**
+     * Subtracts a scalar from each component.
+     * 
+     * @param f The subtrahend scalar.
+     * @return A new vector equal to ( x - f , y - f , z - f) .
+     */
+    public vec3 subtract(float f) { return this.add(-f); }
+    /**
+     * Subtracts a scalar from each component.
+     * 
+     * @param o The minuend vector.
+     * @param f The subtrahend scalar.
+     * @return A new vector equal to ( o.x - f , o.y - f , o.z - f ) .
+     */
+    public static vec3 subtract(vec3 o, float f) { return o.add(-f); }
     
     public vec3 scale(float p) { return new vec3(x * p, y * p, z * p); } 
     
