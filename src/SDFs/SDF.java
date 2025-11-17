@@ -30,12 +30,16 @@ public abstract class SDF {
      * @return 
      */
     public String[] getSettingsAndCurrent() { return SDFParser.getSettings(type); }
+    
+    public abstract boolean parseNewParams(String[] inputs);
     /**
      * Returns the material of the SDF object
      * @param p The position of the vector
      * @return The material.
      */
     public Utility.Material getMaterial(Utility.vec3 p) { return m; }
+    
+    public void setMaterial(Utility.Material material) { m = material; }
     /**
      * Gets the type of SDF as a String
      * @return The type, i.e., "sphere"
@@ -57,6 +61,6 @@ public abstract class SDF {
      */
     @Override
     public String toString() {
-        return getType() + "," + m.toString() + ",";
+        return getType() + ",";
     }
 }

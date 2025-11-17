@@ -27,8 +27,17 @@ public class Cube extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 5);
+        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 3);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
+    }
+    
+    @Override
+    public boolean parseNewParams(String[] inputs) {
+        try {
+            c = new vec3(inputs[0].trim());
+            s = Float.parseFloat(inputs[1].trim());
+            return true;
+        } catch (Exception e) { return false; }        
     }
     
     @Override

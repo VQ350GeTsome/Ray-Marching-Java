@@ -36,6 +36,11 @@ public class Repeating extends SDFs.SDF{
     } 
     
     @Override
+    public boolean parseNewParams(String[] inputs) { return p.parseNewParams(inputs); }
+    
+    public void setPrimitive(SDFs.SDF primitive) { p = primitive; }
+    
+    @Override
     public String toString() { 
         String temp = "repeat" + p.toString();
         int length = temp.length();

@@ -5,9 +5,11 @@
         <group>
             <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Utility/PostProcessor.java</file>
             <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Render/Window.java</file>
+            <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Utility/vec3.java</file>
             <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Render/Core.java</file>
             <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Render/Scene.java</file>
             <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Render/RayMarcher.java</file>
+            <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/Render/Camera.java</file>
             <file>file:/C:/Users/Harrison/Documents/NetBeansProjects/RayMarching/src/SDFs/Repeating.java</file>
         </group>
     </open-files>

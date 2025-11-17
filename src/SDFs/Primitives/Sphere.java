@@ -10,7 +10,7 @@ public class Sphere extends SDFs.SDF{
     public Sphere(vec3 center, float radius, Material material) { 
         type = "sphere";
         
-        r = radius; c = center; m = material;
+        c = center; r = radius; m = material;
     }
 
     @Override
@@ -18,8 +18,17 @@ public class Sphere extends SDFs.SDF{
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = ArrayMath.subArray(toString().split(","), 1, 5);
+        String[] current = ArrayMath.subArray(toString().split(","), 1, 4);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
+    }
+    
+    @Override
+    public boolean parseNewParams(String[] inputs) {
+        try {
+            c = new vec3(inputs[0].trim());
+            r = Float.parseFloat(inputs[1].trim());
+            return true;
+        } catch (Exception e) { return false; }
     }
     
     @Override

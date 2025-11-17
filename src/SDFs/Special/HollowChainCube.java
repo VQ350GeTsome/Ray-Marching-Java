@@ -13,9 +13,9 @@ public class HollowChainCube extends SDFs.SDF {
     public HollowChainCube(vec3 center, float scale, float n, Material material) {
         type = "hollowcc";
         
-        c = center; m = material;      
-        this.n = n;
-        this.scale = scale;
+        c = center; this.scale = scale; this.n = n;
+        m = material;  
+        
     }
     
     @Override
@@ -42,6 +42,16 @@ public class HollowChainCube extends SDFs.SDF {
     public String[] getSettingsAndCurrent() { 
         String[] current = ArrayMath.subArray(this.toString().split(","),1, 6);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
+    }
+    
+    @Override
+    public boolean parseNewParams(String[] inputs) {
+        try {
+            c = new vec3(inputs[0].trim());
+            scale = Float.parseFloat(inputs[1].trim());
+            n = Float.parseFloat(inputs[2].trim());
+            return true;
+        } catch (Exception e) { return false; }
     }
     
     @Override

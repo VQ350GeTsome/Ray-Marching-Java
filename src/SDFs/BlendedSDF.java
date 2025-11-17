@@ -65,24 +65,23 @@ public class BlendedSDF extends SDF {
         return closest;                                     //Return the closest one
     }
     
-    public void remove(SDF t) {
-        if (a == t) {       //If t is a set a to null
+    public void remove(SDF c) {
+        if (a == c) {       //If t is a set a to null
             a = null;  
             return;
         } else if (a instanceof BlendedSDF) {   //Else check if t is a child of a
-            ((BlendedSDF) a).remove(t);         //If so remove it
+            ((BlendedSDF) a).remove(c);         //If so remove it
             return;
         }
 
-        if (b == t) {       //Do the same as above, just with b
+        if (b == c) {       //Do the same as above, just with b
             b = null;
             return;
         } else if (b instanceof BlendedSDF) { 
-            ((BlendedSDF) b).remove(t);
+            ((BlendedSDF) b).remove(c);
             return;
         }
     }
-    
     /**
      * If there is an empty child
      * we set n (new SDF) to the null
@@ -92,6 +91,24 @@ public class BlendedSDF extends SDF {
     public void addChild(SDF n) {
         if (a == null) a = n;
         if (b == null) b = n;
+    }
+    
+    public void editChild(String[] inputs, SDF c) {
+        if (a == c) {       //If t is a set a to null
+            a.parseNewParams(inputs);  
+            return;
+        } else if (a instanceof BlendedSDF) {   //Else check if t is a child of a
+            ((BlendedSDF) a).editChild(inputs, c);         //If so remove it
+            return;
+        }
+
+        if (b == c) {       //Do the same as above, just with b
+            b.parseNewParams(inputs);
+            return;
+        } else if (b instanceof BlendedSDF) { 
+            ((BlendedSDF) b).editChild(inputs, c);
+            return;
+        }
     }
     
     /**
@@ -107,9 +124,13 @@ public class BlendedSDF extends SDF {
      */
     public boolean needsUnblended() { return (a == null || b == null); }
     
+    @Override
     public String[] getSettingsAndCurrent() { return new String[] { "Blending Amount: ", ""+k }; }
     
+    @Override
     public String getType() { return "blended"; }
+    
+    @Override public boolean parseNewParams(String[] inputs) { return false; }
     
     @Override
     public String toString() { 

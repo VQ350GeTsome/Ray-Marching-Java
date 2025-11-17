@@ -54,7 +54,6 @@ public class SDFParser {
     public static String[] getSettings(String type) { return getSettings(type, false); }
     public static String[] getSettings(String type, boolean repeat) {
         
-        final String[] universal = { "Color: ", "Shinyness: " };
         String[] objDependant = null;
         
         switch (type.toLowerCase()) {           
@@ -76,9 +75,9 @@ public class SDFParser {
         
         //Create the return array which is the material settings + object dependant settings
         //And if it's a repeating SDF + the extra settings.
-        String[] returnArr = ArrayMath.add(universal, objDependant);
+
         return (!repeat) ? 
-                returnArr : ArrayMath.add(returnArr, new String[] { "Spacing: " } );
+                objDependant : ArrayMath.add(objDependant, new String[] { "Spacing: " } );
     }
     
     public static SDF parseBlended(String[] info, float k, IntRef i) {

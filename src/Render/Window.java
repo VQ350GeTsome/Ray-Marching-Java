@@ -143,16 +143,28 @@ public class Window extends javax.swing.JFrame {
         });
         popup.add(delete);                              //Add the menu item to the popup menu
         
+        JMenuItem color = new JMenuItem("Change Color");
+        color.addActionListener(evt -> {
+            colorClicked(clickedObj, info.hit);
+        });
+        popup.add(color);
+        
+        JMenuItem matEdit = new JMenuItem("Edit Material");
+        matEdit.addActionListener(evt -> {
+            matEditClicked(clickedObj, info.hit);
+        });
+        popup.add(matEdit);
+        
         JMenuItem edit = new JMenuItem("Edit Properties");
         edit.addActionListener(evt -> {
-            editClicked(clickedObj, info.hit, true);
+            regEditClicked(clickedObj, info.hit, true);
         });
         popup.add(edit);
         
         if (clickedObj instanceof SDFs.BlendedSDF) {
             JMenuItem blendedEdit = new JMenuItem("Edit Blended Properties");
             blendedEdit.addActionListener(evt -> {
-                editClicked(clickedObj, info.hit, false);
+                regEditClicked(clickedObj, info.hit, false);
             });
             popup.add(blendedEdit);
         }
@@ -191,14 +203,25 @@ public class Window extends javax.swing.JFrame {
         else ((BlendedSDF) parent).remove(obj);
         
     }
-    private void editClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
+    private void colorClicked(SDFs.SDF obj, vec3 hit) {
+        SDFs.SDF parent = null;
+        
+        if (obj instanceof SDFs.BlendedSDF) {
+            parent = obj;
+            obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
+        }
+    }
+    private void matEditClicked(SDFs.SDF obj, vec3 hit) {
+        
+    }
+    private void regEditClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
         boolean blended = false;                        //This will keep track if our object is blended
         SDFs.SDF parent = null;                         //This will keep track of the parent incase it's blended
         
         //If the object we clicked is a blended object & we aren't skipping isolating the child
         if (obj instanceof SDFs.BlendedSDF) {
             parent = obj;                               //Save the parent
-            obj = (isolateChild) ? ((BlendedSDF) obj).getClosest(hit) : obj;   //Gets the child that we clicked in the blended group
+            obj = (isolateChild) ? ((SDFs.BlendedSDF) obj).getClosest(hit) : obj;   //Gets the child that we clicked in the blended group
             blended = true;                             //Turn blended to true
         }
         
@@ -207,15 +230,8 @@ public class Window extends javax.swing.JFrame {
                  ((obj.getName() == null) ? obj.getType() : obj.getName()) 
                  + ": ", obj.getSettingsAndCurrent());
         if (inputs == null) return;
-        
-        //Parse the settings into a new SDF ( newObj ).
-        //Note that we check if inputs.length > 2, this is 
-        //because if it's > 2 we know it's an SDF, if it's
-        //<= 2, we know it's not and SDF, ie maybe we're
-        //altering a k on a blendedSDF.
-        SDFs.SDF newObj = null;
-        if (inputs.length > 2) 
-            newObj = SDFs.SDFParser.getSDF(obj.getType(), inputs, new IntRef(0)); 
+
+       
         
         /*  
         If the object we pressed was blended, and we're trying to alter the 
@@ -235,13 +251,10 @@ public class Window extends javax.swing.JFrame {
                 ((BlendedSDF) parent).setK((k <= 0) ? Core.getEps() : k);
             } catch (Exception e) { System.err.println(e.getMessage()); }
             
-        } else if (!blended) { 
-            core.scene.setSDF(obj, newObj);
-        } else {        
-            ((BlendedSDF) parent).remove(obj);
-            ((BlendedSDF) parent).addChild(newObj);
-        }
-        
+        } else if (!blended)
+            obj.parseNewParams(inputs);
+        else     
+            ((SDFs.BlendedSDF) parent).editChild(inputs, obj);
     }
     
     private void addSDF(int type) {
@@ -296,7 +309,6 @@ public class Window extends javax.swing.JFrame {
         if (inputs == null) return;
         safeAddSDF(t, inputs); 
     }
-    
     //Helper method to just parse an SDF safely using a try catch
     private void safeAddSDF(String type, String[] inputs) {
         try { core.scene.addSDF(SDFs.SDFParser.getSDF(type, inputs)); }
@@ -654,11 +666,11 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_bloomToggleActionPerformed
 
     private void bloomTypeToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomTypeToggleActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_bloomTypeToggleActionPerformed
 
     private void bloomSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomSettingsActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_bloomSettingsActionPerformed
 
     private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed

@@ -25,8 +25,18 @@ public class Torus extends SDFs.SDF{
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 6);
+        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 4);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
+    }
+    
+    @Override
+    public boolean parseNewParams(String[] inputs) {
+        try {
+            c = new vec3(inputs[0].trim());
+            r1 = Float.parseFloat(inputs[1].trim());
+            r2 = Float.parseFloat(inputs[2].trim());
+            return true;
+        } catch (Exception e) { return false; } 
     }
     
     @Override
