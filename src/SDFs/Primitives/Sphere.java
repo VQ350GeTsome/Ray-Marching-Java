@@ -18,7 +18,7 @@ public class Sphere extends SDFs.SDF{
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = ArrayMath.subArray(toString().split(","), 1, 4);
+        String[] current = ArrayMath.subArray(toString().split(","), Material.FIELDS + 1, Material.FIELDS + 3);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

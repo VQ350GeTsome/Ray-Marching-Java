@@ -23,7 +23,7 @@ public class Plane extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() {
-        String[] current = ArrayMath.subArray(this.toString().split(","), 1, 3);
+        String[] current = ArrayMath.subArray(this.toString().split(","), Material.FIELDS + 1, Material.FIELDS + 3);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     

@@ -2,6 +2,8 @@ package Utility;
 
 public class Material {
     
+    public static final int FIELDS = 7;
+    
     public vec3 color;
     public float    reflectivity    = 0.0f,
                     specular        = 0.0f,

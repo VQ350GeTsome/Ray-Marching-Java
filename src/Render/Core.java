@@ -103,7 +103,8 @@ public class Core extends JPanel {
         
         SDF blend = new BlendedSDF(sphere, cube, 1.0f);
         blend.setName("Blended Sphere & Cube");
-        scene.addSDF(blend);
+        //scene.addSDF(blend);
+        scene.addSDF(sphere);
         
         Material floorMat = new Material(new vec3(64.0f));
         floorMat.reflectivity = 0.25f;

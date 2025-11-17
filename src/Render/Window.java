@@ -216,7 +216,6 @@ public class Window extends javax.swing.JFrame {
         //Prompts the user with a color chooser with a random color to start
         Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
         
-        
         obj.setColor(new vec3(color));
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
@@ -239,8 +238,6 @@ public class Window extends javax.swing.JFrame {
                  + ": ", obj.getSettingsAndCurrent());
         if (inputs == null) return;
 
-       
-        
         /*  
         If the object we pressed was blended, and we're trying to alter the 
             properties of it, and not the individual children of that BlendedSDF,
