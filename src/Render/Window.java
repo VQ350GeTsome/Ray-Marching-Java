@@ -3,8 +3,10 @@ package Render;
 import Utility.*;
 import File.*;
 import SDFs.BlendedSDF;
+import java.awt.Color;
 
 import java.io.File;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -210,6 +212,10 @@ public class Window extends javax.swing.JFrame {
             parent = obj;
             obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         }
+        
+        Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
+        
+        obj.setColor(color);
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
         

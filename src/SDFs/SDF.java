@@ -40,6 +40,8 @@ public abstract class SDF {
     public Utility.Material getMaterial(Utility.vec3 p) { return m; }
     
     public void setMaterial(Utility.Material material) { m = material; }
+    
+    public void setColor(java.awt.Color color) { m.c = color; }
     /**
      * Gets the type of SDF as a String
      * @return The type, i.e., "sphere"
