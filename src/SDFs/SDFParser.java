@@ -14,7 +14,7 @@ public class SDFParser {
         int r = (int) Float.parseFloat(rgb[0].trim()),
             g = (int) Float.parseFloat(rgb[1].trim()),
             b = (int) Float.parseFloat(rgb[2].trim());
-        Color color = new Color(r, g, b);
+        vec3 color = new vec3(r, g, b);
         
         float reflect = Float.parseFloat(info[i.i++].trim());
         

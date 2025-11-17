@@ -41,7 +41,7 @@ public abstract class SDF {
     
     public void setMaterial(Utility.Material material) { m = material; }
     
-    public void setColor(java.awt.Color color) { m.c = color; }
+    public void setColor(Utility.vec3 color) { m.color = color; }
     /**
      * Gets the type of SDF as a String
      * @return The type, i.e., "sphere"

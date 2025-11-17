@@ -1,30 +1,28 @@
 package Utility;
 
-import java.awt.Color;
-
 public class Material {
     
-    public Color c;
-    public float r = 0.0f;
+    public vec3 color;
+    public float reflectivity = 0.0f;
     
-    public Material(Color color) { c = color; }
-    public Material(Color color, float reflect) { 
-        c = color; 
-        r = Math.min(Math.max(reflect, 0.0f), 1.0f); //Lock reflectivtiy to [0, 1]
+    public Material(vec3 color) { this.color = color; }
+    public Material(vec3 color, float reflect) { 
+        this.color = color; 
+        reflectivity = Math.min(Math.max(reflect, 0.0f), 1.0f); //Lock reflectivtiy to [0, 1]
     }
     
     @Override
     public String toString() {
         //Turn the color a string
         String str = colorString() + "," +
-                   ""+r; 
+                   ""+reflectivity; 
         return str;
     }
     public String[] toStringArray() {
-        return new String[] { colorString(), ""+r };
+        return new String[] { colorString(), ""+reflectivity };
     }
     
     public String colorString() {
-        return c.getRed() + ":" + c.getGreen() + ":" + c.getBlue();
+        return (int) color.x + ":" + (int) color.y + ":" + (int) color.x;
     }
 }

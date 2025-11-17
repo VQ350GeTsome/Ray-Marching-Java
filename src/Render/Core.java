@@ -35,22 +35,22 @@ public class Core extends JPanel {
         
         /* Add some SDFs */
         
-        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(Color.CYAN));
-        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(Color.GRAY));
+        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(new vec3(0,255,255)));
+        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(new vec3(128)));
         
         SDF blend = new BlendedSDF(sphere, cube, 1.0f);
         blend.setName("Blended Sphere & Cube");
         scene.addSDF(blend);
         
-        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(Color.DARK_GRAY, 0.33f));
+        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(new vec3(64), 0.33f));
         floor.setName("Scene Floor");
         scene.addSDF(floor);
         
-        SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(Color.RED));
+        SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(new vec3(255,0,0)));
         chainCube.setName("Chain Cube");
         //scene.addSDF(chainCube);
         
-        SDF cube2 = new Cube(      new vec3( 0.0f , -4.0f, 2.0f ), 1.0f, new Material(Color.GREEN, 0.80f));
+        SDF cube2 = new Cube(      new vec3( 0.0f , -4.0f, 2.0f ), 1.0f, new Material(new vec3(0,255,0), 0.80f));
         scene.addSDF(cube2);
         
         /* Finish adding SDFs */
@@ -100,15 +100,17 @@ public class Core extends JPanel {
      * image ... and repaint it.
      */
     private void renderScene() {
-        Color[][] image = scene.renderScene();
+        vec3[][] vec3Image = scene.renderScene();
+        Color[][] colorImage = null;
               
         //Adds bloom to the image using the current settings
-        if (bloom) {
-            image = PostProcessor.addBloom(scene.getBackground(), image, bloomAmount, bloomRadius, circleBlur);
-        }
+        if (bloom)
+            vec3Image = PostProcessor.addBloom(scene.getBackground(), vec3Image, bloomAmount, bloomRadius, circleBlur);
+        colorImage = PostProcessor.convertToColor(vec3Image);
+        
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
-            screen.setRGB(x, y, image[x][y].getRGB());  //Process the image to the screen
+            screen.setRGB(x, y, colorImage[x][y].getRGB());  //Process the image to the screen
         repaint();  //Update screen
     }
         

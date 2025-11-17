@@ -48,8 +48,8 @@ public class Scene {
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }
     
     public HitInfo marchRay(int x, int y, int w, int h) { return rayMarcher.marchRay(x, y, w, h); }
-    public Color[][] renderScene() { return rayMarcher.marchScreen(w, h); }
-    public Color getBackground() { return rayMarcher.getBackground(); }
+    public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
+    public vec3 getBackground() { return rayMarcher.getBackground(); }
     public String packageScene() {
         return  camera.packageCamera() +
                 rayMarcher.packRayMarcher() +

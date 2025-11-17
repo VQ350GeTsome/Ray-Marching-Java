@@ -31,6 +31,8 @@ public class vec3 {
         y = copy.y;
         z = copy.z;
     }
+    
+    public vec3(java.awt.Color c) { x = c.getRed(); y = c.getGreen(); z = c.getBlue(); }
  
     /**
      * Component wise addition.
@@ -114,6 +116,15 @@ public class vec3 {
     
     public vec3 modulo(float m) { return new vec3(x % m, y % m, z % m); }
     
+    public float average() { return (x + y + z) / 3.0f; }
+    
+    public vec3 clamp(float l, float h) {
+        float nx = Math.min(Math.max(x, l), h),
+              ny = Math.min(Math.max(y, l), h),
+              nz = Math.min(Math.max(z, l), h);
+        return new vec3(nx, ny, nz);
+    }
+    
     public float getDist(vec3 other) { return (float)Math.sqrt(Math.pow(other.x - x, 2) + Math.pow(other.y - y, 2) + Math.pow(other.z - z, 2)); }
     
     public vec3 abs() { return new vec3(Math.abs(x), Math.abs(y), Math.abs(z)); }
@@ -151,6 +162,20 @@ public class vec3 {
     
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
+    public static vec3 blend(vec3 p, vec3 q, float w) {
+        w = Math.min(w, 1.0f);
+        w = Math.max(w, 0.0f);
+        float nx = (1 - w) * p.x + w * q.x;
+        float ny = (1 - w) * p.y + w * q.y;
+        float nz = (1 - w) * p.z + w * q.z;
+        return new vec3(nx, ny, nz); 
+    }
+
+    public java.awt.Color toColor() { 
+        vec3 clamped = this.clamp(0, 255);
+        return new java.awt.Color((int) clamped.x, (int) clamped.y, (int) clamped.z);
+    }
+    
     public static vec3 round(vec3 other, int places) {
         int q = 1;
         for (int i = 0; places > i; i++) q *= 10;
@@ -177,6 +202,8 @@ public class vec3 {
         return new vec3(nx, ny, nz);
     }
     public vec3 round() { return this.round(0); }
+    
+    public boolean equals(vec3 o) { return x == o.x && y == o.y && z == o.z; }
     
     @Override
     public String toString() { return "{" + x + ":" + y + ":" + z + "}"; }

@@ -14,6 +14,7 @@ public class BlendedSDF extends SDF {
         this.k = k;
     }
 
+    @Override
     public float sdf(vec3 p) {      
         if (a == null) return b.sdf(p);
         if (b == null) return a.sdf(p);
@@ -40,12 +41,12 @@ public class BlendedSDF extends SDF {
 
         //Use a & b's colors ( from material ) to blend the 
         //two in order to get a nice gradient between the two.
-        Color c1 = aMat.c, c2 = bMat.c;
-        Color blendedColor = ColorMath.blend(c1, c2, h);
+        vec3 c1 = aMat.color, c2 = bMat.color;
+        vec3  blendedColor = vec3.blend(c1, c2, h);
         
         //Use a & b's reflectivness ( from material ) to
         //blend the two just like the color.
-        float ra = aMat.r, rb = bMat.r;
+        float ra = aMat.reflectivity, rb = bMat.reflectivity;
         float blendedR = (ra * h) + (rb * (1.0f-h));
         
         return new Material(blendedColor, blendedR);

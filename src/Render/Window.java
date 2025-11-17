@@ -213,9 +213,11 @@ public class Window extends javax.swing.JFrame {
             obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         }
         
+        //Prompts the user with a color chooser with a random color to start
         Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
         
-        obj.setColor(color);
+        
+        obj.setColor(new vec3(color));
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
         
