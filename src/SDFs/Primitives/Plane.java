@@ -38,7 +38,7 @@ public class Plane extends SDFs.SDF {
     
     @Override
     public String toString() {
-        return super.toString() + c.toString() + "," + n.toString() + ",";
+        return super.toString() + c.toString() + "," + n.toString() + ",\n";
     }
 
 }

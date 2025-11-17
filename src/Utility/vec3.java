@@ -110,7 +110,8 @@ public class vec3 {
      */
     public static vec3 subtract(vec3 o, float f) { return o.add(-f); }
     
-    public vec3 scale(float p) { return new vec3(x * p, y * p, z * p); } 
+    public vec3 scale(float p) { return new vec3(x * p, y * p, z * p); }
+    public vec3 negate() { return this.scale(-1.0f); }
     
     public vec3 divide(float f) { return new vec3(x / f, y / f, z / f); }
     

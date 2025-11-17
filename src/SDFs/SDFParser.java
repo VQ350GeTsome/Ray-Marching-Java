@@ -3,22 +3,28 @@ package SDFs;
 import SDFs.Primitives.*;
 import SDFs.Special.*;
 import Utility.*;
-import java.awt.Color;
 import java.util.ArrayList;
 
 public class SDFParser {
     
     public static SDF getSDF(String type, String[] info, IntRef i) {
+        
                 
         String[] rgb = info[i.i++].split(":");               //Parse the RGB of the SDF
         int r = (int) Float.parseFloat(rgb[0].trim()),
             g = (int) Float.parseFloat(rgb[1].trim()),
             b = (int) Float.parseFloat(rgb[2].trim());
-        vec3 color = new vec3(r, g, b);
         
-        float reflect = Float.parseFloat(info[i.i++].trim());
         
-        Material mat = new Material(color, reflect);
+        //Use the color to instantiate the material then fill the fields.
+        Material mat = new Material(new vec3(r, g, b));
+        mat.reflectivity    = Float.parseFloat(info[i.i++].trim());
+        mat.specular        = Float.parseFloat(info[i.i++].trim());
+        mat.roughness       = Float.parseFloat(info[i.i++].trim());
+        mat.metalness       = Float.parseFloat(info[i.i++].trim());
+        mat.opacity         = Float.parseFloat(info[i.i++].trim());
+        mat.ior             = Float.parseFloat(info[i.i++].trim());
+
         
         switch (type) {
             case "sphere":

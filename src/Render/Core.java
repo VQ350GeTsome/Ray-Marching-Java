@@ -28,32 +28,15 @@ public class Core extends JPanel {
     private Timer timer;
     
     public Core() {
-        imageSizer();           //Size & initialize screen
-        scene = new Scene(width, height);    //Initialize scene
+        imageSizer();                           //Size & initialize screen
+        scene = new Scene(width, height);       //Initialize scene
+        
+        //Default lighting
         scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));  //Set the lighting
-        scene.setAmbientLighting(0.05f);                        //Set the ambient lighting
+        scene.setAmbientLighting(0.05f);                        //Set the ambient lighting 
         
-        /* Add some SDFs */
-        
-        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(new vec3(0,255,255)));
-        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(new vec3(128)));
-        
-        SDF blend = new BlendedSDF(sphere, cube, 1.0f);
-        blend.setName("Blended Sphere & Cube");
-        scene.addSDF(blend);
-        
-        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), new Material(new vec3(64), 0.33f));
-        floor.setName("Scene Floor");
-        scene.addSDF(floor);
-        
-        SDF chainCube = new HollowChainCube(new vec3(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, new Material(new vec3(255,0,0)));
-        chainCube.setName("Chain Cube");
-        //scene.addSDF(chainCube);
-        
-        SDF cube2 = new Cube(      new vec3( 0.0f , -4.0f, 2.0f ), 1.0f, new Material(new vec3(0,255,0), 0.80f));
-        scene.addSDF(cube2);
-        
-        /* Finish adding SDFs */
+        //Default SDFs
+        addDefaultSDFs();
         
         PostProcessor.initalize(width, height); //Initalize the post processor
     }
@@ -112,6 +95,26 @@ public class Core extends JPanel {
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, colorImage[x][y].getRGB());  //Process the image to the screen
         repaint();  //Update screen
+    }
+    
+    private void addDefaultSDFs() {
+        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(new vec3(0,255,255)));
+        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(new vec3(128)));
+        
+        SDF blend = new BlendedSDF(sphere, cube, 1.0f);
+        blend.setName("Blended Sphere & Cube");
+        scene.addSDF(blend);
+        
+        Material floorMat = new Material(new vec3(64.0f));
+        floorMat.reflectivity = 0.25f;
+        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
+        floor.setName("Scene Floor");
+        scene.addSDF(floor);
+        
+        Material mirror = new Material(new vec3());
+        mirror.reflectivity = 1.0f;
+        SDF mirrorCube = new Cube(new vec3(2.0f, -3.0f, 2.0f), 1.0f, mirror);
+        scene.addSDF(mirrorCube);
     }
         
     public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }

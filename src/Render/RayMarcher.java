@@ -94,42 +94,44 @@ public class RayMarcher {
                 color at that pixel depending on the object & its material.
                 */
                 HitInfo hit = marchRay(pos, dir);                     
-                SDF hitObj = hit.sdf;                                       
-                if (hitObj == null) { image[x][y] = background; continue; }
+                SDF obj = hit.sdf;                                       
+                if (obj == null) { image[x][y] = background; continue; }
                 
-                Material objMat = hitObj.getMaterial(pos); //Get the object we hits material and save it to objMat.
-                vec3 diffusedColor = shade(hitObj, hit);                       
-
-                vec3 reflectionColor = (objMat.reflectivity > 0) ? reflect(hitObj, hit, dir, 3) : diffusedColor;
+                Material objMat = obj.getMaterial(pos);     //Get the object we hits material and save it to objMat.
+                
+                //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
+                vec3 norm = estimateNormal(obj, hit.hit);   
+                
+                vec3 diffusedColor = diffuse(obj, hit, norm);                       
+                vec3 reflectionColor = (objMat.reflectivity > 0) ? reflect(hit, dir, norm, 3) : diffusedColor;
+                
                 vec3 finalColor = vec3.blend(diffusedColor, reflectionColor , objMat.reflectivity);
 
-                float fog =  (hit.totalDist / maxDist);           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
+                float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
                 fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
 
                 finalColor =  vec3.blend(finalColor, background, fog);
                 image[x][y] = finalColor;
-
             }
         });
         return image;
     }
     
-    private vec3 reflect(SDF obj, HitInfo hit, vec3 dir, int depth) {
+    private vec3 reflect(HitInfo hit, vec3 dir, vec3 normal, int depth) {
         if (depth <= 0) return background;
         
-        //Calculate the normal, and use that to calculate a new ray that's reflected off of the surface
-        vec3 normal = estimateNormal(obj, hit.hit).normalize();
+        //Use the normal we already calculated in marchScreen() to calculate the reflected ray.
         vec3 reflected = dir.subtract(normal.scale(2.0f * dir.dot(normal))).normalize();
         vec3 origin = hit.hit.add(normal.scale(Core.getEps() * 1.25f)); 
         
         HitInfo info = marchRay(origin, reflected);
         if (info.sdf == null) return background;
                 
-        vec3 shadedColor = shade(info.sdf, info);
-        vec3 recursiveReflection = reflect(info.sdf, info, reflected, depth - 1);
+        vec3 diffusedColor = diffuse(info.sdf, info, normal);
+        vec3 recursiveReflection = reflect(info, reflected, normal, depth - 1);
         
         float reflectivity = info.sdf.getMaterial(info.hit).reflectivity;
-        vec3 combined = vec3.blend(shadedColor, recursiveReflection, reflectivity);
+        vec3 combined = vec3.blend(diffusedColor, recursiveReflection, reflectivity);
 
         float fog = (info.totalDist / maxDist);
         fog = (float) Math.pow(fog, fogFalloff);
@@ -137,18 +139,16 @@ public class RayMarcher {
         return vec3.blend(combined, background, fog);
     }
     
-    private vec3 shade(SDF obj, HitInfo hit) {
+    private vec3 diffuse(SDF obj, HitInfo hit, vec3 normal) {
         float shadow = getShadow(hit.hit); //Get shadow amount
-        
-        //Get an estimated normal & invert the lighting direction
-        vec3 normal = estimateNormal(obj, hit.hit);   
-        vec3 sceneLight = light.getSceneLighting().scale(-1);   
+         
+        vec3 sceneLight = light.getSceneLighting().negate();   
         
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
         brightness = customClamp(brightness, 5);
 
         vec3 finalColor = vec3.blend(obj.getMaterial(hit.hit).color , new vec3(255.0f), brightness);
-              finalColor = finalColor.scale(shadow);
+             finalColor = finalColor.scale(shadow);
               
         return finalColor;
     }

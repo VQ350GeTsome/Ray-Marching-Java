@@ -63,6 +63,6 @@ public abstract class SDF {
      */
     @Override
     public String toString() {
-        return getType() + ",";
+        return getType() + "," + m.toString() + ",";
     }
 }

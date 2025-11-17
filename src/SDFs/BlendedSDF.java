@@ -1,7 +1,6 @@
 package SDFs;
 
 import Utility.*;
-import java.awt.Color;
 
 public class BlendedSDF extends SDF {
     
@@ -49,7 +48,7 @@ public class BlendedSDF extends SDF {
         float ra = aMat.reflectivity, rb = bMat.reflectivity;
         float blendedR = (ra * h) + (rb * (1.0f-h));
         
-        return new Material(blendedColor, blendedR);
+        return new Material(blendedColor);
     }
     
     public float getK() { return k; }
