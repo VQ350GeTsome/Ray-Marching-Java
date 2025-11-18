@@ -71,9 +71,20 @@ public class Core extends JPanel {
     }
     
     //Postprocessing settings 
-    private int   bloomAmount    = 150,
-                  bloomRadius    =  25;
-    private boolean circleBlur   =  true;
+    private static int   bloomSensitivity    = 150,
+                         bloomRadius         =  25;
+    
+    public static String[] getBloomSettings() { return new String[] { ""+bloomSensitivity, ""+bloomRadius }; }
+    public static void setBloomSettings(String[] settings) {
+        try {
+            bloomSensitivity = Integer.parseInt(settings[0].trim());
+            bloomRadius      = Integer.parseInt(settings[1].trim());
+        } catch (NumberFormatException e) {
+            System.err.println("Error Parsing New Bloom Settings ...");
+            System.err.println(e.getMessage());
+        }
+    }
+    public static String packagePostProcessor() { return bloomSensitivity + "," + bloomRadius + ",\n"; }
     
     /**
      * Calls the scenes ray marcher which will march
@@ -88,7 +99,7 @@ public class Core extends JPanel {
               
         //Adds bloom to the image using the current settings
         if (bloom)
-            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomAmount, bloomRadius, circleBlur);
+            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomSensitivity, bloomRadius);
         colorImage = PostProcessor.convertToColor(vec3Image);
         
         

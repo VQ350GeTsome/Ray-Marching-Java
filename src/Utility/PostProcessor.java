@@ -10,6 +10,7 @@ public class PostProcessor {
     
     /**
      * Sets the width and height
+     * 
      * @param w The width
      * @param h The height
      */
@@ -17,17 +18,16 @@ public class PostProcessor {
     
     /**
      * Isolates the brightest areas, blurs them, then adds them back on to image
-     * @param background        The bg color ( what to ignore ).
+     * @param bg                The background color ( what to ignore ).
      * @param image             The image we're adding bloom to.
      * @param bloomSens  How bright a color must be for it to be isolated.
      * @param blurRadius        How much to blur by
-     * @param circleAvg            What type of blur we are using
      * @return                  The final image
      */
-    public static vec3[][] addBloom(vec3[][] image, vec3 bg, float bloomSens, int blurRadius, boolean circleAvg ) {
+    public static vec3[][] addBloom(vec3[][] image, vec3 bg, float bloomSens, int blurRadius) {
         
         vec3[][] brightRegions = isolateBright(image, bloomSens);               
-        vec3[][] blurredBright = boxBlur(bg, brightRegions, blurRadius, circleAvg);
+        vec3[][] blurredBright = boxBlur(bg, brightRegions, blurRadius, true);
        
         vec3[][] finalImage = new vec3[width][height];                                //Initalize a new screen that we'll end up returning               
         

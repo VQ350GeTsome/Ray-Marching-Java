@@ -363,7 +363,6 @@ public class Window extends javax.swing.JFrame {
         ambientLighting = new javax.swing.JMenuItem();
         backgroundColor = new javax.swing.JMenuItem();
         bloomToggle = new javax.swing.JCheckBoxMenuItem();
-        bloomTypeToggle = new javax.swing.JCheckBoxMenuItem();
         bloomSettings = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -506,15 +505,6 @@ public class Window extends javax.swing.JFrame {
             }
         });
         lightingMenu.add(bloomToggle);
-
-        bloomTypeToggle.setSelected(true);
-        bloomTypeToggle.setText("Toggle Gaussian Bloom");
-        bloomTypeToggle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bloomTypeToggleActionPerformed(evt);
-            }
-        });
-        lightingMenu.add(bloomTypeToggle);
 
         bloomSettings.setText("Bloom Settings");
         bloomSettings.addActionListener(new java.awt.event.ActionListener() {
@@ -687,15 +677,14 @@ public class Window extends javax.swing.JFrame {
     private void bloomToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomToggleActionPerformed
         boolean checked = bloomToggle.getState();
         core.bloom = checked;
-        if (!checked) bloomTypeToggle.setState(false);
     }//GEN-LAST:event_bloomToggleActionPerformed
 
-    private void bloomTypeToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomTypeToggleActionPerformed
-        
-    }//GEN-LAST:event_bloomTypeToggleActionPerformed
-
     private void bloomSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomSettingsActionPerformed
+        String[] options  = new String[] { "Bloom Sensitivity: " , "Bloom Radius: " };
+        String[] defaults = Core.getBloomSettings();
+        String[] inputs   = createOptionsPane("Enter New Bloom Settings: ", options, defaults);
         
+        Core.setBloomSettings(inputs);
     }//GEN-LAST:event_bloomSettingsActionPerformed
 
     private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed
@@ -780,7 +769,6 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenuItem backgroundColor;
     private javax.swing.JMenuItem bloomSettings;
     private javax.swing.JCheckBoxMenuItem bloomToggle;
-    private javax.swing.JCheckBoxMenuItem bloomTypeToggle;
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
     private javax.swing.JMenuItem cameraPosition;

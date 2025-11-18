@@ -56,7 +56,9 @@ public class Scene {
         return  camera.packageCamera() +
                 rayMarcher.packRayMarcher() +
                 light.packLight() +
+                Core.packagePostProcessor() +
                 sdfManager.packSDFs();
+                
     }
     public void unpackageScene(String pack) {
         String[] parts = pack.split(",");       //Split pack by delimiter
@@ -77,7 +79,11 @@ public class Scene {
         String[] lightPack = new String[] { parts[12], parts[13] }; //Get the light parts
         light.unpackLight(lightPack);                               //Update light
         
-        String[] sdfs = Arrays.copyOfRange(parts, 14, parts.length);
+        //Post proccesor parts 14 - 15
+        Core.setBloomSettings(new String[] { parts[14], parts[15] } );
+        
+        //Sdf pars 16 ->
+        String[] sdfs = Arrays.copyOfRange(parts, 16, parts.length);
         sdfManager.unpackSDFs(sdfs);
     }
 }
