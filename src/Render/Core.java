@@ -109,12 +109,16 @@ public class Core extends JPanel {
     }
     
     private void addDefaultSDFs() {
-        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, new Material(new vec3(0,255,255)));
+        Material sphereMat = new Material(new vec3(0, 255, 255));
+        sphereMat.reflectivity = 0.667f;
+        sphereMat.roughness = 0.25f;
+        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, sphereMat);
         SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(new vec3(128)));
         
         SDF blend = new BlendedSDF(sphere, cube, 1.0f);
         blend.setName("Blended Sphere & Cube");
-        scene.addSDF(blend);
+        //scene.addSDF(blend);
+        scene.addSDF(sphere);
         
         Material floorMat = new Material(new vec3(64.0f));
         floorMat.reflectivity = 0.25f;
@@ -125,7 +129,7 @@ public class Core extends JPanel {
         Material mirror = new Material(new vec3());
         mirror.reflectivity = 1.0f;
         SDF mirrorCube = new Cube(new vec3(2.0f, -3.0f, 2.0f), 1.0f, mirror);
-        //scene.addSDF(mirrorCube);
+        scene.addSDF(mirrorCube);
     }
         
     public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }

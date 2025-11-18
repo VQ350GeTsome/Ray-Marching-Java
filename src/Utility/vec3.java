@@ -112,6 +112,14 @@ public class vec3 {
     
     public vec3 scale(float p) { return new vec3(x * p, y * p, z * p); }
     public vec3 negate() { return this.scale(-1.0f); }
+    public vec3 multiply(vec3 o) {
+        return new vec3
+                (
+                        x * o.x,
+                        y * o.y,
+                        z * o.z
+                );
+    }
     
     public vec3 divide(float f) { return new vec3(x / f, y / f, z / f); }
     
@@ -163,6 +171,41 @@ public class vec3 {
     
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
+    public static vec3 randomHemisphere(vec3 normal, vec3 pos) {
+        // Generate random point on unit sphere
+        float u = hash(pos, 1);   
+        float v = hash(pos, 2);     
+        
+        float r = (float)Math.sqrt(u);
+        float theta = 2.0f * (float)Math.PI * v;
+
+        float x = r * (float)Math.cos(theta);
+        float y = r * (float)Math.sin(theta);
+        float z = (float)Math.sqrt(1.0f - u);
+
+        vec3 tangent = normal.anyPerpendicular().normalize();
+        vec3 bitangent = normal.cross(tangent).normalize();
+
+        vec3 dir = tangent.scale(x)
+                    .add(bitangent.scale(y))
+                    .add(normal.scale(z));
+
+        return dir.normalize();
+    }
+    private static float hash(vec3 p, float q) {
+        float dot = p.x * 127.1f * q + p.y * 311.7f * q + p.z * 74.7f * q;
+        return fract((float)Math.sin(dot) * 43758.5453f);
+    }
+
+    private static float fract(float x) {
+        return x - (float)Math.floor(x);
+    }
+    private vec3 anyPerpendicular() {
+        vec3 axis = (Math.abs(x) < 0.9f) ? new vec3(1,0,0) : new vec3(0,1,0);
+        vec3 perp = cross(axis);
+        return perp.normalize();
+    }
+
     public static vec3 blend(vec3 p, vec3 q, float w) {
         //Clamp weight
         w = Math.min(w, 1.0f);

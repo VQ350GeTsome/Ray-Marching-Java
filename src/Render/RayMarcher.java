@@ -105,48 +105,59 @@ public class RayMarcher {
                 an object just set the pixels color to the background, else calculate the 
                 color at that pixel depending on the object & its material.
                 */
-                HitInfo hit = marchRay(pos, dir);                     
-                SDF obj = hit.sdf;                                       
-                if (obj == null) { image[x][y] = background; continue; }
-                
-                Material objMat = obj.getMaterial(hit.hit);     //Get the object we hits material and save it to objMat.
-                
-                //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
-                vec3 norm = estimateNormal(obj, hit.hit);   
-                
-                vec3 diffusedColor = diffuse(obj, hit, norm);                       
-                vec3 reflectionColor = (objMat.reflectivity > 0.01f) ? reflect(hit, dir, norm, 3) : diffusedColor;
-                
-                vec3 finalColor = vec3.blend(diffusedColor, reflectionColor , objMat.reflectivity);
-
-                float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
-                fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
-
-                finalColor =  vec3.blend(finalColor, background, fog);
-                image[x][y] = finalColor;
+                HitInfo hit = marchRay(pos, dir);                                                          
+                if (hit.sdf == null) { image[x][y] = background; continue; }
+                image[x][y] = calculateColor(hit, dir);
             }
         });
         return image;
     }
     
+    private vec3 calculateColor(HitInfo hit, vec3 dir) {
+        SDF obj = hit.sdf;
+        Material objMat = obj.getMaterial(hit.hit);     //Get the object we hits material and save it to objMat.
+                
+        //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
+        vec3 norm = estimateNormal(obj, hit.hit);   
+
+        vec3 diffusedColor = diffuse(obj, hit, norm);                       
+        vec3 reflectionColor = (objMat.reflectivity > 0.01f) ? reflect(hit, dir, norm, 3) : diffusedColor;
+        
+        vec3 finalColor = vec3.blend(diffusedColor, reflectionColor , objMat.reflectivity);
+
+        float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
+        fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
+
+        finalColor =  vec3.blend(finalColor, background, fog);
+        return finalColor;
+    }
+    
     private vec3 reflect(HitInfo hit, vec3 dir, vec3 normal, int depth) {
         if (depth <= 0) return background;
         
+        Material mat = hit.sdf.getMaterial(hit.hit);
+        
+        //Get the new direction of the reflected ray
         vec3 reflected = dir.subtract(normal.scale(2.0f * dir.dot(normal))).normalize();
-        vec3 origin = hit.hit.add(normal.scale(Core.getEps() * 1.25f)); 
+
+        //Add a random distrubance depending on the objects roughness
+        reflected = reflected.add(vec3.randomHemisphere(normal, hit.hit).scale(customClamp(mat.roughness, 2))).normalize();
+        vec3 origin = hit.hit.add(normal.scale(Core.getEps() * 2.0f)); 
         
-        HitInfo info = marchRay(origin, reflected);
-        if (info.sdf == null) return background;
-                
-        vec3 newNormal = estimateNormal(info.sdf, info.hit);
+        //March the reflected ray and get its HitInfo
+        HitInfo reflectHit = marchRay(origin, reflected);
+        SDF reflectObj = reflectHit.sdf;
+        if (reflectObj == null) return background;
+      
+        vec3 newNormal = estimateNormal(reflectObj, reflectHit.hit);
         
-        vec3 diffusedColor = diffuse(info.sdf, info, newNormal);
-        vec3 recursiveReflection = reflect(info, reflected, newNormal, depth - 1);
+        vec3 diffusedColor = diffuse(reflectObj, reflectHit, newNormal);
+        vec3 recursiveReflection = reflect(reflectHit, reflected, newNormal, depth - 1);
         
-        float reflectivity = info.sdf.getMaterial(info.hit).reflectivity;
+        float reflectivity = reflectObj.getMaterial(reflectHit.hit).reflectivity;
         vec3 combined = vec3.blend(diffusedColor, recursiveReflection, reflectivity);
 
-        float fog = (info.totalDist / maxDist);
+        float fog = (reflectHit.totalDist / maxDist);
         fog = (float) Math.pow(fog, fogFalloff);
         
         return vec3.blend(combined, background, fog);
