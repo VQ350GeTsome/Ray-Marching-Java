@@ -18,10 +18,10 @@ public class BlendedSDF extends SDF {
         if (a == null) return b.sdf(p);
         if (b == null) return a.sdf(p);
         
-        float d1 = a.sdf(p);
-        float d2 = b.sdf(p);
-        float h = Math.max(k - Math.abs(d1 - d2), 0.0f) / k;
-        return Math.min(d1, d2) - h * h * k * 0.25f;
+        float da = a.sdf(p);
+        float db = b.sdf(p);
+        float h = Math.max(k - Math.abs(da - db), 0.0f) / k;
+        return Math.min(da, db) - h * h * k * 0.25f;
     }
     
     @Override
@@ -32,23 +32,17 @@ public class BlendedSDF extends SDF {
         float da = a.sdf(p),    //Distance of a
               db = b.sdf(p);    //Distance of b
         
-        float total = Math.abs(db) + Math.abs(da),
-              h = (total == 0) ? 0.5f : Math.abs(da) / total;
+        float total = Math.abs(da) + Math.abs(db),
+                  h = (total == 0) ? 0.5f : Math.abs(da) / total;
+        
+        //System.out.println("Dist of A: " + da + "\tDist of B: " + db + "\tCalculated H: " + h);
         
         //a & b's materials
         Material aMat = a.getMaterial(p), bMat = b.getMaterial(p);
 
-        //Use a & b's colors ( from material ) to blend the 
-        //two in order to get a nice gradient between the two.
-        vec3 c1 = aMat.color, c2 = bMat.color;
-        vec3  blendedColor = vec3.blend(c1, c2, h);
-        
-        //Use a & b's reflectivness ( from material ) to
-        //blend the two just like the color.
-        float ra = aMat.reflectivity, rb = bMat.reflectivity;
-        float blendedR = (ra * h) + (rb * (1.0f-h));
-        
-        return new Material(blendedColor);
+        Material blendMat = aMat.blend(bMat, h);
+        //System.out.println("Calculated H: " + h + "\tReflectivity: " + blendMat.reflectivity);
+        return blendMat;
     }
     
     public float getK() { return k; }
@@ -66,21 +60,16 @@ public class BlendedSDF extends SDF {
     }
     
     public void remove(SDF c) {
-        if (a == c) {       //If t is a set a to null
-            a = null;  
-            return;
-        } else if (a instanceof BlendedSDF) {   //Else check if t is a child of a
-            ((BlendedSDF) a).remove(c);         //If so remove it
-            return;
-        }
-
-        if (b == c) {       //Do the same as above, just with b
-            b = null;
-            return;
-        } else if (b instanceof BlendedSDF) { 
-            ((BlendedSDF) b).remove(c);
-            return;
-        }
+        //If the child, c, we're trying to remove is a child
+        //of this, set it to null, removing it.
+             if (a == c) a = null;  
+        else if (b == c) b = null;
+        
+        //If the child isn't a child of this, see if any of our
+        //children are blended themselves, ( meaning they themselves
+        //have children ), and if so remove it.
+        else if (a instanceof BlendedSDF) ((BlendedSDF) a).remove(c);      
+        else if (b instanceof BlendedSDF) ((BlendedSDF) b).remove(c);
     }
     /**
      * If there is an empty child
@@ -94,21 +83,15 @@ public class BlendedSDF extends SDF {
     }
     
     public void editChild(String[] inputs, SDF c) {
-        if (a == c) {       //If t is a set a to null
-            a.parseNewParams(inputs);  
-            return;
-        } else if (a instanceof BlendedSDF) {   //Else check if t is a child of a
-            ((BlendedSDF) a).editChild(inputs, c);         //If so remove it
-            return;
-        }
-
-        if (b == c) {       //Do the same as above, just with b
-            b.parseNewParams(inputs);
-            return;
-        } else if (b instanceof BlendedSDF) { 
-            ((BlendedSDF) b).editChild(inputs, c);
-            return;
-        }
+        //Just like remove(), we first check if the child we are trying
+        //to edit is one of our children, and if so we edit it.
+             if (a == c) a.parseNewParams(inputs);  
+        else if (b == c) b.parseNewParams(inputs);
+        
+        //Again just like remove(), if it's not one of our children, check 
+        //if our children are blended, ( they have children ), and query them.
+        else if (a instanceof BlendedSDF) ((BlendedSDF) a).editChild(inputs, c);       
+        else if (b instanceof BlendedSDF) ((BlendedSDF) b).editChild(inputs, c);
     }
     
     /**
@@ -123,6 +106,16 @@ public class BlendedSDF extends SDF {
      * @return True if either a or b are null
      */
     public boolean needsUnblended() { return (a == null || b == null); }
+    
+    public void setMaterial(SDF c, Material m) {
+        //Just like remove() & editChild() use a recursive method to
+        //search all our children & grandchildren and so on.
+             if (a == c) a.setMaterial(m);
+        else if (b == c) b.setMaterial(m);
+
+        else if (a instanceof BlendedSDF) ((BlendedSDF) a).setMaterial(c, m);
+        else if (b instanceof BlendedSDF) ((BlendedSDF) b).setMaterial(c, m);
+    }
     
     @Override
     public String[] getSettingsAndCurrent() { return new String[] { "Blending Amount: ", ""+k }; }

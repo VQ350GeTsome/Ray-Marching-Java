@@ -164,11 +164,23 @@ public class vec3 {
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
     public static vec3 blend(vec3 p, vec3 q, float w) {
+        //Clamp weight
         w = Math.min(w, 1.0f);
         w = Math.max(w, 0.0f);
+        
         float nx = (1 - w) * p.x + w * q.x;
         float ny = (1 - w) * p.y + w * q.y;
         float nz = (1 - w) * p.z + w * q.z;
+        return new vec3(nx, ny, nz); 
+    }
+    public vec3 blend(vec3 o, float w) {
+        //Clamp the weight
+        w = Math.min(w, 1.0f);
+        w = Math.max(w, 0.0f);
+        
+        float nx = (1 - w) * x + w * o.x;
+        float ny = (1 - w) * y + w * o.y;
+        float nz = (1 - w) * z + w * o.z;
         return new vec3(nx, ny, nz); 
     }
 

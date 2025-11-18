@@ -109,13 +109,13 @@ public class RayMarcher {
                 SDF obj = hit.sdf;                                       
                 if (obj == null) { image[x][y] = background; continue; }
                 
-                Material objMat = obj.getMaterial(pos);     //Get the object we hits material and save it to objMat.
+                Material objMat = obj.getMaterial(hit.hit);     //Get the object we hits material and save it to objMat.
                 
                 //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
                 vec3 norm = estimateNormal(obj, hit.hit);   
                 
                 vec3 diffusedColor = diffuse(obj, hit, norm);                       
-                vec3 reflectionColor = (objMat.reflectivity > 0) ? reflect(hit, dir, norm, 3) : diffusedColor;
+                vec3 reflectionColor = (objMat.reflectivity > 0.01f) ? reflect(hit, dir, norm, 3) : diffusedColor;
                 
                 vec3 finalColor = vec3.blend(diffusedColor, reflectionColor , objMat.reflectivity);
 

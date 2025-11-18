@@ -101,7 +101,7 @@ public class Window extends javax.swing.JFrame {
         
          //Create the panel we will use & input a grid layout with the right amount of rows
          // & inputs per row ( double since we do label field + input field )
-        JPanel panel = new JPanel(new java.awt.GridLayout(rows, inputsPerRow * 2, 10, 10));
+        JPanel panel = new JPanel(new java.awt.GridLayout(rows, inputsPerRow * 2, 5, 5));
         
         for (int i = 0; length > i; i++) {
             fields[i] = new JTextField(defaults[i], 10);
@@ -243,6 +243,14 @@ public class Window extends javax.swing.JFrame {
         obj.setColor(new vec3(color));
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
+        SDFs.SDF parent = null;
+        boolean blended = false;
+        if (obj instanceof SDFs.BlendedSDF) {
+            parent = obj;
+            obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
+            blended = true;
+        }
+        
         String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Roughness: ",
                                             "Metalness: ", "Opacity: ", "IOR: " };
         String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 1, 7);
@@ -271,7 +279,8 @@ public class Window extends javax.swing.JFrame {
         }
          
         //Set the clicked on objects material to it
-        obj.setMaterial(m);
+        if (blended) ((SDFs.BlendedSDF) parent).setMaterial(obj, m);
+        else obj.setMaterial(m);
         
     }
     private void regEditClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
