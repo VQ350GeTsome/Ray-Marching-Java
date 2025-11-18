@@ -132,15 +132,16 @@ public class RayMarcher {
     private vec3 reflect(HitInfo hit, vec3 dir, vec3 normal, int depth) {
         if (depth <= 0) return background;
         
-        //Use the normal we already calculated in marchScreen() to calculate the reflected ray.
         vec3 reflected = dir.subtract(normal.scale(2.0f * dir.dot(normal))).normalize();
         vec3 origin = hit.hit.add(normal.scale(Core.getEps() * 1.25f)); 
         
         HitInfo info = marchRay(origin, reflected);
         if (info.sdf == null) return background;
                 
-        vec3 diffusedColor = diffuse(info.sdf, info, normal);
-        vec3 recursiveReflection = reflect(info, reflected, normal, depth - 1);
+        vec3 newNormal = estimateNormal(info.sdf, info.hit);
+        
+        vec3 diffusedColor = diffuse(info.sdf, info, newNormal);
+        vec3 recursiveReflection = reflect(info, reflected, newNormal, depth - 1);
         
         float reflectivity = info.sdf.getMaterial(info.hit).reflectivity;
         vec3 combined = vec3.blend(diffusedColor, recursiveReflection, reflectivity);

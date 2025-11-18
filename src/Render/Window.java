@@ -27,6 +27,7 @@ public class Window extends javax.swing.JFrame {
         initComponents();
         core.mainLoop();
     }
+    
     private void cameraMover(int input, boolean shift) {
         float   grain = Core.cameraMoveGrain;               //Get the current camera grain (sensitivity)
         vec3[]  orien = core.scene.getCameraOrien();        //Get the three orientation vectors
@@ -93,12 +94,14 @@ public class Window extends javax.swing.JFrame {
         core.scene.zoomCamera(zoom);
     }
     
-    private String[] createOptionsPane(String title, String[] options, String[] defaults) {
-        JPanel panel = new JPanel();    //Create the panel we will use
-                
+    private String[] createOptionsPane(String title, String[] options, String[] defaults, int inputsPerRow) {  
         int length = options.length;
+        JTextField[] fields = new JTextField[length];               //Initialize the feilds we will use
+        int rows = (int) Math.ceil((double) length / inputsPerRow); //Calculate the amount of rows we'll need
         
-        JTextField[] fields = new JTextField[length];
+         //Create the panel we will use & input a grid layout with the right amount of rows
+         // & inputs per row ( double since we do label field + input field )
+        JPanel panel = new JPanel(new java.awt.GridLayout(rows, inputsPerRow * 2, 10, 10));
         
         for (int i = 0; length > i; i++) {
             fields[i] = new JTextField(defaults[i], 10);
@@ -126,7 +129,7 @@ public class Window extends javax.swing.JFrame {
         }
         
     }
-    private String[] createOptionsPane(String title, String[] both) {
+    private String[] createOptionsPane(String title, String[] both, int inputsPerRow) {
         int length = both.length;                       //Get the amount of settings (double the amount because the current values are stored too)
         
         String[] options  = new String[length / 2];     //Initialize the options  array
@@ -135,7 +138,7 @@ public class Window extends javax.swing.JFrame {
         for (int i = 0; length / 2 > i; i++)  options[i] = both[i];                 //Fill the options  array
         for (int i = 0; length / 2 > i; i++) defaults[i] = both[i + length / 2];    //Fill the defualts array
         
-        return createOptionsPane(title, options, defaults);
+        return createOptionsPane(title, options, defaults, inputsPerRow);
     }
     
     private int createButtonsPane(String prompt, String[] options) {
@@ -236,10 +239,39 @@ public class Window extends javax.swing.JFrame {
         
         //Prompts the user with a color chooser with a random color to start
         Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
-        
+        if (color == null) return;
         obj.setColor(new vec3(color));
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
+        String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Roughness: ",
+                                            "Metalness: ", "Opacity: ", "IOR: " };
+        String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 1, 7);
+        String[] inputs = createOptionsPane
+            (   
+                    "Enter New Material Settings For " 
+                    + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " ... ",
+                    settings, defaults, 3
+            );
+        
+        if (inputs == null) return; 
+        
+        //Parse the new material settings into a material obj
+        Utility.Material m = obj.getMaterial(hit);
+        try {
+            m.reflectivity = Float.parseFloat(inputs[0].trim());
+            m.specular = Float.parseFloat(inputs[1].trim());
+            m.roughness = Float.parseFloat(inputs[2].trim());
+            m.metalness = Float.parseFloat(inputs[3].trim());
+            m.opacity = Float.parseFloat(inputs[4].trim());
+            m.ior = Float.parseFloat(inputs[5].trim());  
+        } catch (NumberFormatException e) {
+            System.err.println("Error Parsing New Material ...");
+            System.err.println(e.getMessage());
+            return;
+        }
+         
+        //Set the clicked on objects material to it
+        obj.setMaterial(m);
         
     }
     private void regEditClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
@@ -254,9 +286,12 @@ public class Window extends javax.swing.JFrame {
         }
         
         //Get the new settings 
-        String[] inputs = createOptionsPane("Enter New Settings for " + 
+        String[] inputs = createOptionsPane
+            (
+                "Enter New Settings for " + 
                  ((obj.getName() == null) ? obj.getType() : obj.getName()) 
-                 + ": ", obj.getSettingsAndCurrent());
+                 + ": ", obj.getSettingsAndCurrent(), 3
+            );
         if (inputs == null) return;
 
         /*  
@@ -331,7 +366,7 @@ public class Window extends javax.swing.JFrame {
                 break;        
         }
         if (type == 1) t = "repeat" + t;
-        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new));
+        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new), 3);
         if (inputs == null) return;
         safeAddSDF(t, inputs); 
     }
@@ -599,7 +634,7 @@ public class Window extends javax.swing.JFrame {
         String defaultMove  = String.valueOf(Core.cameraMoveGrain);
         String defaultPan   = String.valueOf(Core.cameraRotateGrain);
         String[] defaults   = new String[] { defaultMove, defaultPan };
-        String[] inputs = createOptionsPane("Enter new grains: ", options, defaults);
+        String[] inputs = createOptionsPane("Enter new grains: ", options, defaults, 3);
         
         if (inputs == null) return;
         
@@ -612,7 +647,7 @@ public class Window extends javax.swing.JFrame {
     private void sceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sceneLighitngActionPerformed
         String[] options    = new String[] { "Scene Light Direction: " };
         String[] defaultDir = new String[] { core.scene.getSceneLighting().toStringParen() };
-        String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir);
+        String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir, 3);
         
         if (inputs == null) return; 
         
@@ -623,7 +658,7 @@ public class Window extends javax.swing.JFrame {
     private void ambientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ambientLightingActionPerformed
         String[] options = new String[] { "New Level: " };
         String[] current = new String[] { ""+core.scene.getAmbientLighting() };
-        String[] input  = createOptionsPane("Enter New Ambient Lighting Level", options, current);
+        String[] input  = createOptionsPane("Enter New Ambient Lighting Level", options, current, 3);
         
         if (input == null) return;
         
@@ -637,7 +672,7 @@ public class Window extends javax.swing.JFrame {
     private void cameraPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraPositionActionPerformed
         String[] options    = new String[] { "New Camera Position: " };
         String[] defaultDir = new String[] { core.scene.getCameraPos().round(1).toStringParen() };
-        String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir);
+        String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir, 3);
         
         if (inputs == null) return; 
         
@@ -682,7 +717,7 @@ public class Window extends javax.swing.JFrame {
     private void bloomSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomSettingsActionPerformed
         String[] options  = new String[] { "Bloom Sensitivity: " , "Bloom Radius: " };
         String[] defaults = Core.getBloomSettings();
-        String[] inputs   = createOptionsPane("Enter New Bloom Settings: ", options, defaults);
+        String[] inputs   = createOptionsPane("Enter New Bloom Settings: ", options, defaults, 3);
         
         Core.setBloomSettings(inputs);
     }//GEN-LAST:event_bloomSettingsActionPerformed
@@ -690,7 +725,7 @@ public class Window extends javax.swing.JFrame {
     private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed
         String[] options = new String[] { "Max Steps: ", "Max Distance: ", "Shadow Max Steps: " };
         String[] defaults = core.scene.getMarchParams();
-        String[] inputs = createOptionsPane("Enter New March Settings: ", options, defaults);
+        String[] inputs = createOptionsPane("Enter New March Settings: ", options, defaults, 3);
         
         core.scene.setMarchParams(inputs);
     }//GEN-LAST:event_changeRenderActionPerformed
@@ -699,7 +734,7 @@ public class Window extends javax.swing.JFrame {
         String[] options = new String[] { "Enter new FPS Target: " };
         String[] current = new String[] { ""+core.getWait() };
         
-        String input = createOptionsPane("New FPS Cap...", options, current)[0];
+        String input = createOptionsPane("New FPS Cap...", options, current, 3)[0];
         
         try { core.setWait(Integer.parseInt(input)); }
         catch (Exception e) { ; }

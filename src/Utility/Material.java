@@ -11,11 +11,10 @@ public class Material {
                     metalness       = 0.0f,
                     opacity         = 0.0f,
                     ior             = 0.0f;
-    //Emission later
-    
-    public Material(vec3 color) { this.color = color; }
+    //Light emission later ... maybe
     
     public Material() { color = new vec3(0.0f); }
+    public Material(vec3 color) { this.color = color; }
     
     @Override
     public String toString() {
