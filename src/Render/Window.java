@@ -16,17 +16,17 @@ import javax.swing.JTextField;
 public class Window extends javax.swing.JFrame {
        
     //Input constants
-    private final int   SPACE_BAR     =  32, LEFT_ARROW    =  37, UP_ARROW      =  38, RIGHT_ARROW   =  39,
-                        DOWN_ARROW    =  40, LEFT_CLICK    =   1, MIDDLE_CLICK  =   2, RIGHT_CLICK   =   3,
-                        W_KEY         =  87, A_KEY         =  65, S_KEY         =  83, D_KEY         =  68,
-                        Q_KEY         =  81, E_KEY         =  69, R_KEY         =  82, F1_KEY        = 112,
-                        M_WHEEL_UP    = - 1, M_WHEEL_DOWN  =   1;
+    private final int   SPACE_BAR     =   32, LEFT_ARROW    =   37, UP_ARROW      =   38, RIGHT_ARROW   =   39,
+                        DOWN_ARROW    =   40, LEFT_CLICK    =    1, MIDDLE_CLICK  =    2, RIGHT_CLICK   =    3,
+                        W_KEY         =   87, A_KEY         =   65, S_KEY         =   83, D_KEY         =   68,
+                        Q_KEY         =   81, E_KEY         =   69, R_KEY         =   82, F1_KEY        =  112,
+                        M_WHEEL_UP    = -  1, M_WHEEL_DOWN  =    1, M_LEFT_HOLD   = 1024, M_RIGHT_HOLD  = 4096,
+                        M_MIDDLE_HOLD = 2048;
 
     public Window() {
         initComponents();
         core.mainLoop();
     }
-    
     private void cameraMover(int input, boolean shift) {
         float   grain = Core.cameraMoveGrain;               //Get the current camera grain (sensitivity)
         vec3[]  orien = core.scene.getCameraOrien();        //Get the three orientation vectors
@@ -42,6 +42,27 @@ public class Window extends javax.swing.JFrame {
             case D_KEY:   move = right.scale(  grain );    break;  //Move right
         }
         core.scene.moveCamera(move); //Call the core that'll move the camera
+    }
+    private void cameraMover(int dx, int dy, boolean middle) {
+        float  grain = Core.cameraMoveGrain;
+        vec3[] orien = core.scene.getCameraOrien();   
+                                     //        -y        
+        vec3    forward = orien[0],  //         |
+                right   = orien[1],  //   -x  --+-- +x
+                up      = orien[2],  //         |
+                move;                //        +y
+        
+        float sens = 0.10f;
+        
+        if (middle) {
+            move = up.scale(-dy);
+            move = move.add(right.scale(dx));
+        } else {
+            move = forward.scale(-dy);
+        }
+
+        core.scene.moveCamera(move.normalize().scale(sens));
+        
     }
     private void cameraRotater(int input) {
         float grain = Core.cameraRotateGrain;
@@ -702,7 +723,10 @@ public class Window extends javax.swing.JFrame {
         int dx = evt.getX() - mouseLastX,
             dy = evt.getY() - mouseLastY; //Get the delta x & y.
         
-        cameraRotater(dx, dy);
+        int button = evt.getModifiersEx();
+        if (button == M_LEFT_HOLD   || button == M_LEFT_HOLD + M_MIDDLE_HOLD) cameraRotater(dx, dy);
+        if (button == M_MIDDLE_HOLD || button == M_LEFT_HOLD + M_MIDDLE_HOLD) cameraMover(dx, dy, true);
+        if (button == M_RIGHT_HOLD) cameraMover(dx, dy, false);
         
         mouseLastX = evt.getX(); mouseLastY = evt.getY();
     }//GEN-LAST:event_coreMouseDragged
@@ -723,7 +747,7 @@ public class Window extends javax.swing.JFrame {
          */
         try {
 	  for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-	      if ("Nimbus".equals(info.getName())) {
+	      if ("Windows Classic".equals(info.getName())) {
 		javax.swing.UIManager.setLookAndFeel(info.getClassName());
 		break;
 	      }
