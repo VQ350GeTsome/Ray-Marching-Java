@@ -50,6 +50,8 @@ public class Scene {
     public HitInfo marchRay(int x, int y, int w, int h) { return rayMarcher.marchRay(x, y, w, h); }
     public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public vec3 getBackground() { return rayMarcher.getBackground(); }
+    public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }
+    public String[] getMarchParams() { return rayMarcher.getMarchParams(); }
     public String packageScene() {
         return  camera.packageCamera() +
                 rayMarcher.packRayMarcher() +

@@ -22,6 +22,20 @@ public class RayMarcher {
         this.light      = light;
         this.sdfMgr     = sdfMgr;
     }
+    
+    public void setMarchParams(String[] params) {
+        try {
+            maxSteps = Integer.parseInt(params[0]);
+            maxDist  = Integer.parseInt(params[1]);
+            shadowSteps = Integer.parseInt(params[2]);
+        } catch (Exception e) { 
+            System.err.println("Error parsing new March Parameters ... ");
+            System.err.println(e.getMessage()); 
+        }
+    }
+    public String[] getMarchParams() {
+        return new String[] { ""+maxSteps, ""+maxDist, ""+shadowSteps };
+    }
         
     /**
      * Marches a ray starting at pos in the direction ( dir )

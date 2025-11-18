@@ -700,7 +700,11 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_bloomSettingsActionPerformed
 
     private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed
+        String[] options = new String[] { "Max Steps: ", "Max Distance: ", "Shadow Max Steps: " };
+        String[] defaults = core.scene.getMarchParams();
+        String[] inputs = createOptionsPane("Enter New March Settings: ", options, defaults);
         
+        core.scene.setMarchParams(inputs);
     }//GEN-LAST:event_changeRenderActionPerformed
 
     private void changeFPSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeFPSActionPerformed
@@ -724,9 +728,9 @@ public class Window extends javax.swing.JFrame {
             dy = evt.getY() - mouseLastY; //Get the delta x & y.
         
         int button = evt.getModifiersEx();
-        if (button == M_LEFT_HOLD   || button == M_LEFT_HOLD + M_MIDDLE_HOLD) cameraRotater(dx, dy);
-        if (button == M_MIDDLE_HOLD || button == M_LEFT_HOLD + M_MIDDLE_HOLD) cameraMover(dx, dy, true);
-        if (button == M_RIGHT_HOLD) cameraMover(dx, dy, false);
+        if (button == M_LEFT_HOLD)   cameraRotater(dx, dy);
+        if (button == M_RIGHT_HOLD)  cameraMover(dx, dy, true);
+        if (button == M_MIDDLE_HOLD) cameraMover(dx, dy, false);
         
         mouseLastX = evt.getX(); mouseLastY = evt.getY();
     }//GEN-LAST:event_coreMouseDragged
