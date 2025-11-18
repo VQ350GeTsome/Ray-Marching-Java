@@ -617,7 +617,6 @@ public class Window extends javax.swing.JFrame {
             Core.cameraMoveGrain = Float.parseFloat(inputs[0]);
             Core.cameraRotateGrain = Float.parseFloat(inputs[1]);   
         } catch (Exception e) { System.err.println("Error in parsing new grains: " + e.getMessage()); }
-        
     }//GEN-LAST:event_cameraGrainActionPerformed
 
     private void sceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sceneLighitngActionPerformed

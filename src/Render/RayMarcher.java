@@ -28,14 +28,12 @@ public class RayMarcher {
             maxSteps = Integer.parseInt(params[0]);
             maxDist  = Integer.parseInt(params[1]);
             shadowSteps = Integer.parseInt(params[2]);
-        } catch (Exception e) { 
+        } catch (NumberFormatException e) { 
             System.err.println("Error parsing new March Parameters ... ");
             System.err.println(e.getMessage()); 
         }
     }
-    public String[] getMarchParams() {
-        return new String[] { ""+maxSteps, ""+maxDist, ""+shadowSteps };
-    }
+    public String[] getMarchParams() { return new String[] { ""+maxSteps, ""+maxDist, ""+shadowSteps }; }
         
     /**
      * Marches a ray starting at pos in the direction ( dir )
