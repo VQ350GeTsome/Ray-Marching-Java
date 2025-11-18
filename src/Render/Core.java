@@ -70,6 +70,10 @@ public class Core extends JPanel {
         renderScene();
     }
     
+    //Postprocessing settings 
+    private int   bloomAmount    = 150,
+                  bloomRadius    =  25;
+    private boolean circleBlur   =  true;
     
     /**
      * Calls the scenes ray marcher which will march
@@ -80,10 +84,13 @@ public class Core extends JPanel {
      */
     private void renderScene() {
         vec3[][] vec3Image = scene.renderScene();
-        Color[][] colorImage = null;              
-
-        vec3Image = PostProcessor.process(vec3Image);
+        Color[][] colorImage = null;
+              
+        //Adds bloom to the image using the current settings
+        if (bloom)
+            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomAmount, bloomRadius, circleBlur);
         colorImage = PostProcessor.convertToColor(vec3Image);
+        
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, colorImage[x][y].getRGB());  //Process the image to the screen
