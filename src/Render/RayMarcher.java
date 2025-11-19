@@ -113,7 +113,7 @@ public class RayMarcher {
         return image;
     }
     
-    private vec3 calculateColor(HitInfo hit, vec3 dir) {
+    private vec3 calculateColor(HitInfo hit, vec3 dir, int depth) {
         SDF obj = hit.sdf;
         Material objMat = obj.getMaterial(hit.hit);     //Get the object we hits material and save it to objMat.
                 
@@ -122,9 +122,31 @@ public class RayMarcher {
         //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
         vec3 norm = estimateNormal(obj, hit.hit);   
 
+        //Get the diffused color & specular color
         vec3 diffusedColor = diffuse(obj, hit, norm).scale(shadow);                       
         vec3 specularColor = specular(norm, dir, objMat).scale(shadow);
-        vec3 reflectionColor = (objMat.reflectivity > 0.01f) ? reflect(hit, dir, norm, 3) : diffusedColor;
+        
+        //Using recursion calculate the color of the reflected ray
+        vec3 reflectionColor;
+        if (objMat.reflectivity > 0.01f && depth > 0) {
+            //Calculate the direction of a reflected ray
+            vec3 reflected = dir.subtract(norm.scale(2.0f * dir.dot(norm))).normalize();
+            
+            //If the material is rough add a random vector seeded with the normal & hit position
+            if (objMat.roughness > 0.01f)
+                reflected = reflected.add(vec3.randomHemisphere(norm, hit.hit).scale(customClamp(objMat.roughness, 2))).normalize();
+            
+            //Start the ray a little off the surface
+            vec3 origin = hit.hit.add(norm.scale(Core.getEps() * 2.0f));
+
+            //March that reflected ray
+            HitInfo reflectHit = marchRay(origin, reflected);
+
+            //Use recursion if we hit an object
+            if (reflectHit.sdf == null) reflectionColor = background;   
+            else reflectionColor = calculateColor(reflectHit, reflected, depth - 1);
+ 
+        } else reflectionColor = diffusedColor;
         
         vec3 finalColor = diffusedColor
                           .blend(reflectionColor, objMat.reflectivity)
@@ -136,38 +158,8 @@ public class RayMarcher {
         finalColor =  vec3.blend(finalColor, background, fog);
         return finalColor;
     }
-    
-    private vec3 reflect(HitInfo hit, vec3 dir, vec3 normal, int depth) {
-        if (depth <= 0) return background;
+    private vec3 calculateColor(HitInfo hit, vec3 dir) { return calculateColor(hit, dir, 4); }
         
-        Material mat = hit.sdf.getMaterial(hit.hit);
-        
-        //Get the new direction of the reflected ray
-        vec3 reflected = dir.subtract(normal.scale(2.0f * dir.dot(normal))).normalize();
-
-        //Add a random distrubance depending on the objects roughness
-        reflected = reflected.add(vec3.randomHemisphere(normal, hit.hit).scale(customClamp(mat.roughness, 2))).normalize();
-        vec3 origin = hit.hit.add(normal.scale(Core.getEps() * 2.0f)); 
-        
-        //March the reflected ray and get its HitInfo
-        HitInfo reflectHit = marchRay(origin, reflected);
-        SDF reflectObj = reflectHit.sdf;
-        if (reflectObj == null) return background;
-      
-        vec3 newNormal = estimateNormal(reflectObj, reflectHit.hit);
-        
-        vec3 diffusedColor = diffuse(reflectObj, reflectHit, newNormal);
-        vec3 recursiveReflection = reflect(reflectHit, reflected, newNormal, depth - 1);
-        
-        float reflectivity = reflectObj.getMaterial(reflectHit.hit).reflectivity;
-        vec3 combined = vec3.blend(diffusedColor, recursiveReflection, reflectivity);
-
-        float fog = (reflectHit.totalDist / maxDist);
-        fog = (float) Math.pow(fog, fogFalloff);
-        
-        return vec3.blend(combined, background, fog);
-    }
-    
     private vec3 diffuse(SDF obj, HitInfo hit, vec3 normal) {
         vec3 sceneLight = light.getSceneLighting().negate();   
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
@@ -209,7 +201,7 @@ public class RayMarcher {
         float spec = (float)Math.pow(specAngle, shinyness);
 
         // Use normalized white highlight
-        vec3 highlightColor = (mat.metalness > 0.5f) ? mat.color : mat.specularColor;
+        vec3 highlightColor = mat.specularColor.blend(mat.color, mat.metalness);
         return highlightColor.scale(spec * mat.specular);
     }
     
