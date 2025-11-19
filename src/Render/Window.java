@@ -257,14 +257,14 @@ public class Window extends javax.swing.JFrame {
             blended = true;
         }
         
-        String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Roughness: ",
+        String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
                                             "Metalness: ", "Opacity: ", "IOR: " };
         String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 2, Material.FIELDS);
         String[] inputs = createOptionsPane
             (   
                     "Enter New Material Settings For " 
                     + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " ... ",
-                    settings, defaults, 3
+                    settings, defaults, 1
             );
         
         if (inputs == null) return; 
@@ -272,12 +272,14 @@ public class Window extends javax.swing.JFrame {
         //Parse the new material settings into a material obj
         Utility.Material m = obj.getMaterial(hit);
         try {
-            m.reflectivity = Float.parseFloat(inputs[0].trim());
-            m.specular = Float.parseFloat(inputs[1].trim());
-            m.roughness = Float.parseFloat(inputs[2].trim());
-            m.metalness = Float.parseFloat(inputs[3].trim());
-            m.opacity = Float.parseFloat(inputs[4].trim());
-            m.ior = Float.parseFloat(inputs[5].trim());  
+            int i = 0;
+            m.reflectivity = Float.parseFloat(inputs[i++].trim());
+            m.specular = Float.parseFloat(inputs[i++].trim());
+            m.shinyness = Float.parseFloat(inputs[i++].trim());
+            m.roughness = Float.parseFloat(inputs[i++].trim());
+            m.metalness = Float.parseFloat(inputs[i++].trim());
+            m.opacity = Float.parseFloat(inputs[i++].trim());
+            m.ior = Float.parseFloat(inputs[i++].trim());  
         } catch (NumberFormatException e) {
             System.err.println("Error Parsing New Material ...");
             System.err.println(e.getMessage());

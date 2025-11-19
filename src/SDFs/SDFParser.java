@@ -82,6 +82,7 @@ public class SDFParser {
         m.specularColor = color;
         m.reflectivity    = Float.parseFloat(info[i.i++].trim());
         m.specular        = Float.parseFloat(info[i.i++].trim());
+        m.shinyness       = Float.parseFloat(info[i.i++].trim());
         m.roughness       = Float.parseFloat(info[i.i++].trim());
         m.metalness       = Float.parseFloat(info[i.i++].trim());
         m.opacity         = Float.parseFloat(info[i.i++].trim());

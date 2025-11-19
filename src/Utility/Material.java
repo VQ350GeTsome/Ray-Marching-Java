@@ -2,7 +2,7 @@ package Utility;
 
 public class Material {
     
-    public static final int FIELDS = 8;
+    public static final int FIELDS = 9;
     
     public vec3 color, specularColor = new vec3(255.0f);
     public float    reflectivity    =  0.0f,
@@ -40,6 +40,7 @@ public class Material {
                     colorString(specularColor) + "," +
                     reflectivity + "," + 
                     specular     + "," +
+                    shinyness    + "," +
                     roughness    + "," + 
                     metalness    + "," + 
                     opacity      + "," + 
@@ -50,7 +51,7 @@ public class Material {
         return new String[] 
         { 
             colorString(color), colorString(specularColor), ""+reflectivity, 
-            ""+specular, ""+roughness, ""+metalness, ""+opacity, ""+ior
+            ""+specular, ""+shinyness, ""+roughness, ""+metalness, ""+opacity, ""+ior
         };
     }
     
