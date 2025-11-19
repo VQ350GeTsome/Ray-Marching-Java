@@ -110,8 +110,7 @@ public class Core extends JPanel {
     
     private void addDefaultSDFs() {
         Material sphereMat = new Material(new vec3(0, 255, 255));
-        sphereMat.reflectivity = 0.667f;
-        sphereMat.roughness = 0.25f;
+        sphereMat.specular = 0.75f;
         SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  1.0f ), 1.0f, sphereMat);
         SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -1.0f ), 1.0f, new Material(new vec3(128)));
         

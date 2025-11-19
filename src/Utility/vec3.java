@@ -172,7 +172,6 @@ public class vec3 {
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
     public static vec3 randomHemisphere(vec3 normal, vec3 pos) {
-        // Generate random point on unit sphere
         float u = hash(pos, 1);   
         float v = hash(pos, 2);     
         
@@ -196,7 +195,6 @@ public class vec3 {
         float dot = p.x * 127.1f * q + p.y * 311.7f * q + p.z * 74.7f * q;
         return fract((float)Math.sin(dot) * 43758.5453f);
     }
-
     private static float fract(float x) {
         return x - (float)Math.floor(x);
     }
@@ -272,7 +270,6 @@ public class vec3 {
     public vec3(String vector) {
         vector = vector.trim().substring(1, vector.length() - 2);   //Trim off grouping character
         String[] componenets = vector.split("[,\\:]");              //Split by , or :
-        
         
         if (componenets.length != 3) {
             throw new IllegalArgumentException("Invalid vec3 format: " + vector);

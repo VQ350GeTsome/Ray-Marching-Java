@@ -230,6 +230,10 @@ public class Window extends javax.swing.JFrame {
         
     }
     private void colorClicked(SDFs.SDF obj, vec3 hit) {
+        int choice = createButtonsPane("Base Color or Highlight Color ?", new String[] { "Base", "Highlight" } );
+        if (choice == -1) return;
+        boolean baseColor = choice == 0;
+        
         SDFs.SDF parent = null;
         
         if (obj instanceof SDFs.BlendedSDF) {
@@ -240,7 +244,9 @@ public class Window extends javax.swing.JFrame {
         //Prompts the user with a color chooser with a random color to start
         Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
         if (color == null) return;
-        obj.setColor(new vec3(color));
+        
+        if (baseColor) obj.setColor(new vec3(color));
+        else obj.setHighlightColor(new vec3(color));
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
         SDFs.SDF parent = null;
@@ -253,7 +259,7 @@ public class Window extends javax.swing.JFrame {
         
         String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Roughness: ",
                                             "Metalness: ", "Opacity: ", "IOR: " };
-        String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 1, 7);
+        String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 2, Material.FIELDS);
         String[] inputs = createOptionsPane
             (   
                     "Enter New Material Settings For " 

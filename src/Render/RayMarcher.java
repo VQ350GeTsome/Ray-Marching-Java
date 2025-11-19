@@ -117,13 +117,18 @@ public class RayMarcher {
         SDF obj = hit.sdf;
         Material objMat = obj.getMaterial(hit.hit);     //Get the object we hits material and save it to objMat.
                 
+        float shadow = getShadow(hit.hit); //Get shadow amount
+        
         //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
         vec3 norm = estimateNormal(obj, hit.hit);   
 
-        vec3 diffusedColor = diffuse(obj, hit, norm);                       
+        vec3 diffusedColor = diffuse(obj, hit, norm).scale(shadow);                       
+        vec3 specularColor = specular(norm, dir, objMat).scale(shadow);
         vec3 reflectionColor = (objMat.reflectivity > 0.01f) ? reflect(hit, dir, norm, 3) : diffusedColor;
         
-        vec3 finalColor = vec3.blend(diffusedColor, reflectionColor , objMat.reflectivity);
+        vec3 finalColor = diffusedColor
+                          .blend(reflectionColor, objMat.reflectivity)
+                          .add(specularColor); //Add specular color last so you can see the light in reflections
 
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
         fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
@@ -164,27 +169,20 @@ public class RayMarcher {
     }
     
     private vec3 diffuse(SDF obj, HitInfo hit, vec3 normal) {
-        float shadow = getShadow(hit.hit); //Get shadow amount
-         
         vec3 sceneLight = light.getSceneLighting().negate();   
-        
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
-        brightness = customClamp(brightness, 5);
-
-        vec3 finalColor = vec3.blend(obj.getMaterial(hit.hit).color , new vec3(255.0f), brightness);
-             finalColor = finalColor.scale(shadow);
-              
+        vec3 finalColor = obj.getMaterial(hit.hit).color.scale(brightness);    
         return finalColor;
     }
     
-    public float getShadow(vec3 orgin) {
+    private float getShadow(vec3 orgin) {
         float ambientLight = light.getAmbeintLight();       //Get the scenes ambient lighting
         
         float lighting = 1.0f - ambientLight;               //Minus the starting light % by the ambient light, for it will be added back later ... 
         float t = 0.1f;                                     //Start slightly off the surface ... this must be greater than epsilon
         final float softness = 1.0f;                        //Penumbra width ... i think
         vec3 lightDir = light.getSceneLighting()
-                        .scale(-1.0f);                   //Flip lighting around
+                        .negate();                          //Flip lighting around
         for (int i = 0; shadowSteps > i; i++) {
             vec3 pos =  orgin
                         .add(   lightDir 
@@ -197,6 +195,22 @@ public class RayMarcher {
             if (lighting > maxDist) { break; }
         }
         return lighting + ambientLight;
+    }
+    
+    private vec3 specular(vec3 norm, vec3 viewDir, Material mat) {
+        vec3 lightDir = light.getSceneLighting();//.negate();
+
+        vec3 reflectDir = lightDir.negate()
+                          .subtract(norm.scale(2.0f * lightDir.negate().dot(norm)))
+                          .normalize();
+
+        float specAngle = Math.max(0.0f, reflectDir.dot(viewDir));
+        float shinyness = mat.shinyness;
+        float spec = (float)Math.pow(specAngle, shinyness);
+
+        // Use normalized white highlight
+        vec3 highlightColor = (mat.metalness > 0.5f) ? mat.color : mat.specularColor;
+        return highlightColor.scale(spec * mat.specular);
     }
     
     /**

@@ -2,15 +2,16 @@ package Utility;
 
 public class Material {
     
-    public static final int FIELDS = 7;
+    public static final int FIELDS = 8;
     
-    public vec3 color;
-    public float    reflectivity    = 0.0f,
-                    specular        = 0.0f,
-                    roughness       = 0.0f,
-                    metalness       = 0.0f,
-                    opacity         = 0.0f,
-                    ior             = 0.0f;
+    public vec3 color, specularColor = new vec3(255.0f);
+    public float    reflectivity    =  0.0f,
+                    specular        =  0.75f,
+                    shinyness       = 16.0f,
+                    roughness       =  0.0f,
+                    metalness       =  0.0f,
+                    opacity         =  0.0f,
+                    ior             =  0.0f;
     //Light emission later ... maybe
     
     public Material() { color = new vec3(0.0f); }
@@ -30,12 +31,13 @@ public class Material {
     }
     
     private float wAvg(float a, float b, float w) { return (a * (1.0f - w)) + (b * w); }
-
     
     @Override
     public String toString() {
         //Turn the color a string
-        String str = colorString() + "," +
+        String str = 
+                    colorString(color) + "," +
+                    colorString(specularColor) + "," +
                     reflectivity + "," + 
                     specular     + "," +
                     roughness    + "," + 
@@ -47,12 +49,12 @@ public class Material {
     public String[] toStringArray() {
         return new String[] 
         { 
-            colorString(), ""+reflectivity, ""+specular,
-            ""+roughness, ""+metalness, ""+opacity, ""+ior
+            colorString(color), colorString(specularColor), ""+reflectivity, 
+            ""+specular, ""+roughness, ""+metalness, ""+opacity, ""+ior
         };
     }
     
-    public String colorString() {
+    public String colorString(vec3 color) {
         return (int) color.x + ":" + (int) color.y + ":" + (int) color.z;
     }
 }

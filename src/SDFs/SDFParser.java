@@ -9,23 +9,8 @@ public class SDFParser {
     
     public static SDF getSDF(String type, String[] info, IntRef i) {
         
-                
-        String[] rgb = info[i.i++].split(":");               //Parse the RGB of the SDF
-        int r = (int) Float.parseFloat(rgb[0].trim()),
-            g = (int) Float.parseFloat(rgb[1].trim()),
-            b = (int) Float.parseFloat(rgb[2].trim());
-        
-        
-        //Use the color to instantiate the material then fill the fields.
-        Material mat = new Material(new vec3(r, g, b));
-        mat.reflectivity    = Float.parseFloat(info[i.i++].trim());
-        mat.specular        = Float.parseFloat(info[i.i++].trim());
-        mat.roughness       = Float.parseFloat(info[i.i++].trim());
-        mat.metalness       = Float.parseFloat(info[i.i++].trim());
-        mat.opacity         = Float.parseFloat(info[i.i++].trim());
-        mat.ior             = Float.parseFloat(info[i.i++].trim());
+        Material mat = parseMaterial(info, i);
 
-        
         switch (type) {
             case "sphere":
                 return parseSphere(info, mat, i);
@@ -84,6 +69,34 @@ public class SDFParser {
 
         return (!repeat) ? 
                 objDependant : ArrayMath.add(objDependant, new String[] { "Spacing: " } );
+    }
+    
+    private static Material parseMaterial(String[] info, IntRef i) {
+        
+        //Use the color to instantiate the material then fill the fields.
+        vec3 color = parseColor(info[i.i++]);
+        Material m = new Material(color);
+        
+        color = parseColor(info[i.i++]);
+        
+        m.specularColor = color;
+        m.reflectivity    = Float.parseFloat(info[i.i++].trim());
+        m.specular        = Float.parseFloat(info[i.i++].trim());
+        m.roughness       = Float.parseFloat(info[i.i++].trim());
+        m.metalness       = Float.parseFloat(info[i.i++].trim());
+        m.opacity         = Float.parseFloat(info[i.i++].trim());
+        m.ior             = Float.parseFloat(info[i.i++].trim());
+        
+        return m;
+    }
+    
+    private static vec3 parseColor(String info) {
+        String[] rgb = info.split(":");               //Parse the RGB of the SDF
+        int r = (int) Float.parseFloat(rgb[0].trim()),
+            g = (int) Float.parseFloat(rgb[1].trim()),
+            b = (int) Float.parseFloat(rgb[2].trim());
+        
+        return new vec3(r,g,b);
     }
     
     public static SDF parseBlended(String[] info, float k, IntRef i) {
