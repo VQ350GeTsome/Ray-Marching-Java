@@ -115,7 +115,7 @@ public class RayMarcher {
     
     private vec3 calculateColor(HitInfo hit, vec3 dir, int depth) {
         SDF obj = hit.sdf;
-        Material objMat = obj.getMaterial(hit.hit);     //Get the object we hits material and save it to objMat.
+        Material objMat = hit.mat;     //Get the object we hits material and save it to objMat.
                 
         float shadow = getShadow(hit.hit); //Get shadow amount
         
@@ -123,26 +123,18 @@ public class RayMarcher {
         vec3 norm = estimateNormal(obj, hit.hit);   
 
         //Get the diffused color & specular color
-        vec3 diffusedColor = diffuse(obj, hit, norm).scale(shadow);                       
+        vec3 diffusedColor = diffuse(hit, norm).scale(shadow);                       
         vec3 specularColor = specular(norm, dir, objMat).scale(shadow);
         
         //Using recursion calculate the color of the reflected ray
-        vec3 reflectionColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, objMat, depth) : diffusedColor;
+        vec3 reflectionColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth) : diffusedColor;
         
-        vec3 behindColor = (objMat.opacity < 1.0f && depth > 0) ? opacity() : background;
-        if (objMat.opacity < 1.0f && depth > 0) {
-            // Continue ray through the surface
-            vec3 origin = hit.hit.add(dir.scale(Core.getEps() * 2.0f));
-            HitInfo behindHit = marchRay(origin, dir);
-            if (behindHit.sdf != null) {
-                behindColor = calculateColor(behindHit, dir, depth - 1);
-            }
-        }
+        //vec3 behindColor = (objMat.opacity < 1.0f && depth > 0) ? opacity(hit, norm, dir, depth) : background;
         
         vec3 finalColor = diffusedColor
                           .blend(reflectionColor, objMat.reflectivity)
                           .add(specularColor); //Add specular color last so you can see the light in reflections
-        finalColor = finalColor.blend(behindColor, objMat.opacity);
+        //finalColor = finalColor.blend(behindColor, objMat.opacity);
 
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
         fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
@@ -152,17 +144,24 @@ public class RayMarcher {
     }
     private vec3 calculateColor(HitInfo hit, vec3 dir) { return calculateColor(hit, dir, 4); }
     
-    private vec3 opacity() {
+    private vec3 opacity(HitInfo hit, vec3 norm, vec3 dir, int depth) {
+        Material mat = hit.mat;
         
+        vec3 transmitDir = refract(dir.normalize(), norm.normalize(), mat.ior); // ior ~ 1.5 for glass
+        vec3 origin = hit.hit.subtract(norm.scale(Core.getEps() * 2.0f)); // start just inside
+        HitInfo behindHit = marchRay(origin, transmitDir);
+        if (behindHit.sdf != null) {
+            return calculateColor(behindHit, transmitDir, depth - 1);
+        }
     }
     
-    private vec3 reflect(HitInfo hit, vec3 norm, vec3 dir, Material mat, int depth) {
+    private vec3 reflect(HitInfo hit, vec3 norm, vec3 dir, int depth) {
         //Calculate the direction of a reflected ray
         vec3 reflected = dir.subtract(norm.scale(2.0f * dir.dot(norm))).normalize();
 
         //If the material is rough add a random vector seeded with the normal & hit position
-        if (mat.roughness > 0.01f)
-            reflected = reflected.add(vec3.randomHemisphere(norm, hit.hit).scale(customClamp(mat.roughness, 2))).normalize();
+        if (hit.mat.roughness > 0.01f)
+            reflected = reflected.add(vec3.randomHemisphere(norm, hit.hit).scale(customClamp(hit.mat.roughness, 2))).normalize();
 
         //Start the ray a little off the surface
         vec3 origin = hit.hit.add(norm.scale(Core.getEps() * 2.0f));
@@ -175,10 +174,10 @@ public class RayMarcher {
         else return calculateColor(reflectHit, reflected, depth - 1);
     }
         
-    private vec3 diffuse(SDF obj, HitInfo hit, vec3 normal) {
+    private vec3 diffuse(HitInfo hit, vec3 normal) {
         vec3 sceneLight = light.getSceneLighting().negate();   
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
-        vec3 finalColor = obj.getMaterial(hit.hit).color.scale(brightness);    
+        vec3 finalColor = hit.mat.color.scale(brightness);    
         return finalColor;
     }
     

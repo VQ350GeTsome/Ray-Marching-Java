@@ -11,7 +11,7 @@ public class Material {
                     roughness       =  0.0f,
                     metalness       =  0.0f,
                     opacity         =  0.0f,
-                    ior             =  0.0f;
+                    ior             =  1.5f;    //Glass
     //Light emission later ... maybe
     
     public Material() { color = new vec3(0.0f); }
