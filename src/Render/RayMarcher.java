@@ -88,16 +88,14 @@ public class RayMarcher {
     
     private HitInfo marchThrough(vec3 pos, vec3 dir) {
         if (sdfMgr.getClosestSDFDist(pos) >= 0f) return marchRay(pos, dir);
-        float totalDistance = 0.0f;
-        for (int step = 0; step < maxSteps && totalDistance <= maxDist; step++) {
-            float d = sdfMgr.getClosestSDFDist(pos);
-            if (d >= -Core.getEps()) break; // at/near boundary -> stop phase 1
-            float advance = Math.max(Core.getEps() * 2.0f, -d);
-            pos = pos.add(dir.scale(advance));
-            totalDistance += advance;
+        float totalDist = 0.0f;
+        for (int i = 0; maxSteps > i && maxDist > totalDist; i++) {
+            float d = sdfMgr.getClosestSDFDist(pos); //Get the nearest surface
+            if (d > Core.getEps()) break;
+            pos = pos.add(dir.scale(-d));
+            totalDist += -d;
         }
-        HitInfo exitHit = new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
-        return exitHit;
+        return new HitInfo(pos, totalDist, sdfMgr.getSDFAtPos(pos));
     } 
     
     public vec3[][] marchScreen(int w, int h) {
@@ -125,13 +123,12 @@ public class RayMarcher {
     }
 
     private vec3 calculateColor(HitInfo hit, vec3 dir, int depth) {
-        SDF obj = hit.sdf;
         Material objMat = hit.mat;     //Get the object we hits material and save it to objMat.
                 
         float shadow = getShadow(hit.hit); //Get shadow amount
         
         //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
-        vec3 norm = estimateNormal(obj, hit.hit);   
+        vec3 norm = estimateNormal(hit);   
 
         //Get the diffused color & specular color
         vec3 diffusedColor = diffuse(hit, norm).scale(shadow);                       
@@ -140,7 +137,7 @@ public class RayMarcher {
         //Using recursion calculate the color of the reflected ray
         vec3 reflectionColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth) : diffusedColor;
         
-        vec3 behindColor = (objMat.opacity < 1.0f && depth > 0) ? opacity(hit, norm, dir, depth) : background;
+        vec3 behindColor = (objMat.opacity > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth) : background;
         
         vec3 finalColor = diffusedColor
                           .blend(reflectionColor, objMat.reflectivity)
@@ -155,38 +152,32 @@ public class RayMarcher {
     }
     private vec3 calculateColor(HitInfo hit, vec3 dir) { return calculateColor(hit, dir, 4); }
     
-    private vec3 opacity(HitInfo entryHit, vec3 entryNorm, vec3 inDir, int depth) {
-        if (depth <= 0) return entryHit.mat.color;
-
-        entryNorm = entryNorm.normalize();
+    private vec3 opacity(HitInfo entryHit, vec3 norm, vec3 inDir, int depth) {
+        if (depth == 0) return entryHit.mat.color;
+        
         inDir = inDir.normalize();
         Material mat = entryHit.mat;
 
-        //Entry refraction (air to the obj material). If total internal reflection just reflect.
-        vec3 refrEntry = refract(inDir, entryNorm, 1.0f, mat.ior);
-        if (refrEntry == null) return reflect(entryHit, entryNorm, inDir, depth - 1);
-        
-        //Make sure the refraction entry direction is slightly inside the object.
-        vec3 insideOrigin = entryHit.hit.add(refrEntry.scale(Core.getEps() * 2.0f));
+        vec3 refractDirIn = refract(inDir, norm, 1.0f, mat.ior);
+        if (refractDirIn == null) return reflect(entryHit, norm, inDir, depth - 1);
 
-        //March through the object to find where we will exit.
-        HitInfo exitHit = marchThrough(insideOrigin, refrEntry);
+        vec3 surface = entryHit.hit.add(norm.scale(-Core.getEps()));
+        HitInfo exitHit = marchThrough(surface, refractDirIn);
+                
+        vec3 exitNorm = estimateNormal(exitHit);
         
-        //Find the exit normal and attempt exit refraction (material back to air).
-        vec3 exitNorm = estimateNormal(exitHit.sdf, exitHit.hit).normalize();
-        vec3 refrExit = refract(refrEntry, exitNorm, mat.ior, 1.0f);
-        if (refrExit == null) {
-            // TIR inside: reflect inside and continue from just inside the surface
-            vec3 insideReflectDir = refrEntry.subtract(exitNorm.scale(2.0f * refrEntry.dot(exitNorm))).normalize();
-            vec3 reflectOrigin = exitHit.hit.add(insideReflectDir.scale(Core.getEps() * 2.0f));
-            HitInfo reflectHit = marchRay(reflectOrigin, insideReflectDir);
+        vec3 surfaceExitPos = exitHit.hit.add(exitNorm.scale(Core.getEps()));
+ 
+        vec3 refractDirExit = refract(refractDirIn, exitNorm, mat.ior, 1.0f);
+        if (refractDirExit == null) {
+            vec3 insideReflectDir = refractDirIn.subtract(exitNorm.scale(refractDirIn.dot(exitNorm)*2f)).normalize();
+            HitInfo reflectHit = marchRay(surfaceExitPos, insideReflectDir);
             return (reflectHit.sdf == null) ? background : calculateColor(reflectHit, insideReflectDir, depth - 1);
         }
 
-        //Step just outside the exit along refracted exit direction and continue the scene march
-        vec3 afterExitOrigin = exitHit.hit.add(exitNorm.scale(Core.getEps() * 2.0f));
-        HitInfo behind = marchRay(afterExitOrigin, refrExit);
-        return (behind.sdf == null) ? background : calculateColor(behind, refrExit, depth - 1);
+        refractDirExit = refractDirExit.negate();
+        HitInfo behind = marchRay(surfaceExitPos, refractDirExit);
+        return (behind.sdf == null) ? background : calculateColor(behind, refractDirExit, depth - 1);
     }
    
     private vec3 refract(vec3 dir, vec3 norm, float etai, float etat) {
@@ -236,15 +227,13 @@ public class RayMarcher {
         vec3 lightDir = light.getSceneLighting()
                         .negate();                          //Flip lighting around
         for (int i = 0; shadowSteps > i; i++) {
-            vec3 pos =  orgin
-                        .add(   lightDir 
-                                .scale(t)
-                        );
+            vec3 pos =  orgin.add(lightDir 
+                                  .scale(t));
             float minDist = sdfMgr.getClosestSDFDist(pos);
             if (minDist < Core.getEps()) { return ambientLight; }
             lighting = Math.min(lighting, softness * minDist / t);
             t += minDist;
-            if (lighting > maxDist) { break; }
+            if (lighting > maxDist) break; 
         }
         return lighting + ambientLight;
     }
@@ -291,11 +280,11 @@ public class RayMarcher {
      * @param p     Point we are starting at
      * @return      A normalized vec3 that it about the normal
      */
-    private vec3 estimateNormal(SDF obj, vec3 p) {
+    private vec3 estimateNormal(HitInfo i) {
         float e = Core.getEps();
-        float x = obj.sdf(p.add(new vec3(e, 0.0f, 0.0f))) - obj.sdf(p.subtract(new vec3(e, 0.0f, 0.0f)));
-        float y = obj.sdf(p.add(new vec3(0.0f, e, 0.0f))) - obj.sdf(p.subtract(new vec3(0.0f, e, 0.0f)));
-        float z = obj.sdf(p.add(new vec3(0.0f, 0.0f, e))) - obj.sdf(p.subtract(new vec3(0.0f, 0.0f, e)));
+        float x = i.sdf.sdf(i.hit.add(new vec3(e, 0.0f, 0.0f))) - i.sdf.sdf(i.hit.subtract(new vec3(e, 0.0f, 0.0f)));
+        float y = i.sdf.sdf(i.hit.add(new vec3(0.0f, e, 0.0f))) - i.sdf.sdf(i.hit.subtract(new vec3(0.0f, e, 0.0f)));
+        float z = i.sdf.sdf(i.hit.add(new vec3(0.0f, 0.0f, e))) - i.sdf.sdf(i.hit.subtract(new vec3(0.0f, 0.0f, e)));
         return new vec3(x, y, z).normalize();
     }
     
