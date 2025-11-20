@@ -8,9 +8,12 @@ import java.util.ArrayList;
 public class SDFParser {
     
     public static SDF getSDF(String type, String[] info, IntRef i) {
-        
         Material mat = parseMaterial(info, i);
-
+        return getSDF(mat, type, info, i);
+    }
+    
+    public static SDF getSDF(Material mat, String type, String[] info, IntRef i) {
+       
         switch (type) {
             case "sphere":
                 return parseSphere(info, mat, i);
@@ -35,11 +38,12 @@ public class SDFParser {
         return null;
     }
     public static SDF getSDF(String type, String[] info) { return getSDF(type, info, new IntRef(0)); }
+    public static SDF getSDF(Material mat, String type, String[] info) { return getSDF(mat, type, info, new IntRef(0)); }
     
     public static String[] getTypes() {
         return new String[] { "Primitive", "Repeating" };
     }
-    public static String[] getPrimitives() {
+    public static String[] getImplementedPrimitives() {
         return new String[] { "Sphere", "Cube", "Torus", "Plane" };
     }
     public static String[] getSettings(String type) { return getSettings(type, false); }

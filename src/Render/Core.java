@@ -22,7 +22,7 @@ public class Core extends JPanel {
     public boolean bloom = true;
     
     private BufferedImage screen;               //What we will use as the screen
-    private int width = 200, height = width;    //screens dimensions
+    private int width = 150, height = width;    //screens dimensions
     
     public Scene scene;
     private Timer timer;

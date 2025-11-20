@@ -166,13 +166,14 @@ public class RayMarcher {
                 
         vec3 exitNorm = estimateNormal(exitHit);
         
-        vec3 surfaceExitPos = exitHit.hit.add(exitNorm.scale(Core.getEps()));
+        vec3 surfaceExitPos = exitHit.hit.add(exitNorm.scale(Core.getEps()*2.0f));
  
         vec3 refractDirExit = refract(refractDirIn, exitNorm, mat.ior, 1.0f);
         if (refractDirExit == null) {
-            vec3 insideReflectDir = refractDirIn.subtract(exitNorm.scale(refractDirIn.dot(exitNorm)*2f)).normalize();
+            vec3 insideReflectDir = refractDirIn.subtract(exitNorm.scale(refractDirIn.dot(exitNorm)*2.0f)).normalize();
             HitInfo reflectHit = marchRay(surfaceExitPos, insideReflectDir);
-            return (reflectHit.sdf == null) ? background : calculateColor(reflectHit, insideReflectDir, depth - 1);
+            return background;
+            //return (reflectHit.sdf == null) ? background : calculateColor(reflectHit, insideReflectDir, depth - 1);
         }
 
         refractDirExit = refractDirExit.negate();

@@ -340,18 +340,14 @@ public class Window extends javax.swing.JFrame {
                     PLANE  = 3;
         
         //This will be applicable for primitives & repeating
-        String[] choices = SDFs.SDFParser.getPrimitives();  
+        String[] choices = SDFs.SDFParser.getImplementedPrimitives();  
         int choice = createButtonsPane("Choose an SDF...", choices);
         
         java.util.ArrayList<String> placeHolder = new java.util.ArrayList<>(3);
         
         //We can fill the place holder with a color, as it always come first
-        int r = (int) (Math.random() * 255), g = (int) (Math.random() * 255), b = (int) (Math.random() * 255);
-        placeHolder.add(r + ":" + g + ":" + b);     
-        
-        //Then we can fill it with a random float for the shinyness
-        float shiny = ((int) ((Math.random() * 1000))) / 1000.0f;
-        placeHolder.add(""+shiny);
+        float r = (float) (Math.random() * 255), g = (float) (Math.random() * 255), b = (float) (Math.random() * 255);
+        Material mat = new Material(new vec3(r,g,b));
         
         //Gets the cameras orientation and uses the forward & positon vectors to get a 
         //vector n units infront of the camera
@@ -383,13 +379,13 @@ public class Window extends javax.swing.JFrame {
                 break;        
         }
         if (type == 1) t = "repeat" + t;
-        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new), 3);
+        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new), 1);
         if (inputs == null) return;
-        safeAddSDF(t, inputs); 
+        safeAddSDF(mat, t, inputs); 
     }
     //Helper method to just parse an SDF safely using a try catch
-    private void safeAddSDF(String type, String[] inputs) {
-        try { core.scene.addSDF(SDFs.SDFParser.getSDF(type, inputs)); }
+    private void safeAddSDF(Material mat, String type, String[] inputs) {
+        try { core.scene.addSDF(SDFs.SDFParser.getSDF(mat, type, inputs)); }
         catch (Exception e) { System.err.print(e.getMessage()); }
     }
     
