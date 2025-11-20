@@ -14,7 +14,7 @@ public class PostProcessor {
      * @param w The width
      * @param h The height
      */
-    public static void initalize(int w, int h) { width = w; height = h; }
+    public static void setWidthHeight(int w, int h) { width = w; height = h; }
     
     /**
      * Isolates the brightest areas, blurs them, then adds them back on to image

@@ -25,7 +25,7 @@ public class Core extends JPanel {
     private int width = 150, height = width;    //screens dimensions
     
     public Scene scene;
-    private Timer timer;
+    public Timer timer;
     
     public Core() {
         imageSizer();                           //Size & initialize screen
@@ -38,11 +38,8 @@ public class Core extends JPanel {
         //Default SDFs
         addDefaultSDFs();
         
-        PostProcessor.initalize(width, height); //Initalize the post processor
+        PostProcessor.setWidthHeight(width, height); //Initalize the post processor
     }
-
-    public void setWait(int w) { timer.setDelay(w); }
-    public int  getWait() { return timer.getDelay(); }
     
     /**
      * Main loop ... we are constantly updating
@@ -58,10 +55,6 @@ public class Core extends JPanel {
                 }
             );
         timer.start(); /* Start timer */
-    }
-    public void startStopTimer() {
-        if (timer.isRunning()) timer.stop();
-        else timer.start();
     }
     public void refresh() { run(); }
     
@@ -85,6 +78,7 @@ public class Core extends JPanel {
         }
     }
     public static String packagePostProcessor() { return bloomSensitivity + "," + bloomRadius + ",\n"; }
+    public String[] getResoultion() { return new String[] { ""+width, ""+height }; }
     
     /**
      * Calls the scenes ray marcher which will march
@@ -136,11 +130,42 @@ public class Core extends JPanel {
         SDF mirrorCube = new Cube(new vec3(-1.0f, -7.0f, 1.0f), 1.0f, mirror);
         //scene.addSDF(mirrorCube);
     }
+    
+    /**
+     * Updates all objects using the width & height, with the new width & height.
+     * 
+     * @param w The new width.
+     * @param h The new height.
+     */
+    public void changeResolution(int w, int h) {
+        width = w; height = h;
+        imageSizer();
+        scene.setWidthHeight(w, h);
+        PostProcessor.setWidthHeight(w, h);
+    }
         
     public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
     @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
-    public void screenShot() {
-        File.ScreenShot.exportCurrentImage(screen);
+    
+    private int hiResW = 1000, hiResH = 1000;
+    public void screenShotHiRes() {
+        //Saves the current width & height
+        int pWidth = width, pHeight = height;
+        
+        changeResolution(hiResW, hiResH);
+        
+        vec3[][] vec3Image = scene.renderScene();
+        Color[][] colorImage = null;
+              
+        if (bloom)
+            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomSensitivity, bloomRadius);
+        colorImage = PostProcessor.convertToColor(vec3Image);
+        
+        File.ScreenShot.exportImage(colorImage);
+    }
+    
+    public void screenShotAsIs() {
+        File.ScreenShot.exportImage(screen);
     }
     
 }

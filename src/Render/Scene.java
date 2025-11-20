@@ -3,9 +3,7 @@ package Render;
 import File.FileManager;
 import SDFs.SDF;
 import Utility.*;
-import java.awt.Color;
 import java.util.Arrays;
-import javax.swing.Timer;
 
 public class Scene {
     
@@ -28,6 +26,11 @@ public class Scene {
         rayMarcher = new RayMarcher(camera, light, sdfManager); //Instatiate a new RayMarcher        
         FileManager.setScene(this);     //Send this scene to the file manager
         w = width; h = height;
+    }
+    
+    public void setWidthHeight(int w, int h) {
+        this.w = w;
+        this.h = h;
     }
     
     public void collectGarbageSDFs() { sdfManager.gc(); }

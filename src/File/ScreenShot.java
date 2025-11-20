@@ -28,7 +28,7 @@ public class ScreenShot {
         } 
     }
     
-    public static void exportCurrentImage(BufferedImage image){
+    public static void exportImage(BufferedImage image){
         if (dir.isBlank() || finalDir.isBlank()) getCurrentDirectory(); //If the directories have yet to be found find it
         
         try {
@@ -40,5 +40,13 @@ public class ScreenShot {
         } catch (IOException e) {
             System.err.println(dir + "is broken / not a valid path.");
         }
+    }
+    public static void exportImage(java.awt.Color[][] screen) { exportImage(TwoDColorToBufferedImage(screen)); }
+    
+    private static BufferedImage TwoDColorToBufferedImage(java.awt.Color[][] colors) {
+        int width = colors.length, height = colors[0].length;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++) image.setRGB(x, y, colors[x][y].getRGB());
+        return image;
     }
 }

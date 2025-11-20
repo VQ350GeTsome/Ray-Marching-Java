@@ -379,7 +379,7 @@ public class Window extends javax.swing.JFrame {
                 break;        
         }
         if (type == 1) t = "repeat" + t;
-        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, choice == 1), placeHolder.toArray(String[]::new), 1);
+        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, type == 1), placeHolder.toArray(String[]::new), 1);
         if (inputs == null) return;
         safeAddSDF(mat, t, inputs); 
     }
@@ -401,6 +401,7 @@ public class Window extends javax.swing.JFrame {
         objectsMenu = new javax.swing.JMenu();
         addNewObj = new javax.swing.JMenuItem();
         renderMenu = new javax.swing.JMenu();
+        resolutionChange = new javax.swing.JMenuItem();
         changeRender = new javax.swing.JMenuItem();
         changeFPS = new javax.swing.JMenuItem();
         cameraMenu = new javax.swing.JMenu();
@@ -485,6 +486,14 @@ public class Window extends javax.swing.JFrame {
         menuBar.add(objectsMenu);
 
         renderMenu.setText("Render");
+
+        resolutionChange.setText("Change Resolution");
+        resolutionChange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resolutionChangeActionPerformed(evt);
+            }
+        });
+        renderMenu.add(resolutionChange);
 
         changeRender.setText("Change Render Settings");
         changeRender.addActionListener(new java.awt.event.ActionListener() {
@@ -601,13 +610,14 @@ public class Window extends javax.swing.JFrame {
                 cameraZoomer(input);
                 break;
             case SPACE_BAR: 
-                core.startStopTimer();
+                if (core.timer.isRunning()) core.timer.stop();
+                else core.timer.start();
                 break;
             case R_KEY:
                 core.refresh();
                 break;
             case F1_KEY:
-                core.screenShot();
+                core.screenShotAsIs();
                 break;
         }
     }//GEN-LAST:event_formKeyPressed
@@ -745,11 +755,19 @@ public class Window extends javax.swing.JFrame {
 
     private void changeFPSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeFPSActionPerformed
         String[] options = new String[] { "Enter new FPS Target: " };
-        String[] current = new String[] { ""+core.getWait() };
+        String[] current = new String[] { ""+(int) (1000.0f / core.timer.getDelay()) };
+        String inputs[] = createOptionsPane("New FPS Cap...", options, current, 1);
         
-        String input = createOptionsPane("New FPS Cap...", options, current, 3)[0];
+        if (inputs == null) return;
         
-        try { core.setWait(Integer.parseInt(input)); }
+        try { 
+            int newTarget = Integer.parseInt(inputs[0]);
+            if (0 > newTarget) {
+                System.err.println("FPS cannot be negative!");
+                return;
+            }
+            core.timer.setDelay((int) 1000.0f / newTarget);
+        }
         catch (Exception e) { ; }
     }//GEN-LAST:event_changeFPSActionPerformed
 
@@ -775,6 +793,25 @@ public class Window extends javax.swing.JFrame {
         //Update the mouse starting positon x & y.
         mouseLastX = evt.getX(); mouseLastY = evt.getY();
     }//GEN-LAST:event_coreMousePressed
+
+    private void resolutionChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resolutionChangeActionPerformed
+        String[] settings = new String[] { "Width: ", "Height: " };
+        String[] defaults = core.getResoultion();
+        String[] inputs   = createOptionsPane("Enter New Dimensions: ", settings, defaults, 1);
+        
+        if (inputs == null) return;
+        
+        try {
+            int w = Integer.parseInt(inputs[0].trim()),
+                h = Integer.parseInt(inputs[1].trim());
+            core.timer.stop();
+            core.changeResolution(w, h);
+            core.timer.start();
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing new dimensions ...");
+            System.err.println(e.getMessage());
+        }
+    }//GEN-LAST:event_resolutionChangeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -830,6 +867,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenu objectsMenu;
     private javax.swing.JMenuItem openScene;
     private javax.swing.JMenu renderMenu;
+    private javax.swing.JMenuItem resolutionChange;
     private javax.swing.JMenuItem sceneLighitng;
     // End of variables declaration//GEN-END:variables
 }

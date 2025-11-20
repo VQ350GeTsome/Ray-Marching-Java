@@ -52,6 +52,14 @@
             <Property name="text" type="java.lang.String" value="Render"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="resolutionChange">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Resolution"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resolutionChangeActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="changeRender">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change Render Settings"/>
