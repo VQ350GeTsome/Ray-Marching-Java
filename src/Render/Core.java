@@ -67,6 +67,8 @@ public class Core extends JPanel {
     private static int   bloomSensitivity    = 150,
                          bloomRadius         =  25;
     
+    private static boolean crosshair = false;
+    
     public static String[] getBloomSettings() { return new String[] { ""+bloomSensitivity, ""+bloomRadius }; }
     public static void setBloomSettings(String[] settings) {
         try {
@@ -94,8 +96,10 @@ public class Core extends JPanel {
         //Adds bloom to the image using the current settings
         if (bloom)
             vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomSensitivity, bloomRadius);
-        colorImage = PostProcessor.convertToColor(vec3Image);
+        if (crosshair)
+            vec3Image = PostProcessor.addCrossHair(vec3Image, new vec3(255.0f), 0.005f);
         
+        colorImage = PostProcessor.convertToColor(vec3Image);
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, colorImage[x][y].getRGB());  //Process the image to the screen
@@ -104,17 +108,11 @@ public class Core extends JPanel {
     
     private void addDefaultSDFs() {
         Material sphereMat = new Material(new vec3(0, 255, 255));
-        //sphereMat.metalness = 0.33f;
+        sphereMat.metalness = 0.33f;
         //sphereMat.reflectivity = 0.80f;
-        sphereMat.opacity = 0.75f;
         SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  0.0f ), 1.0f, sphereMat);
         SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -3.0f ), 1.0f, new Material(new vec3(128)));
-        scene.addSDF(sphere);
-        
-        
-        SDF blankSphere = new Sphere(new vec3(1.0f, 1.0f, 0.0f), 0.33f, new Material(new vec3(255,0,0)));
-        scene.addSDF(blankSphere);
-        
+
         SDF blend = new BlendedSDF(sphere, cube, 2.1f);
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
@@ -123,12 +121,15 @@ public class Core extends JPanel {
         floorMat.reflectivity = 0.25f;
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
-        scene.addSDF(floor);
+        //scene.addSDF(floor);
         
-        Material mirror = new Material(new vec3());
-        mirror.reflectivity = 1.0f;
-        SDF mirrorCube = new Cube(new vec3(-1.0f, -7.0f, 1.0f), 1.0f, mirror);
-        //scene.addSDF(mirrorCube);
+        Material red = new Material(new vec3(255,0,0));
+        red.shinyness = 32.0f;
+        SDF chain = new HollowChainCube(new vec3(0), 1.0f, 1.0f, red);
+        //scene.addSDF(chain);
+        
+        SDF repeat = new Repeating(sphere, 5.0f);
+        scene.addSDF(repeat);
     }
     
     /**
@@ -149,6 +150,7 @@ public class Core extends JPanel {
     
     private int hiResW = 2000, hiResH = 2000;
     public void changeF2Res(int w, int h) { hiResW = w; hiResH = h; }
+    public String[] getF2Res() { return new String[] { ""+hiResW, ""+hiResH }; }
     public void screenShotHiRes() {
         timer.stop();
         

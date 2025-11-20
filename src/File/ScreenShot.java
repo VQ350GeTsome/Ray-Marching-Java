@@ -35,11 +35,11 @@ public class ScreenShot {
             BufferedImage bi = image;
             File outputfile = new File("ScreenShot.png");
             ImageIO.write(bi, "png", outputfile);
-            outputfile.renameTo(new File(dir + "\\" + "images" + "\\" + frame + Math.round(Math.random() * 10000) + ".png"));
+            String rename = dir + "\\" + "images" + "\\" + frame + Math.round(Math.random() * 10000) + ".png";
+            outputfile.renameTo(new File(rename));
             frame++;
-        } catch (IOException e) {
-            System.err.println(dir + "is broken / not a valid path.");
-        }
+            System.out.println("\nScreen Shot successful !!!\nSaved to: " + rename + "\n");
+        } catch (IOException e) { System.err.println(dir + "is broken / not a valid path."); }        
     }
     public static void exportImage(java.awt.Color[][] screen) { exportImage(TwoDColorToBufferedImage(screen)); }
     

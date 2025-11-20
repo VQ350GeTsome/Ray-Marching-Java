@@ -24,10 +24,6 @@ public class SDFParser {
             case "plane":
                 return parsePlane(info, mat, i);
                 
-            case "repeatsphere":
-                SDF s = parseSphere(info, mat, i);
-                return new Repeating((Sphere) s, Float.parseFloat(info[i.i++]));
-                
             case "hollowcc":
                 return parseHollowCC(info, mat, i);
                 

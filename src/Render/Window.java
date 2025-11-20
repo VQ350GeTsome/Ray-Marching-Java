@@ -826,7 +826,20 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_resolutionChangeActionPerformed
 
     private void f2SSChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f2SSChangeActionPerformed
-        core.changeF2Res();
+        String[] settings = new String[] { "Width: ", "Height: " };
+        String[] defaults = core.getF2Res();
+        String[] inputs   = createOptionsPane("Enter High Resolution Screen Shot Dimensions: ", settings, defaults, 1);
+        
+        if (inputs == null) return;
+        
+        try {
+            int w = Integer.parseInt(inputs[0].trim()),
+                h = Integer.parseInt(inputs[1].trim());
+            core.changeF2Res(w, h);
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing new dimensions ...");
+            System.err.println(e.getMessage());
+        }
     }//GEN-LAST:event_f2SSChangeActionPerformed
 
     /**

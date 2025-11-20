@@ -6,7 +6,7 @@ public class Repeating extends SDFs.SDF{
 
     private float s;
     
-    SDFs.SDF p;
+    private SDFs.SDF p;
     
     public Repeating(SDFs.SDF primitive, float spacing) {
         type = "repeatsphere";

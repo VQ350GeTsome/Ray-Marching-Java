@@ -4,7 +4,8 @@ import java.util.stream.IntStream;
 
 public class PostProcessor {
     
-    private static int width, height;
+    private static int width, height,
+                       centerW, centerH;
         
     private static vec3 BLACK      = new vec3();
     
@@ -14,7 +15,10 @@ public class PostProcessor {
      * @param w The width
      * @param h The height
      */
-    public static void setWidthHeight(int w, int h) { width = w; height = h; }
+    public static void setWidthHeight(int w, int h) { 
+        width = w; height = h; 
+        centerW = w / 2; centerH = h / 2;
+    }
     
     /**
      * Isolates the brightest areas, blurs them, then adds them back on to image
@@ -119,6 +123,16 @@ public class PostProcessor {
         }
         if (c == 0) return BLACK;
         else return new vec3((float) r / c, (float) g / c, (float) b / c);
+    }
+    
+    public static vec3[][] addCrossHair(vec3[][] image, vec3 color, float size) {
+        //Cross hair pixel size
+        int w = (int) (width * size), h = (int) (height * size);
+        
+        for (int x = -w; x <= w; x++) image[centerW + x][centerH] = color;
+        for (int y = -h; y <= h; y++) image[centerW][centerH + y] = color;
+ 
+        return image;
     }
     
     public static java.awt.Color[][] convertToColor(vec3[][] image) {
