@@ -56,14 +56,11 @@ public class RayMarcher {
             if (distance < Core.getEps() || totalDistance > maxDist) {
                 vec3 hitPos = pos.add(dir.scale(distance));
                 totalDistance += distance;
-                return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(pos));
+                return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(hitPos));
             }
             //If we weren't close enought to hit an object, march forward by the 
             //minimum distance we calculated earlier ( distance )
-            pos =   pos
-                    .add(   dir
-                            .scale( distance ) 
-                    );
+            pos = pos.add(dir.scale(distance));
             totalDistance += distance;
         }
         return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
@@ -89,6 +86,20 @@ public class RayMarcher {
         return marchRay(pos, dir);
     }
     
+    private HitInfo marchThrough(vec3 pos, vec3 dir) {
+        if (sdfMgr.getClosestSDFDist(pos) >= 0f) return marchRay(pos, dir);
+        float totalDistance = 0.0f;
+        for (int step = 0; step < maxSteps && totalDistance <= maxDist; step++) {
+            float d = sdfMgr.getClosestSDFDist(pos);
+            if (d >= -Core.getEps()) break; // at/near boundary -> stop phase 1
+            float advance = Math.max(Core.getEps() * 2.0f, -d);
+            pos = pos.add(dir.scale(advance));
+            totalDistance += advance;
+        }
+        HitInfo exitHit = new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
+        return exitHit;
+    } 
+    
     public vec3[][] marchScreen(int w, int h) {
         vec3[][] image = new vec3[w][h];                                 //2D array for image of size { width , height }
         
@@ -112,7 +123,7 @@ public class RayMarcher {
         });
         return image;
     }
-    
+
     private vec3 calculateColor(HitInfo hit, vec3 dir, int depth) {
         SDF obj = hit.sdf;
         Material objMat = hit.mat;     //Get the object we hits material and save it to objMat.
@@ -129,12 +140,12 @@ public class RayMarcher {
         //Using recursion calculate the color of the reflected ray
         vec3 reflectionColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth) : diffusedColor;
         
-        //vec3 behindColor = (objMat.opacity < 1.0f && depth > 0) ? opacity(hit, norm, dir, depth) : background;
+        vec3 behindColor = (objMat.opacity < 1.0f && depth > 0) ? opacity(hit, norm, dir, depth) : background;
         
         vec3 finalColor = diffusedColor
                           .blend(reflectionColor, objMat.reflectivity)
                           .add(specularColor); //Add specular color last so you can see the light in reflections
-        //finalColor = finalColor.blend(behindColor, objMat.opacity);
+        finalColor = finalColor.blend(behindColor, objMat.opacity);
 
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
         fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
@@ -144,15 +155,50 @@ public class RayMarcher {
     }
     private vec3 calculateColor(HitInfo hit, vec3 dir) { return calculateColor(hit, dir, 4); }
     
-    private vec3 opacity(HitInfo hit, vec3 norm, vec3 dir, int depth) {
-        Material mat = hit.mat;
+    private vec3 opacity(HitInfo entryHit, vec3 entryNorm, vec3 inDir, int depth) {
+        if (depth <= 0) return entryHit.mat.color;
+
+        entryNorm = entryNorm.normalize();
+        inDir = inDir.normalize();
+        Material mat = entryHit.mat;
+
+        //Entry refraction (air to the obj material). If total internal reflection just reflect.
+        vec3 refrEntry = refract(inDir, entryNorm, 1.0f, mat.ior);
+        if (refrEntry == null) return reflect(entryHit, entryNorm, inDir, depth - 1);
         
-        vec3 transmitDir = refract(dir.normalize(), norm.normalize(), mat.ior); // ior ~ 1.5 for glass
-        vec3 origin = hit.hit.subtract(norm.scale(Core.getEps() * 2.0f)); // start just inside
-        HitInfo behindHit = marchRay(origin, transmitDir);
-        if (behindHit.sdf != null) {
-            return calculateColor(behindHit, transmitDir, depth - 1);
+        //Make sure the refraction entry direction is slightly inside the object.
+        vec3 insideOrigin = entryHit.hit.add(refrEntry.scale(Core.getEps() * 2.0f));
+
+        //March through the object to find where we will exit.
+        HitInfo exitHit = marchThrough(insideOrigin, refrEntry);
+        
+        //Find the exit normal and attempt exit refraction (material back to air).
+        vec3 exitNorm = estimateNormal(exitHit.sdf, exitHit.hit).normalize();
+        vec3 refrExit = refract(refrEntry, exitNorm, mat.ior, 1.0f);
+        if (refrExit == null) {
+            // TIR inside: reflect inside and continue from just inside the surface
+            vec3 insideReflectDir = refrEntry.subtract(exitNorm.scale(2.0f * refrEntry.dot(exitNorm))).normalize();
+            vec3 reflectOrigin = exitHit.hit.add(insideReflectDir.scale(Core.getEps() * 2.0f));
+            HitInfo reflectHit = marchRay(reflectOrigin, insideReflectDir);
+            return (reflectHit.sdf == null) ? background : calculateColor(reflectHit, insideReflectDir, depth - 1);
         }
+
+        //Step just outside the exit along refracted exit direction and continue the scene march
+        vec3 afterExitOrigin = exitHit.hit.add(exitNorm.scale(Core.getEps() * 2.0f));
+        HitInfo behind = marchRay(afterExitOrigin, refrExit);
+        return (behind.sdf == null) ? background : calculateColor(behind, refrExit, depth - 1);
+    }
+   
+    private vec3 refract(vec3 dir, vec3 norm, float etai, float etat) {
+        dir = dir.normalize();
+        norm = norm.normalize();
+
+        float cosi = clamp(-dir.dot(norm), -1.0f, 1.0f);
+        float eta = etai / etat;
+        float k = 1.0f - eta * eta * (1.0f - cosi * cosi);
+        if (k < 0.0f) return null; // TIR
+        vec3 refr = dir.scale(eta).add(norm.scale(eta * cosi - (float)Math.sqrt(k)));
+        return refr.normalize();
     }
     
     private vec3 reflect(HitInfo hit, vec3 norm, vec3 dir, int depth) {
@@ -229,6 +275,14 @@ public class RayMarcher {
         float result = (float) Math.pow(f, n);
         
         return result / (result + 1.0f);
+    }
+    private float clamp(float v, float lo, float hi) {
+        return v < lo ? lo : (v > hi ? hi : v);
+    }
+    private float fresnelSchlick(float cosTheta, float ior) {
+        float r0 = (1.0f - ior) / (1.0f + ior);
+        r0 = r0 * r0;
+        return r0 + (1.0f - r0) * (float)Math.pow(1.0f - cosTheta, 5.0f);
     }
     
     /**
