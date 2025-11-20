@@ -21,7 +21,7 @@ public class Window extends javax.swing.JFrame {
                         W_KEY         =   87, A_KEY         =   65, S_KEY         =   83, D_KEY         =   68,
                         Q_KEY         =   81, E_KEY         =   69, R_KEY         =   82, F1_KEY        =  112,
                         M_WHEEL_UP    = -  1, M_WHEEL_DOWN  =    1, M_LEFT_HOLD   = 1024, M_RIGHT_HOLD  = 4096,
-                        M_MIDDLE_HOLD = 2048;
+                        M_MIDDLE_HOLD = 2048, F2_KEY        =  113;
 
     public Window() {
         initComponents();
@@ -404,6 +404,7 @@ public class Window extends javax.swing.JFrame {
         resolutionChange = new javax.swing.JMenuItem();
         changeRender = new javax.swing.JMenuItem();
         changeFPS = new javax.swing.JMenuItem();
+        f2SSChange = new javax.swing.JMenuItem();
         cameraMenu = new javax.swing.JMenu();
         cameraPosition = new javax.swing.JMenuItem();
         cameraGrain = new javax.swing.JMenuItem();
@@ -511,6 +512,14 @@ public class Window extends javax.swing.JFrame {
         });
         renderMenu.add(changeFPS);
 
+        f2SSChange.setText("Change F2 Screen Shot Resolution");
+        f2SSChange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                f2SSChangeActionPerformed(evt);
+            }
+        });
+        renderMenu.add(f2SSChange);
+
         menuBar.add(renderMenu);
 
         cameraMenu.setText("Camera");
@@ -591,7 +600,7 @@ public class Window extends javax.swing.JFrame {
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         int  input = (int)evt.getKeyCode();                        //Keycode input
-
+        
         switch (input) {
             case W_KEY:
             case A_KEY:
@@ -618,6 +627,9 @@ public class Window extends javax.swing.JFrame {
                 break;
             case F1_KEY:
                 core.screenShotAsIs();
+                break;
+            case F2_KEY:
+                core.screenShotHiRes();
                 break;
         }
     }//GEN-LAST:event_formKeyPressed
@@ -813,6 +825,10 @@ public class Window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_resolutionChangeActionPerformed
 
+    private void f2SSChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f2SSChangeActionPerformed
+        core.changeF2Res();
+    }//GEN-LAST:event_f2SSChangeActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -861,6 +877,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenuItem changeRender;
     private Render.Core core;
     private javax.swing.JMenuItem exportScene;
+    private javax.swing.JMenuItem f2SSChange;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu lightingMenu;
     private javax.swing.JMenuBar menuBar;

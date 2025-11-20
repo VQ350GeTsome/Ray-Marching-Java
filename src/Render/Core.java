@@ -147,8 +147,11 @@ public class Core extends JPanel {
     public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
     @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
     
-    private int hiResW = 1000, hiResH = 1000;
+    private int hiResW = 2000, hiResH = 2000;
+    public void changeF2Res(int w, int h) { hiResW = w; hiResH = h; }
     public void screenShotHiRes() {
+        timer.stop();
+        
         //Saves the current width & height
         int pWidth = width, pHeight = height;
         
@@ -162,6 +165,10 @@ public class Core extends JPanel {
         colorImage = PostProcessor.convertToColor(vec3Image);
         
         File.ScreenShot.exportImage(colorImage);
+        
+        changeResolution(pWidth, pHeight);
+        
+        timer.start();
     }
     
     public void screenShotAsIs() {
