@@ -325,14 +325,22 @@ public class Window extends javax.swing.JFrame {
         else     
             ((SDFs.BlendedSDF) parent).editChild(inputs, obj);
     }
-    private void rotationClicked(SDFs.SDF obj, vec3 hit) {
+    private void rotateClicked(SDFs.SDF obj, vec3 hit) {
         if (obj instanceof SDFs.BlendedSDF) obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         
         String[] options = new String[] { "i: ", "j: ", "k: " };
         String quat = obj.getRotQuat().toStringImag();
-        quat = quat.substring(1, quat.length() - 2);
+        quat = quat.substring(1, quat.length() - 1);
         String[] defaults = quat.split(":");
-        String[] inputs = createOptionsPane("Enter New Rotation: ", options, defaults, 1);
+        String[] inputs = createOptionsPane("Enter New Rotation (will be normalized): ", options, defaults, 1);
+        
+        try {
+            Quaternion q = new Quaternion(ArrayMath.add(new String[] { "1" } , inputs));
+            obj.setRotQuat(q);
+        } catch (Exception e) {
+            System.err.println("Error in parsing new roatation.");
+            System.err.println(e.getMessage());
+        }
     }
     
     private void addSDF(int type) {

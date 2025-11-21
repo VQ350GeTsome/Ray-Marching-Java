@@ -25,6 +25,7 @@ public class Quaternion {
             w*q.z + x*q.y - y*q.x + z*q.w
         );
     }
+    public Quaternion scaleImag(float f) { return new Quaternion(w, x*f, y*f, z*f); }
 
     public Quaternion conjugate() { return new Quaternion(w, -x, -y, -z); }
 
@@ -50,6 +51,12 @@ public class Quaternion {
         this.x = Float.parseFloat(comp[1].trim());
         this.y = Float.parseFloat(comp[2].trim());
         this.z = Float.parseFloat(comp[3].trim());
+    }
+    public Quaternion(String[] s) {
+        this.w = Float.parseFloat(s[0].trim());
+        this.x = Float.parseFloat(s[1].trim());
+        this.y = Float.parseFloat(s[2].trim());
+        this.z = Float.parseFloat(s[3].trim());
     }
     public String toStringImag() { return "{" + x + ":" + y + ":" + z + "}"; }
 }
