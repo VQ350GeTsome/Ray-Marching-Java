@@ -13,19 +13,21 @@ public class SDFParser {
     }
     
     public static SDF getSDF(Material mat, String type, String[] info, IntRef i) {
+        
+        Quaternion q = new Quaternion(info[i.i++]);
        
         switch (type) {
             case "sphere":
-                return parseSphere(info, mat, i);
+                return parseSphere(info, mat, q, i);
             case "cube":
-                return parseCube(info, mat, i);
+                return parseCube(info, mat, q, i);
             case "torus":
-                return parseTorus(info, mat, i);      
+                return parseTorus(info, mat, q, i);      
             case "plane":
-                return parsePlane(info, mat, i);
+                return parsePlane(info, mat, q, i);
                 
             case "hollowcc":
-                return parseHollowCC(info, mat, i);
+                return parseHollowCC(info, mat, q, i);
                 
             default:
                 System.err.println("Unknown SDF type: " + type);
@@ -79,7 +81,7 @@ public class SDFParser {
         
         color = parseColor(info[i.i++]);
         
-        m.specularColor = color;
+        m.specularColor   = color;
         m.reflectivity    = Float.parseFloat(info[i.i++].trim());
         m.specular        = Float.parseFloat(info[i.i++].trim());
         m.shinyness       = Float.parseFloat(info[i.i++].trim());
@@ -87,6 +89,8 @@ public class SDFParser {
         m.metalness       = Float.parseFloat(info[i.i++].trim());
         m.opacity         = Float.parseFloat(info[i.i++].trim());
         m.ior             = Float.parseFloat(info[i.i++].trim());
+        m.texture         = Float.parseFloat(info[i.i++].trim());
+        m.textureness     = Float.parseFloat(info[i.i++].trim());
         
         return m;
     }
@@ -118,35 +122,40 @@ public class SDFParser {
         return new BlendedSDF(a, mergeBlended(sdfs, k), k);
     }
     
-    private static SDF parseSphere(String[] info, Material m, IntRef i) {
+    private static SDF parseSphere(String[] info, Material m, Quaternion q, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float radius = Float.parseFloat(info[i.i++].trim());
-        return new Sphere(center, radius, m);
+        SDF s = new Sphere(center, radius, m); s.setRotQuat(q);
+        return s;
     }
     
-    private static SDF parseCube(String[] info, Material m, IntRef i) {
+    private static SDF parseCube(String[] info, Material m, Quaternion q, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
-        return new Cube(center, size, m);
+        SDF s = new Cube(center, size, m); s.setRotQuat(q);
+        return s;
     }
     
-    private static SDF parseTorus(String[] info, Material m, IntRef i) {
+    private static SDF parseTorus(String[] info, Material m, Quaternion q, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float majorR = Float.parseFloat(info[i.i++].trim());
         float minorR = Float.parseFloat(info[i.i++].trim());
-        return new Torus(center, majorR, minorR, m);
+        SDF s = new Torus(center, majorR, minorR, m); s.setRotQuat(q);
+        return s;
     }
     
-    private static SDF parsePlane(String[] info, Material m, IntRef i) {
+    private static SDF parsePlane(String[] info, Material m, Quaternion q, IntRef i) {
         vec3 pos = new vec3(info[i.i++]);
         vec3 normal = new vec3(info[i.i++]);
-        return new Plane(pos, normal, m);
+        SDF s = new Plane(pos, normal, m); s.setRotQuat(q);
+        return s;
     }
     
-    private static SDF parseHollowCC(String[] info, Material m, IntRef i) {
+    private static SDF parseHollowCC(String[] info, Material m, Quaternion q, IntRef i) {
         vec3 center = new vec3(info[i.i++]);
         float scale = Float.parseFloat(info[i.i++]);
         float n     = Float.parseFloat(info[i.i++]);
-        return new HollowChainCube(center, scale, n, m);
+        SDF s = new HollowChainCube(center, scale, n, m); s.setRotQuat(q);
+        return s;
     }
 }

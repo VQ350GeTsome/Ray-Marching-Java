@@ -138,7 +138,7 @@ public class vec3 {
     
     public vec3 abs() { return new vec3(Math.abs(x), Math.abs(y), Math.abs(z)); }
     
-    public float length() { return (float)Math.sqrt(x * x + y * y + z * z); }
+    public float length() { return (float)Math.sqrt(x*x + y*y + z*z); }
     public float lengthSqr() { return x*x + y*y + z*z; }
     
     public vec3 max(vec3 other) { return new vec3(Math.max(this.x, other.x), Math.max(this.y, other.y), Math.max(this.z, other.z)); }

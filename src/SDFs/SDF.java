@@ -11,8 +11,9 @@ package SDFs;
 public abstract class SDF {
     
     protected Utility.Material m;
+    protected Utility.Quaternion rotQuat = new Utility.Quaternion();
     protected String name, type;
-       
+    
     /**
      * Takes in a point and returns the distance 
      * to the surface of the object.
@@ -30,16 +31,18 @@ public abstract class SDF {
      * @return 
      */
     public String[] getSettingsAndCurrent() { return SDFParser.getSettings(type); }
-    
     public abstract boolean parseNewParams(String[] inputs);
+    
     /**
      * Returns the material of the SDF object
      * @param p The position of the vector
      * @return The material.
      */
     public Utility.Material getMaterial(Utility.vec3 p) { return m; }
-    
     public void setMaterial(Utility.Material material) { m = material; }
+    
+    public Utility.Quaternion getRotQuat() { return rotQuat; }
+    public void setRotQuat(Utility.Quaternion q) { rotQuat = q; }
     
     public void setColor(Utility.vec3 color) { m.color = color; }
     public void setHighlightColor(Utility.vec3 color) { m.specularColor = color; }
@@ -64,6 +67,6 @@ public abstract class SDF {
      */
     @Override
     public String toString() {
-        return getType() + "," + m.toString() + ",";
+        return getType() + "," + m.toString() + "," +  rotQuat.toString() + ",";
     }
 }

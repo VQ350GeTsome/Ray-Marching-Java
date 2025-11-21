@@ -110,18 +110,29 @@ public class Core extends JPanel {
         Material sphereMat = new Material(new vec3(0, 255, 255));
         sphereMat.metalness = 0.33f;
         //sphereMat.reflectivity = 0.80f;
-        SDF sphere  = new Sphere(    new vec3( 0.0f , 0.0f,  0.0f ), 1.0f, sphereMat);
-        SDF cube    = new Cube(      new vec3( 0.0f , 0.0f, -3.0f ), 1.0f, new Material(new vec3(128)));
+        SDF sphere  = new Sphere(new vec3(), 1.0f, sphereMat);
+        SDF cube    = new Cube(new vec3(0.0f , 0.0f, -3.0f), 1.0f, new Material(new vec3(128)));
 
         SDF blend = new BlendedSDF(sphere, cube, 2.1f);
         blend.setName("Blended Sphere & Cube");
-        scene.addSDF(blend);
+        //scene.addSDF(blend);
         
         Material floorMat = new Material(new vec3(100.0f));
         floorMat.reflectivity = 0.25f;
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
         scene.addSDF(floor);
+        
+        SDF t = new Torus(new vec3(), 1.0f, 0.5f, sphereMat);
+        Quaternion q = new Quaternion
+            (
+                    1.0f, 
+                    (float) (1.0f * Math.PI), 
+                    (float) (0.0f * Math.PI), 
+                    (float) (0.0f * Math.PI)
+            );
+        t.setRotQuat(q);
+        scene.addSDF(t);
         
         Material red = new Material(new vec3(255,0,0));
         red.shinyness = 32.0f;
