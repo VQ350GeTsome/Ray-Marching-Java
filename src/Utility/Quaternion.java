@@ -51,4 +51,5 @@ public class Quaternion {
         this.y = Float.parseFloat(comp[2].trim());
         this.z = Float.parseFloat(comp[3].trim());
     }
+    public String toStringImag() { return "{" + x + ":" + y + ":" + z + "}"; }
 }

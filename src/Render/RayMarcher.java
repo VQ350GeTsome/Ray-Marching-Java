@@ -141,7 +141,7 @@ public class RayMarcher {
         
         vec3 finalColor = diffusedColor
                           .blend(reflectionColor, objMat.reflectivity)
-                          .add(specularColor); //Add specular color last so you can see the light in reflections
+                          .add(specularColor); //Add specular color last so you can see the light in reflections & refractions
         finalColor = finalColor.blend(behindColor, objMat.opacity);
 
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%

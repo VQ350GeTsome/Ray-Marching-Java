@@ -187,6 +187,12 @@ public class Window extends javax.swing.JFrame {
         });
         popup.add(edit);
         
+        JMenuItem rotate = new JMenuItem("Edit Rotation");
+        rotate.addActionListener(evt -> {
+            rotateClicked(clickedObj, info.hit);
+        });
+        popup.add(rotate);
+        
         if (clickedObj instanceof SDFs.BlendedSDF) {
             JMenuItem blendedEdit = new JMenuItem("Edit Blended Properties");
             blendedEdit.addActionListener(evt -> {
@@ -234,12 +240,7 @@ public class Window extends javax.swing.JFrame {
         if (choice == -1) return;
         boolean baseColor = choice == 0;
         
-        SDFs.SDF parent = null;
-        
-        if (obj instanceof SDFs.BlendedSDF) {
-            parent = obj;
-            obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
-        }
+        if (obj instanceof SDFs.BlendedSDF) obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         
         //Prompts the user with a color chooser with a random color to start
         Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
@@ -313,18 +314,6 @@ public class Window extends javax.swing.JFrame {
             );
         if (inputs == null) return;
 
-        /*  
-        If the object we pressed was blended, and we're trying to alter the 
-            properties of it, and not the individual children of that BlendedSDF,
-            just pass in the new settings to the BlendedSDF.
-        Else we check if it's just an individual SDF we are trying to edit, if so
-            we use the new SDF we had made with the new settings and replace the
-            old one with it.
-        Then finally, if it's neither of those, we can conclude it's a BlenedSDF
-            where we are trying to alter one of it's children. We had previously 
-            gotten its child and set it to obj, so we remove obj from the parent
-            and add the newObj.
-        */
         if (!isolateChild && blended) {
             try { 
                 float k = Float.parseFloat(inputs[0]);
@@ -335,6 +324,15 @@ public class Window extends javax.swing.JFrame {
             obj.parseNewParams(inputs);
         else     
             ((SDFs.BlendedSDF) parent).editChild(inputs, obj);
+    }
+    private void rotationClicked(SDFs.SDF obj, vec3 hit) {
+        if (obj instanceof SDFs.BlendedSDF) obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
+        
+        String[] options = new String[] { "i: ", "j: ", "k: " };
+        String quat = obj.getRotQuat().toStringImag();
+        quat = quat.substring(1, quat.length() - 2);
+        String[] defaults = quat.split(":");
+        String[] inputs = createOptionsPane("Enter New Rotation: ", options, defaults, 1);
     }
     
     private void addSDF(int type) {
