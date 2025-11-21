@@ -2,7 +2,7 @@ package Utility;
 
 public class Material {
     
-    public static final int FIELDS = 9;
+    public static final int FIELDS = 11;
     
     public vec3 color, specularColor = new vec3(255.0f);
     public float    reflectivity    =  0.0f,
@@ -11,7 +11,9 @@ public class Material {
                     roughness       =  0.0f,
                     metalness       =  0.0f,
                     opacity         =  0.0f,
-                    ior             =  1.5f;    //Glass
+                    ior             =  1.5f,    //Glass
+                    texture         =  0.0f,
+                    textureness     =  0.0f;
     //Light emission later ... maybe
     
     public Material() { color = new vec3(0.0f); }
@@ -26,6 +28,8 @@ public class Material {
         m.metalness     = wAvg(metalness,    b.metalness,    w);
         m.opacity       = wAvg(opacity,      b.opacity,      w);
         m.ior           = wAvg(ior,          b.ior,          w);
+        m.texture       = wAvg(texture,      b.texture,      w);
+        m.textureness   = wAvg(textureness,  b.textureness,  w);
         
         return m;
     }
@@ -44,14 +48,17 @@ public class Material {
                     roughness    + "," + 
                     metalness    + "," + 
                     opacity      + "," + 
-                    ior;
+                    ior          + "," +
+                    texture      + "," +
+                    textureness;
         return str;
     }
     public String[] toStringArray() {
         return new String[] 
         { 
             colorString(color), colorString(specularColor), ""+reflectivity, 
-            ""+specular, ""+shinyness, ""+roughness, ""+metalness, ""+opacity, ""+ior
+            ""+specular, ""+shinyness, ""+roughness, ""+metalness, ""+opacity, ""+ior,
+            ""+texture, ""+textureness
         };
     }
     

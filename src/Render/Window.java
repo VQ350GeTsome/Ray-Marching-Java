@@ -258,7 +258,7 @@ public class Window extends javax.swing.JFrame {
         }
         
         String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
-                                            "Metalness: ", "Opacity: ", "IOR: " };
+                                            "Metalness: ", "Opacity: ", "IOR: ", "Texture: ", "Textureness: " };
         String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 2, Material.FIELDS);
         String[] inputs = createOptionsPane
             (   
@@ -279,7 +279,9 @@ public class Window extends javax.swing.JFrame {
             m.roughness = Float.parseFloat(inputs[i++].trim());
             m.metalness = Float.parseFloat(inputs[i++].trim());
             m.opacity = Float.parseFloat(inputs[i++].trim());
-            m.ior = Float.parseFloat(inputs[i++].trim());  
+            m.ior = Float.parseFloat(inputs[i++].trim()); 
+            m.texture = Float.parseFloat(inputs[i++].trim()); 
+            m.textureness = Float.parseFloat(inputs[i++].trim()); 
         } catch (NumberFormatException e) {
             System.err.println("Error Parsing New Material ...");
             System.err.println(e.getMessage());

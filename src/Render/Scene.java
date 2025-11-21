@@ -11,8 +11,8 @@ public class Scene {
     private SDFManager  sdfManager;
     private Camera      camera 
 		= new Camera(
-	  new vec3(-4.0f,  1.0f,  1.0f),        //Position in space
-	  new vec3( 0.0f,  0.0f,  0.0f),        //Where it is pointing
+	  new vec3(-4.0f,  3.0f,  1.0f),        //Position in space
+	  new vec3( 0.0f,  0.0f, -0.8f),        //Where it is pointing
           new vec3( 0.0f,  0.0f,  1.0f),        //Up vector
           90                                    //Field of view
 	  );

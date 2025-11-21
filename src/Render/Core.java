@@ -115,21 +115,19 @@ public class Core extends JPanel {
 
         SDF blend = new BlendedSDF(sphere, cube, 2.1f);
         blend.setName("Blended Sphere & Cube");
-        //scene.addSDF(blend);
+        scene.addSDF(blend);
         
         Material floorMat = new Material(new vec3(100.0f));
         floorMat.reflectivity = 0.25f;
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
-        //scene.addSDF(floor);
+        scene.addSDF(floor);
         
         Material red = new Material(new vec3(255,0,0));
         red.shinyness = 32.0f;
         SDF chain = new HollowChainCube(new vec3(0), 1.0f, 1.0f, red);
         //scene.addSDF(chain);
         
-        SDF repeat = new Repeating(sphere, 5.0f);
-        scene.addSDF(repeat);
     }
     
     /**
