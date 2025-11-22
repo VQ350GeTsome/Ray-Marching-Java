@@ -26,7 +26,8 @@ public class Cylinder extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() {
-        return null;
+        String[] current = ArrayMath.subArray(this.toString().split(","), START, START + 3);
+        return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     
     @Override
@@ -38,4 +39,7 @@ public class Cylinder extends SDFs.SDF {
             return true;
         } catch (Exception e) { return false; }
     }
+   
+    @Override
+    public String toString() { return super.toString() + c.toString() + "," + r + "," + h + ",\n"; }
 }

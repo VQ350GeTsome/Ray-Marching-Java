@@ -123,9 +123,7 @@ public class Core extends JPanel {
         floor.setName("Scene Floor");
         scene.addSDF(floor);
         
-        SDF t = new Cube(new vec3(), 1.0f, sphereMat);
-        Quaternion q = new Quaternion().normalize();
-        t.setRotQuat(q);
+        SDF t = new KindaHyperCube(new vec3(), 1.0f, sphereMat);
         scene.addSDF(t);
  
         

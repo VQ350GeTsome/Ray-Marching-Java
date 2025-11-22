@@ -1,25 +1,25 @@
-package SDFs.Primitives;
+package SDFs.Special;
 
 import Utility.*;
 
-public class Cube extends SDFs.SDF {
+public class KindaHyperCube extends SDFs.SDF {
     
     private vec3 c;
     private float s;
    
-    public Cube(vec3 center, float size, Material material) { 
-        type = "cube";
+    public KindaHyperCube(vec3 center, float size, Material material) { 
+        type = "kidnahypercube";
         
         c = center; s = size; m = material;
     }
         
     @Override
     public float sdf(vec3 p){
-        p = rotQuat.rotate(p);
         vec3 d = p
 	        .subtract(c)
 	        .abs()
 	        .subtract(new vec3(s, s, s));
+        d = rotQuat.rotate(d);
         
         vec3 max = d.max(new vec3());
         float outsideDist = max.length();

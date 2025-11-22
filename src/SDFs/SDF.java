@@ -13,6 +13,7 @@ public abstract class SDF {
     protected Utility.Material m;
     protected Utility.Quaternion rotQuat = new Utility.Quaternion();
     protected String name, type;
+    protected final static int START = Utility.Material.FIELDS + 1;
     
     /**
      * Takes in a point and returns the distance 
