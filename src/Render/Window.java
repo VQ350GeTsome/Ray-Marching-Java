@@ -159,8 +159,46 @@ public class Window extends javax.swing.JFrame {
     private void rightClick(int x, int y, int w, int h) {
         HitInfo info = core.scene.marchRay(x, y, w, h);
         SDFs.SDF clickedObj = info.sdf;
-        if (clickedObj == null) return; //If we didn't click an object just return
+        
+        javax.swing.JPopupMenu popup = null;
+        if (clickedObj == null) popup = nothingClicked();
+        else popup = objectClicked(clickedObj, info);
             
+        int nw = core.getWidth(),
+            nh = core.getHeight(),
+            nx = (int) Math.round((x + 0.5f) * (nw / (float) w)),
+            ny = (int) Math.round((y + 0.5f) * (nh / (float) h));
+
+        nx = Math.max(0, Math.min(nx, nw - 1));
+        ny = Math.max(0, Math.min(ny, nh - 1));
+
+        popup.show(core, nx, ny);
+    }
+    
+    private javax.swing.JPopupMenu nothingClicked(){
+        javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
+        
+        JMenuItem changeBG = new JMenuItem("Change Background");
+        changeBG.addActionListener(evt -> {
+            changeBG();
+        });
+        popup.add(changeBG);
+        
+        return popup;
+    }
+    private void changeBG() {
+        String[] settings = new String[] { "r: ", "g: ", "b: " };
+        String[] defaults = core.scene.getBackground().toStringArray();
+        String[] inputs = createOptionsPane("Enter New Background Color: ", settings, defaults, 1);
+        
+        if (inputs == null) return;
+        
+        vec3 newBG = new vec3(inputs);
+        
+        core.scene.setBackground(newBG);
+    }
+    
+    private javax.swing.JPopupMenu objectClicked(SDFs.SDF clickedObj, HitInfo info) {
         javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
 
         JMenuItem delete = new JMenuItem("Delete");     //Define a menu item    
@@ -201,15 +239,7 @@ public class Window extends javax.swing.JFrame {
             popup.add(blendedEdit);
         }
         
-        int nw = core.getWidth(),
-            nh = core.getHeight(),
-            nx = (int) Math.round((x + 0.5f) * (nw / (float) w)),
-            ny = (int) Math.round((y + 0.5f) * (nh / (float) h));
-
-        nx = Math.max(0, Math.min(nx, nw - 1));
-        ny = Math.max(0, Math.min(ny, nh - 1));
-
-        popup.show(core, nx, ny);
+        return popup;
     }
     private void deleteClicked(SDFs.SDF obj, vec3 hit) {
         boolean blended = false;                        //This will keep track if our object is blended
@@ -333,6 +363,8 @@ public class Window extends javax.swing.JFrame {
         quat = quat.substring(1, quat.length() - 1);
         String[] defaults = quat.split(":");
         String[] inputs = createOptionsPane("Enter New Rotation (will be normalized): ", options, defaults, 1);
+        
+        if (inputs == null) return;
         
         try {
             Quaternion q = new Quaternion(ArrayMath.add(new String[] { "1" } , inputs));
@@ -578,6 +610,11 @@ public class Window extends javax.swing.JFrame {
         lightingMenu.add(ambientLighting);
 
         backgroundColor.setText("Change Background Colors");
+        backgroundColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backgroundColorActionPerformed(evt);
+            }
+        });
         lightingMenu.add(backgroundColor);
 
         bloomToggle.setSelected(true);
@@ -862,6 +899,10 @@ public class Window extends javax.swing.JFrame {
     private void cameraObjCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraObjCheckActionPerformed
         core.scene.cameraObj(cameraObjCheck.getState());
     }//GEN-LAST:event_cameraObjCheckActionPerformed
+
+    private void backgroundColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorActionPerformed
+        changeBG();
+    }//GEN-LAST:event_backgroundColorActionPerformed
 
     /**
      * @param args the command line arguments

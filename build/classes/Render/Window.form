@@ -142,6 +142,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change Background Colors"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="backgroundColorActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="bloomToggle">
               <Properties>

@@ -1,6 +1,5 @@
 package Render;
 
-import SDFs.SDF;
 import Utility.*;
 import java.util.stream.IntStream;
 
@@ -12,6 +11,7 @@ public class RayMarcher {
     
     private vec3 background    = new vec3(0.0f);
     public vec3 getBackground() { return background; }
+    public void setBackground(vec3 bg) { background = bg; }
     private int   maxSteps      = 1024,
                   maxDist       =  128,
                   shadowSteps   =   64,

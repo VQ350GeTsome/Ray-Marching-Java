@@ -64,6 +64,7 @@ public class Scene {
     }
     public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public vec3 getBackground() { return rayMarcher.getBackground(); }
+    public void setBackground(vec3 bg) { rayMarcher.setBackground(bg); }
     public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }
     public String[] getMarchParams() { return rayMarcher.getMarchParams(); }
     public String packageScene() {
