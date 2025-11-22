@@ -85,7 +85,7 @@ public class SDFManager {
      */
     public String packSDFs() {
         String str = "";
-        for (SDF sdf : sdfs) {
+        for (SDF sdf : sdfs) if (!sdf.getType().equals("camera")) { //Don't save the camera
             if (sdf instanceof BlendedSDF) {    //If of type blended append the blended tag
                 float k = ((BlendedSDF) sdf).getK();    //Blending factor
                 boolean needsTagged = !((BlendedSDF) sdf).needsUnblended(); //If we need to tag the new SDF as blended
