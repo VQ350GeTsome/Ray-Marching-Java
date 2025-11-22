@@ -8,7 +8,7 @@ public class KindaHyperCube extends SDFs.SDF {
     private float s;
    
     public KindaHyperCube(vec3 center, float size, Material material) { 
-        type = "kidnahypercube";
+        type = "kindahypercube";
         
         c = center; s = size; m = material;
     }
@@ -39,7 +39,10 @@ public class KindaHyperCube extends SDFs.SDF {
             c = new vec3(inputs[0].trim());
             s = Float.parseFloat(inputs[1].trim());
             return true;
-        } catch (Exception e) { return false; }        
+        } catch (Exception e) { 
+            System.err.println(e.getMessage());
+            return false; 
+        }        
     }
     
     @Override

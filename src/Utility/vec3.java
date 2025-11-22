@@ -268,17 +268,19 @@ public class vec3 {
      * @param vector A String in the form {x:y:z} or (x, y, z)
      */
     public vec3(String vector) {
-        vector = vector.trim().substring(1, vector.length() - 2);   //Trim off grouping character
-        String[] componenets = vector.split("[,\\:]");              //Split by , or :
+        vector = vector.trim().substring(1, vector.length() - 1);   //Trim off grouping character
+        String[] comp = vector.split("[,\\:]");              //Split by , or :
         
-        if (componenets.length != 3) {
+        for (String s : comp) System.out.println(s);
+        
+        if (comp.length != 3) {
             throw new IllegalArgumentException("Invalid vec3 format: " + vector);
         }
                 
         // Parse and assign
-        this.x = Float.parseFloat(componenets[0].trim());
-        this.y = Float.parseFloat(componenets[1].trim());
-        this.z = Float.parseFloat(componenets[2].trim());
+        this.x = Float.parseFloat(comp[0].trim());
+        this.y = Float.parseFloat(comp[1].trim());
+        this.z = Float.parseFloat(comp[2].trim());
     }
     /**
      * Turns the .toStringArray method back into a vec3 object
