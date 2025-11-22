@@ -41,6 +41,17 @@ public class SDFManager {
         }
         return minDist;                 //Return the closest surface
     }
+    
+    public float getClosestSDFDistSkipCam(vec3 pos) {
+        float minDist = Float.MAX_VALUE, dist;
+        for (SDF sdf : sdfs) if (!sdf.getType().equals("camera")) {          //For each SDF that's not the camera
+            dist = sdf.sdf(pos);        //Get the distance to surface
+            minDist = (minDist > dist)  //Store the closest surface
+                    ? dist : minDist;
+        }
+        return minDist;                 //Return the closest surface
+    }
+    
     /**
      * Returns The SDF at an input position, else null.
      * @param pos The input position.

@@ -89,7 +89,7 @@ public class Core extends JPanel {
      * to this to then finally write it to the
      * image ... and repaint it.
      */
-    private void renderScene() {
+    private void renderScene() {        
         vec3[][] vec3Image = scene.renderScene();
         Color[][] colorImage = null;
               
@@ -123,16 +123,11 @@ public class Core extends JPanel {
         floor.setName("Scene Floor");
         scene.addSDF(floor);
         
-        SDF t = new Torus(new vec3(), 1.0f, 0.5f, sphereMat);
-        Quaternion q = new Quaternion
-            (
-                    1.0f, 
-                    (float) (1.0f * Math.PI), 
-                    (float) (0.0f * Math.PI), 
-                    (float) (0.0f * Math.PI)
-            );
+        SDF t = new Cube(new vec3(), 1.0f, sphereMat);
+        Quaternion q = new Quaternion().normalize();
         t.setRotQuat(q);
         scene.addSDF(t);
+ 
         
         Material red = new Material(new vec3(255,0,0));
         red.shinyness = 32.0f;

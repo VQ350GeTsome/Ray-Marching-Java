@@ -66,26 +66,6 @@ public class RayMarcher {
         return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
     }
     
-    /**
-     * Marches a ray, but instead of feeding the method a 
-     * starting position, and direction. We give it the x & y 
-     * on the screen, and the width & height to then calculate
-     * the direction, and the position is the camera position.
-     * @param x on the screen.
-     * @param y on the screen.
-     * @param w Width of the screen.
-     * @param h Height of the screen.
-     * @return marchRay( camera position , calculated direction )
-     */
-    public HitInfo marchRay(int x, int y, int w, int h) {
-        float nx = (x + 0.5f) / (float) w;
-        float ny = (y + 0.5f) / (float) h;
-        vec3 pos = camera.getOrientation()[3];
-        vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
-        
-        return marchRay(pos, dir);
-    }
-    
     private HitInfo marchThrough(vec3 pos, vec3 dir) {
         if (sdfMgr.getClosestSDFDist(pos) >= 0f) return marchRay(pos, dir);
         float totalDist = 0.0f;
@@ -97,6 +77,22 @@ public class RayMarcher {
         }
         return new HitInfo(pos, totalDist, sdfMgr.getSDFAtPos(pos));
     } 
+    
+    public HitInfo marchRaySkipCam(vec3 pos, vec3 dir) {
+        float totalDistance = 0.0f;
+        for (int step = 0; step < maxSteps; step++) {
+            float distance = sdfMgr.getClosestSDFDistSkipCam(pos);        
+            if (distance < Core.getEps() || totalDistance > maxDist) {
+                vec3 hitPos = pos.add(dir.scale(distance));
+                totalDistance += distance;
+                return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(hitPos));
+            }
+
+            pos = pos.add(dir.scale(distance));
+            totalDistance += distance;
+        }
+        return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
+    }
     
     public vec3[][] marchScreen(int w, int h) {
         vec3[][] image = new vec3[w][h];                                 //2D array for image of size { width , height }
@@ -114,7 +110,7 @@ public class RayMarcher {
                 an object just set the pixels color to the background, else calculate the 
                 color at that pixel depending on the object & its material.
                 */
-                HitInfo hit = marchRay(pos, dir);                                                          
+                HitInfo hit = marchRaySkipCam(pos, dir);                                                          
                 if (hit.sdf == null) { image[x][y] = background; continue; }
                 image[x][y] = calculateColor(hit, dir);
             }

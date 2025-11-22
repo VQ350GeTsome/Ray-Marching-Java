@@ -30,9 +30,9 @@ public class Quaternion {
     public Quaternion conjugate() { return new Quaternion(w, -x, -y, -z); }
 
     public vec3 rotate(vec3 v) {
-        Quaternion q = normalize();
+        if (w == 1 && length() == 1) return v;  //If no rotation just return v.
         Quaternion qv = new Quaternion(0, v.x, v.y, v.z);
-        Quaternion res = q.multiply(qv).multiply(q.conjugate());
+        Quaternion res = this.multiply(qv).multiply(this.conjugate());
         return new vec3(res.x, res.y, res.z);
     }
     

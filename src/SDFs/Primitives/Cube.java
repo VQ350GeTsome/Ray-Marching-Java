@@ -14,11 +14,13 @@ public class Cube extends SDFs.SDF {
     }
         
     @Override
-    public float sdf(vec3 point){
-        vec3 d = point
-	      .subtract(c)
-	      .abs()
-	      .subtract( new vec3(s, s, s) );
+    public float sdf(vec3 p){
+        p = rotQuat.rotate(p);
+        vec3 d = p
+	        .subtract(c)
+	        .abs()
+	        .subtract(new vec3(s, s, s));
+        
         vec3 max = d.max(new vec3());
         float outsideDist = max.length();
         float insideDist = Math.max(Math.max(d.x, d.y), d.z);

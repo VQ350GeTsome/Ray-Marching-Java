@@ -336,7 +336,7 @@ public class Window extends javax.swing.JFrame {
         
         try {
             Quaternion q = new Quaternion(ArrayMath.add(new String[] { "1" } , inputs));
-            obj.setRotQuat(q);
+            obj.setRotQuat(q.normalize());
         } catch (Exception e) {
             System.err.println("Error in parsing new roatation.");
             System.err.println(e.getMessage());
@@ -416,6 +416,7 @@ public class Window extends javax.swing.JFrame {
         cameraMenu = new javax.swing.JMenu();
         cameraPosition = new javax.swing.JMenuItem();
         cameraGrain = new javax.swing.JMenuItem();
+        cameraObjCheck = new javax.swing.JCheckBoxMenuItem();
         lightingMenu = new javax.swing.JMenu();
         sceneLighitng = new javax.swing.JMenuItem();
         ambientLighting = new javax.swing.JMenuItem();
@@ -547,6 +548,14 @@ public class Window extends javax.swing.JFrame {
             }
         });
         cameraMenu.add(cameraGrain);
+
+        cameraObjCheck.setText("Camera as Object");
+        cameraObjCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cameraObjCheckActionPerformed(evt);
+            }
+        });
+        cameraMenu.add(cameraObjCheck);
 
         menuBar.add(cameraMenu);
 
@@ -850,6 +859,10 @@ public class Window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_f2SSChangeActionPerformed
 
+    private void cameraObjCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraObjCheckActionPerformed
+        core.scene.cameraObj(cameraObjCheck.getState());
+    }//GEN-LAST:event_cameraObjCheckActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -893,6 +906,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem bloomToggle;
     private javax.swing.JMenuItem cameraGrain;
     private javax.swing.JMenu cameraMenu;
+    private javax.swing.JCheckBoxMenuItem cameraObjCheck;
     private javax.swing.JMenuItem cameraPosition;
     private javax.swing.JMenuItem changeFPS;
     private javax.swing.JMenuItem changeRender;

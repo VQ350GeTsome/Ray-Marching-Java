@@ -15,12 +15,12 @@ public class Torus extends SDFs.SDF{
     }
     
     @Override
-    public float sdf(vec3 point){
-        point = point.subtract(c);
-        point = rotQuat.rotate(point);
+    public float sdf(vec3 p){
+        p = p.subtract(c);
+        p = rotQuat.rotate(p);
         
-        float radial = (float)Math.sqrt(point.x * point.x + point.y * point.y) - r1;
-        float tubeDist = (float)Math.sqrt(radial * radial + point.z * point.z);
+        float radial = (float)Math.sqrt(p.x * p.x + p.y * p.y) - r1;
+        float tubeDist = (float)Math.sqrt(radial * radial + p.z * p.z);
         return tubeDist - r2;
     }
     

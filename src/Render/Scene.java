@@ -49,8 +49,19 @@ public class Scene {
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
     public void zoomCamera(float z)             { camera.zoom(z); }
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }
+    public void cameraObj(boolean add) {
+        if (add) sdfManager.addSDF(camera);
+        else sdfManager.removeSDF(camera);
+    }
     
-    public HitInfo marchRay(int x, int y, int w, int h) { return rayMarcher.marchRay(x, y, w, h); }
+    public HitInfo marchRay(int x, int y, int w, int h) { 
+        float nx = (x + 0.5f) / (float) w;
+        float ny = (y + 0.5f) / (float) h;
+        vec3 pos = camera.getOrientation()[3];
+        vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
+        
+        return rayMarcher.marchRaySkipCam(pos, dir);
+    }
     public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public vec3 getBackground() { return rayMarcher.getBackground(); }
     public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }

@@ -14,7 +14,7 @@ public class Sphere extends SDFs.SDF{
     }
 
     @Override
-    public float sdf(vec3 point) { return point.getDist(c) - r; }
+    public float sdf(vec3 p) { return p.getDist(c) - r; }
     
     @Override
     public String[] getSettingsAndCurrent() {

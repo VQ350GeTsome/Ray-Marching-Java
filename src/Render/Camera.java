@@ -2,7 +2,7 @@ package Render;
 
 import Utility.vec3;
 
-public class Camera {
+public class Camera extends SDFs.SDF {
     
     private static final float DEG_TO_RAD = (float)(Math.PI / 180.0),
                                RAD_TO_DEG = (float)(180.0 / Math.PI);
@@ -48,6 +48,9 @@ public class Camera {
         
         this.fov = (float)(fov * DEG_TO_RAD);       //Store FOV in radians
         tanOfHalfFov = (float)Math.tan(this.fov / 2.0);
+        
+        m = new Utility.Material(new vec3(200.0f));
+        type = "camera";
     }
     /**
      * Updates FOV. Takes in FOV in radians, calculates
@@ -131,4 +134,14 @@ public class Camera {
         pitch   = Float.parseFloat(parts[5]);
         updateFov((float) Double.parseDouble(parts[6]));
     }
+    
+    private SDFs.Primitives.Cube body = new SDFs.Primitives.Cube(new vec3(0.0f), 0.1f, m);
+    
+    @Override 
+    public float sdf(vec3 p) {
+        return body.sdf(p.subtract(pos));
+    }
+    
+    @Override
+    public boolean parseNewParams(String[] p) { return false; }
 }
