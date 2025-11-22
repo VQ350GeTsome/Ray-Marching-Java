@@ -123,7 +123,7 @@ public class Core extends JPanel {
         floor.setName("Scene Floor");
         scene.addSDF(floor);
         
-        SDF t = new KindaHyperCube(new vec3(), 1.0f, sphereMat);
+        SDF t = new Cylinder(new vec3(), 1.0f, 1.0f, sphereMat);
         scene.addSDF(t);
  
         

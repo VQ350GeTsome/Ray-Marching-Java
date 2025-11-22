@@ -1,16 +1,16 @@
-package SDFs.Primitives;
+package SDFs.Special;
 
 import Utility.*;
 
-public class Cylinder extends SDFs.SDF {
+public class InfiniteColumn extends SDFs.SDF {
 
-    private float r, h;
+    private float r;
     private vec3 c;
     
-    public Cylinder(vec3 center, float radius, float height, Material mat) {
-        type = "cylinder";
+    public InfiniteColumn(vec3 center, float radius, Material mat) {
+        type = "infinitecolumn";
         
-        c = center; r = radius; h = height; m = mat;
+        c = center; r = radius; m = mat;
     }
     
     @Override
@@ -18,11 +18,10 @@ public class Cylinder extends SDFs.SDF {
         p = p.subtract(c);
         p = rotQuat.rotate(p);
         
-        float rad = new vec2(p.x, p.y).length() - r;
-
-        float vert = Math.abs(p.z) - h;
-
-        return Math.max(rad, vert);
+        float d = new vec2(p.x, p.y).length() - r;
+        d = Math.max(d, Math.abs(p.y) - r);
+        
+        return d;
     }
     
     @Override
@@ -36,11 +35,10 @@ public class Cylinder extends SDFs.SDF {
         try {
             c = new vec3(inputs[0].trim());
             r = Float.parseFloat(inputs[1].trim());
-            h = Float.parseFloat(inputs[2].trim());
             return true;
         } catch (Exception e) { return false; }
     }
    
     @Override
-    public String toString() { return super.toString() + c.toString() + "," + r + "," + h + ",\n"; }
+    public String toString() { return super.toString() + c.toString() + "," + r  + ",\n"; }
 }

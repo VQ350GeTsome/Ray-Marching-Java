@@ -16,6 +16,7 @@ public class RayMarcher {
                   maxDist       =  128,
                   shadowSteps   =   64,
                   fogFalloff    =    5;
+    private float shadowAmount  = 0.66f;
     
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
@@ -220,7 +221,7 @@ public class RayMarcher {
         
         float lighting = 1.0f - ambientLight;               //Minus the starting light % by the ambient light, for it will be added back later ... 
         float t = 0.1f;                                     //Start slightly off the surface ... this must be greater than epsilon
-        final float softness = 1.0f;                        //Penumbra width ... i think
+        final float softness = 1 / shadowAmount;                        //Penumbra width ... i think
         vec3 lightDir = light.getSceneLighting()
                         .negate();                          //Flip lighting around
         for (int i = 0; shadowSteps > i; i++) {
