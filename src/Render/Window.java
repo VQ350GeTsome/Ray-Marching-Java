@@ -395,7 +395,7 @@ public class Window extends javax.swing.JFrame {
         vec3[] camOrien = core.scene.getCameraOrien();  
         vec3 forward    = camOrien[0];
         vec3 pos        = camOrien[3];
-        placeHolder.add(vec3.round(pos.add(forward.scale(n))).toStringParen());
+        placeHolder.add(vec3.round(pos.add(forward.scale(n))).toString());
 
         //Now we fill the placeholder with more values and prompt the user for any changes
         String t = "";
@@ -440,6 +440,9 @@ public class Window extends javax.swing.JFrame {
         exportScene = new javax.swing.JMenuItem();
         objectsMenu = new javax.swing.JMenu();
         addNewObj = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        bloomToggle = new javax.swing.JCheckBoxMenuItem();
+        bloomSettings = new javax.swing.JMenuItem();
         renderMenu = new javax.swing.JMenu();
         resolutionChange = new javax.swing.JMenuItem();
         changeRender = new javax.swing.JMenuItem();
@@ -452,9 +455,9 @@ public class Window extends javax.swing.JFrame {
         lightingMenu = new javax.swing.JMenu();
         sceneLighitng = new javax.swing.JMenuItem();
         ambientLighting = new javax.swing.JMenuItem();
+        shadowAmount = new javax.swing.JMenuItem();
+        skyboxMenu = new javax.swing.JMenu();
         backgroundColor = new javax.swing.JMenuItem();
-        bloomToggle = new javax.swing.JCheckBoxMenuItem();
-        bloomSettings = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -526,6 +529,27 @@ public class Window extends javax.swing.JFrame {
         objectsMenu.add(addNewObj);
 
         menuBar.add(objectsMenu);
+
+        jMenu1.setText("Post Processing");
+
+        bloomToggle.setSelected(true);
+        bloomToggle.setText("Toggle Bloom");
+        bloomToggle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bloomToggleActionPerformed(evt);
+            }
+        });
+        jMenu1.add(bloomToggle);
+
+        bloomSettings.setText("Bloom Settings");
+        bloomSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bloomSettingsActionPerformed(evt);
+            }
+        });
+        jMenu1.add(bloomSettings);
+
+        menuBar.add(jMenu1);
 
         renderMenu.setText("Render");
 
@@ -609,32 +633,27 @@ public class Window extends javax.swing.JFrame {
         });
         lightingMenu.add(ambientLighting);
 
-        backgroundColor.setText("Change Background Colors");
+        shadowAmount.setText("Change Shadow Amount");
+        shadowAmount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                shadowAmountActionPerformed(evt);
+            }
+        });
+        lightingMenu.add(shadowAmount);
+
+        menuBar.add(lightingMenu);
+
+        skyboxMenu.setText("Skybox");
+
+        backgroundColor.setText("Change Background Color");
         backgroundColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backgroundColorActionPerformed(evt);
             }
         });
-        lightingMenu.add(backgroundColor);
+        skyboxMenu.add(backgroundColor);
 
-        bloomToggle.setSelected(true);
-        bloomToggle.setText("Toggle Bloom");
-        bloomToggle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bloomToggleActionPerformed(evt);
-            }
-        });
-        lightingMenu.add(bloomToggle);
-
-        bloomSettings.setText("Bloom Settings");
-        bloomSettings.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bloomSettingsActionPerformed(evt);
-            }
-        });
-        lightingMenu.add(bloomSettings);
-
-        menuBar.add(lightingMenu);
+        menuBar.add(skyboxMenu);
 
         setJMenuBar(menuBar);
 
@@ -735,7 +754,7 @@ public class Window extends javax.swing.JFrame {
 
     private void sceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sceneLighitngActionPerformed
         String[] options    = new String[] { "Scene Light Direction: " };
-        String[] defaultDir = new String[] { core.scene.getSceneLighting().toStringParen() };
+        String[] defaultDir = new String[] { core.scene.getSceneLighting().toString() };
         String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir, 3);
         
         if (inputs == null) return; 
@@ -760,7 +779,7 @@ public class Window extends javax.swing.JFrame {
 
     private void cameraPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraPositionActionPerformed
         String[] options    = new String[] { "New Camera Position: " };
-        String[] defaultDir = new String[] { core.scene.getCameraPos().round(1).toStringParen() };
+        String[] defaultDir = new String[] { core.scene.getCameraPos().round(1).toString() };
         String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir, 3);
         
         if (inputs == null) return; 
@@ -904,6 +923,23 @@ public class Window extends javax.swing.JFrame {
         changeBG();
     }//GEN-LAST:event_backgroundColorActionPerformed
 
+    private void shadowAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shadowAmountActionPerformed
+        String[] settings = new String[] { "New Shadow Amount: " };
+        String[] defaults = new String[] { ""+core.scene.getShadowAmount() };
+        String[] inputs = createOptionsPane("Setting a New Shadow Amount ...", settings, defaults, 1);
+        
+        if (inputs == null) return;
+        
+        try {
+            float f = Float.parseFloat(inputs[0]);
+            if (0 > f) throw new NumberFormatException("Shadow Amount cannot be negative ...");
+            core.scene.setShadowAmount(f);
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing new shadow amount ...");
+            System.err.println(e.getMessage());
+        }
+    }//GEN-LAST:event_shadowAmountActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -955,6 +991,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenuItem exportScene;
     private javax.swing.JMenuItem f2SSChange;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu lightingMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu objectsMenu;
@@ -962,5 +999,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenu renderMenu;
     private javax.swing.JMenuItem resolutionChange;
     private javax.swing.JMenuItem sceneLighitng;
+    private javax.swing.JMenuItem shadowAmount;
+    private javax.swing.JMenu skyboxMenu;
     // End of variables declaration//GEN-END:variables
 }

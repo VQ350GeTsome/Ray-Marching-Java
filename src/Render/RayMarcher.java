@@ -5,17 +5,22 @@ import java.util.stream.IntStream;
 
 public class RayMarcher {
 
-    private Camera      camera;
-    private Light       light;
-    private SDFManager  sdfMgr;
+    private final Camera      camera;
+    private final Light       light;
+    private final SDFManager  sdfMgr;
     
-    private vec3 background    = new vec3(0.0f);
+    private vec3 background    = new vec3();
+    private vec3 bgSecondary   = new vec3();
     public vec3 getBackground() { return background; }
     public void setBackground(vec3 bg) { background = bg; }
     private int   maxSteps      = 1024,
                   maxDist       =  128,
                   shadowSteps   =   64,
-                  fogFalloff    =    5;
+                  fogFalloff    =    5,
+                  maxDepth         =    3;
+    
+    public void setShadowAmount(float s) { shadowAmount = s; }
+    public float getShadowAmount() { return shadowAmount; }
     private float shadowAmount  = 0.66f;
     
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
@@ -112,14 +117,20 @@ public class RayMarcher {
                 color at that pixel depending on the object & its material.
                 */
                 HitInfo hit = marchRaySkipCam(pos, dir);                                                          
-                if (hit.sdf == null) { image[x][y] = background; continue; }
-                image[x][y] = calculateColor(hit, dir);
+                if (hit.sdf == null) 
+                    image[x][y] = calcBackground(dir);
+                else 
+                    image[x][y] = calcColor(hit, dir, maxDepth);
             }
         });
         return image;
     }
 
-    private vec3 calculateColor(HitInfo hit, vec3 dir, int depth) {
+    private vec3 calcBackground(vec3 dir) {
+        return background;
+    }
+    
+    private vec3 calcColor(HitInfo hit, vec3 dir, int depth) {
         Material objMat = hit.mat;     //Get the object we hits material and save it to objMat.
                 
         float shadow = getShadow(hit.hit); //Get shadow amount
@@ -147,7 +158,6 @@ public class RayMarcher {
         finalColor =  vec3.blend(finalColor, background, fog);
         return finalColor;
     }
-    private vec3 calculateColor(HitInfo hit, vec3 dir) { return calculateColor(hit, dir, 4); }
     
     private vec3 opacity(HitInfo entryHit, vec3 norm, vec3 inDir, int depth) {
         if (depth == 0) return entryHit.mat.color;
@@ -175,7 +185,7 @@ public class RayMarcher {
 
         refractDirExit = refractDirExit.negate();
         HitInfo behind = marchRay(surfaceExitPos, refractDirExit);
-        return (behind.sdf == null) ? background : calculateColor(behind, refractDirExit, depth - 1);
+        return (behind.sdf == null) ? background : calcColor(behind, refractDirExit, depth - 1);
     }
    
     private vec3 refract(vec3 dir, vec3 norm, float etai, float etat) {
@@ -206,7 +216,7 @@ public class RayMarcher {
 
         //Use recursion if we hit an object
         if (reflectHit.sdf == null) return background;   
-        else return calculateColor(reflectHit, reflected, depth - 1);
+        else return calcColor(reflectHit, reflected, depth - 1);
     }
         
     private vec3 diffuse(HitInfo hit, vec3 normal) {
@@ -288,25 +298,22 @@ public class RayMarcher {
     
     public String packRayMarcher() {
         return  (int) background.x + ":" + (int) background.y + ":" + (int) background.z + "," +
+                (int) bgSecondary.x + ":" + (int) bgSecondary.y + ":" + (int) bgSecondary.z + "," +
                 maxSteps    + "," + maxDist + "," +
-                shadowSteps + "," + fogFalloff + ",\n" ;
+                shadowSteps + "," + fogFalloff + "," + maxDepth + ",\n" ;
     }
     public void unpackRayMarcher(String[] parts) {
-        String[] rgb = parts[0].split(":");
+        int i = 0;
         
-        if (rgb.length != 3) 
-            throw new IllegalArgumentException("Invalid color format: " + parts[0]);
-                
-        int r = Integer.parseInt(rgb[0].trim());
-        int g = Integer.parseInt(rgb[1].trim());
-        int b = Integer.parseInt(rgb[2].trim());
-        
-        this.background = new vec3(r, g, b);
+        background  = new vec3(parts[i++].split(":"));
+        bgSecondary = new vec3(parts[i++].split(":"));
 
-        this.maxSteps       = Integer.parseInt(parts[1].trim());
-        this.maxDist        = Integer.parseInt(parts[2].trim());
-        this.shadowSteps    = Integer.parseInt(parts[3].trim());
-        this.fogFalloff     = Integer.parseInt(parts[4].trim());
+        maxSteps       = Integer.parseInt(parts[i++].trim());
+        maxDist        = Integer.parseInt(parts[i++].trim());
+        shadowSteps    = Integer.parseInt(parts[i++].trim());
+        fogFalloff     = Integer.parseInt(parts[i++].trim());
+        maxDepth       = Integer.parseInt(parts[i++].trim());
+        
     }
 
 }

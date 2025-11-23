@@ -65,6 +65,8 @@ public class Scene {
     public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public vec3 getBackground() { return rayMarcher.getBackground(); }
     public void setBackground(vec3 bg) { rayMarcher.setBackground(bg); }
+    public float getShadowAmount() { return rayMarcher.getShadowAmount(); }
+    public void setShadowAmount(float f) { rayMarcher.setShadowAmount(f); }
     public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }
     public String[] getMarchParams() { return rayMarcher.getMarchParams(); }
     public String packageScene() {
@@ -84,21 +86,21 @@ public class Scene {
               parts[4], parts[5], parts[6], };
         camera.unpackageCamera(cameraPack);     //Update the camera 
         
-        //RayMarcher parts 7 - 11
+        //RayMarcher parts 7 - 13
         String[] rayMarcherPack = new String[]          //Get all the raymarcher parts
-            { parts[7] , parts[8] , parts[9] , parts[10], 
-              parts[11] };
+            { parts[7],  parts[8],  parts[9], parts[10], 
+              parts[11], parts[12], parts[13] };
         rayMarcher.unpackRayMarcher(rayMarcherPack);    //Update the raymarcher
         
-        //Light parts 12 - 13
-        String[] lightPack = new String[] { parts[12], parts[13] }; //Get the light parts
+        //Light parts 14 - 15
+        String[] lightPack = new String[] { parts[14], parts[15] }; //Get the light parts
         light.unpackLight(lightPack);                               //Update light
         
-        //Post proccesor parts 14 - 15
-        Core.setBloomSettings(new String[] { parts[14], parts[15] } );
+        //Post proccesor parts 16 - 17
+        Core.setBloomSettings(new String[] { parts[16], parts[17] } );
         
-        //Sdf pars 16 ->
-        String[] sdfs = Arrays.copyOfRange(parts, 16, parts.length);
+        //Sdf pars 18 -> rest
+        String[] sdfs = Arrays.copyOfRange(parts, 18, parts.length);
         sdfManager.unpackSDFs(sdfs);
     }
 }

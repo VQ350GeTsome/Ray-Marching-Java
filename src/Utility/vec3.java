@@ -260,36 +260,26 @@ public class vec3 {
     public boolean equals(vec3 o) { return x == o.x && y == o.y && z == o.z; }
     
     @Override
-    public String toString() { return "{" + x + ":" + y + ":" + z + "}"; }
-    public String toStringParen() { return "(" + x + ", " + y + ", " + z + ")"; }
+    public String toString() { return "(" + x + " : " + y + " : " + z + ")"; }
     public String[] toStringArray() { return new String[] { ""+x, ""+y, ""+z }; }
     /**
      * Turns the .toString() method back into a vec3 object
      * @param vector A String in the form {x:y:z} or (x, y, z)
      */
-    public vec3(String vector) {
-        vector = vector.trim().substring(1, vector.length() - 1);   //Trim off grouping character
-        String[] comp = vector.split("[,\\:]");              //Split by , or :
-        
-        for (String s : comp) System.out.println(s);
-        
-        if (comp.length != 3) {
-            throw new IllegalArgumentException("Invalid vec3 format: " + vector);
-        }
-                
-        // Parse and assign
-        this.x = Float.parseFloat(comp[0].trim());
-        this.y = Float.parseFloat(comp[1].trim());
-        this.z = Float.parseFloat(comp[2].trim());
-    }
+    public vec3(String vector) { this(vector.trim().substring(1, vector.length() - 2).split("[,\\:]")); }
     /**
      * Turns the .toStringArray method back into a vec3 object
-     * @param components A length 3 array of Strings that are floats
+     * @param comp A length 3 array of Strings that are floats
      */
-    public vec3(String[] components) {
-        this.x = Float.parseFloat(components[0].trim());
-        this.y = Float.parseFloat(components[1].trim());
-        this.z = Float.parseFloat(components[2].trim());
+    public vec3(String[] comp) {
+        try {
+            this.x = Float.parseFloat(comp[0].trim());
+            this.y = Float.parseFloat(comp[1].trim());
+            this.z = Float.parseFloat(comp[2].trim());
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing string for vec3 ...");
+            System.err.println(e.getMessage());
+        }
     }
 
 }
