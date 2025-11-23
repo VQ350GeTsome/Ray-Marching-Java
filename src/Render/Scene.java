@@ -69,6 +69,8 @@ public class Scene {
     public void setShadowAmount(float f) { rayMarcher.setShadowAmount(f); }
     public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }
     public String[] getMarchParams() { return rayMarcher.getMarchParams(); }
+    public void setSeeLight(boolean b) { rayMarcher.setSeeLight(b); }
+    
     public String packageScene() {
         return  camera.packageCamera() +
                 rayMarcher.packRayMarcher() +

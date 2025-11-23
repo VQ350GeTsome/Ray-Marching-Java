@@ -9,7 +9,7 @@ public class Light {
     private float ambientLight = 0.0f;
     private ArrayList<vec3> lightSources;   /* Unemplemented */
     
-    public void setSceneLighting(vec3 l)    { sceneLight = l; }
+    public void setSceneLighting(vec3 l)    { sceneLight = l.normalize(); }
     public vec3 getSceneLighting()          { return sceneLight; }
     
     public void setAmbientLight(float l)    { ambientLight = l; }

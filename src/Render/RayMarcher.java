@@ -9,10 +9,14 @@ public class RayMarcher {
     private final Light       light;
     private final SDFManager  sdfMgr;
     
-    private vec3 background    = new vec3();
-    private vec3 bgSecondary   = new vec3();
+    
     public vec3 getBackground() { return background; }
     public void setBackground(vec3 bg) { background = bg; }
+    public vec3 getSecondaryBG() { return bgSecondary; }
+    public void setSecondaryBG(vec3 bg) { bgSecondary = bg; }
+    private vec3 background    = new vec3(255),
+                 bgSecondary   = new vec3(0);
+    
     private int   maxSteps      = 1024,
                   maxDist       =  128,
                   shadowSteps   =   64,
@@ -22,6 +26,11 @@ public class RayMarcher {
     public void setShadowAmount(float s) { shadowAmount = s; }
     public float getShadowAmount() { return shadowAmount; }
     private float shadowAmount  = 0.66f;
+    
+    public void setSeeLight(boolean b) { seeLight = b; }
+    private boolean seeLight = true,
+                    gradient = true,
+                    gradUseY = false;
     
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
@@ -127,7 +136,13 @@ public class RayMarcher {
     }
 
     private vec3 calcBackground(vec3 dir) {
-        return background;
+        if (!gradient) return background;
+        
+        if (gradUseY)
+            return background.blend(bgSecondary, 0.50f - (dir.z / 2.0f));
+        else
+            return background.blend(bgSecondary, 0.50f - (dir.dot(light.getSceneLighting()) / 2.0f));
+          
     }
     
     private vec3 calcColor(HitInfo hit, vec3 dir, int depth) {
@@ -145,7 +160,7 @@ public class RayMarcher {
         //Using recursion calculate the color of the reflected ray
         vec3 reflectionColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth) : diffusedColor;
         
-        vec3 behindColor = (objMat.opacity > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth) : background;
+        vec3 behindColor = (objMat.opacity > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth) : calcBackground(dir);
         
         vec3 finalColor = diffusedColor
                           .blend(reflectionColor, objMat.reflectivity)
@@ -155,7 +170,7 @@ public class RayMarcher {
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
         fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
 
-        finalColor =  vec3.blend(finalColor, background, fog);
+        finalColor =  vec3.blend(finalColor, calcBackground(dir), fog);
         return finalColor;
     }
     
@@ -179,13 +194,12 @@ public class RayMarcher {
         if (refractDirExit == null) {
             vec3 insideReflectDir = refractDirIn.subtract(exitNorm.scale(refractDirIn.dot(exitNorm)*2.0f)).normalize();
             HitInfo reflectHit = marchRay(surfaceExitPos, insideReflectDir);
-            return background;
-            //return (reflectHit.sdf == null) ? background : calculateColor(reflectHit, insideReflectDir, depth - 1);
+            return calcBackground(refractDirExit);
         }
 
         refractDirExit = refractDirExit.negate();
         HitInfo behind = marchRay(surfaceExitPos, refractDirExit);
-        return (behind.sdf == null) ? background : calcColor(behind, refractDirExit, depth - 1);
+        return (behind.sdf == null) ? calcBackground(refractDirExit) : calcColor(behind, refractDirExit, depth - 1);
     }
    
     private vec3 refract(vec3 dir, vec3 norm, float etai, float etat) {
@@ -215,7 +229,7 @@ public class RayMarcher {
         HitInfo reflectHit = marchRay(origin, reflected);
 
         //Use recursion if we hit an object
-        if (reflectHit.sdf == null) return background;   
+        if (reflectHit.sdf == null) return calcBackground(dir);   
         else return calcColor(reflectHit, reflected, depth - 1);
     }
         
