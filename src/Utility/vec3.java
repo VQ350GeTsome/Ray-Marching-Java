@@ -225,7 +225,7 @@ public class vec3 {
         return new vec3(nx, ny, nz); 
     }
 
-    public java.awt.Color toColor() { 
+    public java.awt.Color toAwtColor() { 
         vec3 clamped = this.clamp(0, 255);
         return new java.awt.Color((int) clamped.x, (int) clamped.y, (int) clamped.z);
     }

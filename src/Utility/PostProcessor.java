@@ -138,7 +138,7 @@ public class PostProcessor {
     public static java.awt.Color[][] convertToColor(vec3[][] image) {
         java.awt.Color[][] color = new java.awt.Color[width][height];
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++) 
-            color[x][y] = image[x][y].toColor();
+            color[x][y] = image[x][y].toAwtColor();
         return color;
     }
 }

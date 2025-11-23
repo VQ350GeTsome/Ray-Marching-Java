@@ -184,18 +184,29 @@ public class Window extends javax.swing.JFrame {
         });
         popup.add(changeBG);
         
+        JMenuItem changeSBG = new JMenuItem("Change Secondary Background");
+        changeSBG.addActionListener(evt -> {
+            changeSecBG();
+        });
+        popup.add(changeSBG);
+        
         return popup;
     }
     private void changeBG() {
-        String[] settings = new String[] { "r: ", "g: ", "b: " };
-        String[] defaults = core.scene.getBackground().toStringArray();
-        String[] inputs = createOptionsPane("Enter New Background Color: ", settings, defaults, 1);
+        Color input = getColor(core.scene.getBackground().toAwtColor());
+        if (input == null) return;
         
-        if (inputs == null) return;
-        
-        vec3 newBG = new vec3(inputs);
+        vec3 newBG = new vec3(input);
         
         core.scene.setBackground(newBG);
+    }
+    private void changeSecBG() {
+        Color input = getColor(core.scene.getSecondaryBG().toAwtColor());
+        if (input == null) return;
+        
+        vec3 newBG = new vec3(input);
+        
+        core.scene.setSecondaryBG(newBG);
     }
     
     private javax.swing.JPopupMenu objectClicked(SDFs.SDF clickedObj, HitInfo info) {
@@ -273,7 +284,7 @@ public class Window extends javax.swing.JFrame {
         if (obj instanceof SDFs.BlendedSDF) obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         
         //Prompts the user with a color chooser with a random color to start
-        Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random())));
+        Color color = getColor();
         if (color == null) return;
         
         if (baseColor) obj.setColor(new vec3(color));
@@ -427,6 +438,15 @@ public class Window extends javax.swing.JFrame {
     private void safeAddSDF(Material mat, String type, String[] inputs) {
         try { core.scene.addSDF(SDFs.SDFParser.getSDF(mat, type, inputs)); }
         catch (Exception e) { System.err.print(e.getMessage()); }
+    }
+    
+    private Color getColor() {
+        Color arg = new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random()));
+        return getColor(arg);
+    }
+    private Color getColor(Color defaultArg) {
+        Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", defaultArg);
+        return color;
     }
     
     @SuppressWarnings("unchecked")
@@ -979,11 +999,15 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_shadowAmountActionPerformed
 
     private void gradientCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gradientCheckActionPerformed
-        // TODO add your handling code here:
+        core.scene.setUseGradient(gradientCheck.getState());
+        if (!gradientCheck.getState()) {
+            useLightForGradCheck.setState(false);
+            core.scene.setGradUseZ(true);
+        }
     }//GEN-LAST:event_gradientCheckActionPerformed
 
     private void useLightForGradCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useLightForGradCheckActionPerformed
-        // TODO add your handling code here:
+        core.scene.setGradUseZ(!useLightForGradCheck.getState());
     }//GEN-LAST:event_useLightForGradCheckActionPerformed
 
     private void seeLightCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeLightCheckActionPerformed

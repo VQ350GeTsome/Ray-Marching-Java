@@ -64,12 +64,16 @@ public class Scene {
     }
     public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
     public vec3 getBackground() { return rayMarcher.getBackground(); }
+    public vec3 getSecondaryBG() { return rayMarcher.getSecondaryBG(); }
     public void setBackground(vec3 bg) { rayMarcher.setBackground(bg); }
+    public void setSecondaryBG(vec3 bg) { rayMarcher.setSecondaryBG(bg); }
     public float getShadowAmount() { return rayMarcher.getShadowAmount(); }
     public void setShadowAmount(float f) { rayMarcher.setShadowAmount(f); }
     public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }
     public String[] getMarchParams() { return rayMarcher.getMarchParams(); }
     public void setSeeLight(boolean b) { rayMarcher.setSeeLight(b); }
+    public void setUseGradient(boolean b) { rayMarcher.setUseGradient(b); }
+    public void setGradUseZ(boolean b) { rayMarcher.setGradUseZ(b); }
     
     public String packageScene() {
         return  camera.packageCamera() +

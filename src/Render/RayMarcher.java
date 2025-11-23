@@ -28,9 +28,11 @@ public class RayMarcher {
     private float shadowAmount  = 0.66f;
     
     public void setSeeLight(boolean b) { seeLight = b; }
+    public void setUseGradient(boolean b) { gradient = b; }
+    public void setGradUseZ(boolean b) { gradUseZ = b; }
     private boolean seeLight = true,
                     gradient = true,
-                    gradUseY = false;
+                    gradUseZ = false;
     
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
@@ -138,10 +140,10 @@ public class RayMarcher {
     private vec3 calcBackground(vec3 dir) {
         if (!gradient) return background;
         
-        if (gradUseY)
+        if (gradUseZ)
             return background.blend(bgSecondary, 0.50f - (dir.z / 2.0f));
         else
-            return background.blend(bgSecondary, 0.50f - (dir.dot(light.getSceneLighting()) / 2.0f));
+            return background.blend(bgSecondary, 0.50f + (dir.dot(light.getSceneLighting()) / 2.0f));
           
     }
     
