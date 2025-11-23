@@ -445,7 +445,7 @@ public class Window extends javax.swing.JFrame {
         return getColor(arg);
     }
     private Color getColor(Color defaultArg) {
-        Color color = JColorChooser.showDialog(rootPane, "Choose Color: ", defaultArg);
+        Color color = JColorChooser.showDialog(rootPane, "Choose a Color: ", defaultArg);
         return color;
     }
     
@@ -474,10 +474,12 @@ public class Window extends javax.swing.JFrame {
         cameraObjCheck = new javax.swing.JCheckBoxMenuItem();
         lightingMenu = new javax.swing.JMenu();
         sceneLighitng = new javax.swing.JMenuItem();
+        setLightColor = new javax.swing.JMenuItem();
         ambientLighting = new javax.swing.JMenuItem();
         shadowAmount = new javax.swing.JMenuItem();
         skyboxMenu = new javax.swing.JMenu();
         seeLightCheck = new javax.swing.JCheckBoxMenuItem();
+        setLightAmount = new javax.swing.JMenuItem();
         backgroundColor = new javax.swing.JMenuItem();
         secondarybgColor = new javax.swing.JMenuItem();
         gradientCheck = new javax.swing.JCheckBoxMenuItem();
@@ -650,6 +652,14 @@ public class Window extends javax.swing.JFrame {
         });
         lightingMenu.add(sceneLighitng);
 
+        setLightColor.setText("Change Scene Lighting Color");
+        setLightColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setLightColorActionPerformed(evt);
+            }
+        });
+        lightingMenu.add(setLightColor);
+
         ambientLighting.setText("Change Ambient Lighting");
         ambientLighting.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -671,13 +681,21 @@ public class Window extends javax.swing.JFrame {
         skyboxMenu.setText("Skybox");
 
         seeLightCheck.setSelected(true);
-        seeLightCheck.setText("See Light");
+        seeLightCheck.setText("See Skybox Light");
         seeLightCheck.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 seeLightCheckActionPerformed(evt);
             }
         });
         skyboxMenu.add(seeLightCheck);
+
+        setLightAmount.setText("Change Skybox Light Amount");
+        setLightAmount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setLightAmountActionPerformed(evt);
+            }
+        });
+        skyboxMenu.add(setLightAmount);
 
         backgroundColor.setText("Change Background Color (Primary for Gradient)");
         backgroundColor.addActionListener(new java.awt.event.ActionListener() {
@@ -687,10 +705,14 @@ public class Window extends javax.swing.JFrame {
         });
         skyboxMenu.add(backgroundColor);
 
-        secondarybgColor.setText("Change Secondary Background");
+        secondarybgColor.setText("Change Secondary Background (For Gradient)");
+        secondarybgColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                secondarybgColorActionPerformed(evt);
+            }
+        });
         skyboxMenu.add(secondarybgColor);
 
-        gradientCheck.setSelected(true);
         gradientCheck.setText("Gradient");
         gradientCheck.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -699,7 +721,6 @@ public class Window extends javax.swing.JFrame {
         });
         skyboxMenu.add(gradientCheck);
 
-        useLightForGradCheck.setSelected(true);
         useLightForGradCheck.setText("Use Light for Gradient");
         useLightForGradCheck.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1014,6 +1035,19 @@ public class Window extends javax.swing.JFrame {
         core.scene.setSeeLight(seeLightCheck.getState());
     }//GEN-LAST:event_seeLightCheckActionPerformed
 
+    private void secondarybgColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_secondarybgColorActionPerformed
+        changeSecBG();
+    }//GEN-LAST:event_secondarybgColorActionPerformed
+
+    private void setLightAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setLightAmountActionPerformed
+        String[] options = new String[] { "New Light Amount: " };
+        
+    }//GEN-LAST:event_setLightAmountActionPerformed
+
+    private void setLightColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setLightColorActionPerformed
+        core.scene.setLightColor(new vec3(getColor(core.scene.getLightColor().toAwtColor())));
+    }//GEN-LAST:event_setLightColorActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1077,6 +1111,8 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenuItem sceneLighitng;
     private javax.swing.JMenuItem secondarybgColor;
     private javax.swing.JCheckBoxMenuItem seeLightCheck;
+    private javax.swing.JMenuItem setLightAmount;
+    private javax.swing.JMenuItem setLightColor;
     private javax.swing.JMenuItem shadowAmount;
     private javax.swing.JMenu skyboxMenu;
     private javax.swing.JCheckBoxMenuItem useLightForGradCheck;

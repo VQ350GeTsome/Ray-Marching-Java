@@ -6,7 +6,7 @@ public class Material {
     
     public vec3 color, specularColor = new vec3(255.0f);
     public float    reflectivity    =  0.0f,
-                    specular        =  0.75f,
+                    specular        =  0.5f,
                     shinyness       = 16.0f,
                     roughness       =  0.0f,
                     metalness       =  0.0f,

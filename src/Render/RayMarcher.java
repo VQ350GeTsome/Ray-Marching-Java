@@ -9,30 +9,21 @@ public class RayMarcher {
     private final Light       light;
     private final SDFManager  sdfMgr;
     
+    public vec3 background     = new vec3(0),
+                 bgSecondary   = new vec3(255);
     
-    public vec3 getBackground() { return background; }
-    public void setBackground(vec3 bg) { background = bg; }
-    public vec3 getSecondaryBG() { return bgSecondary; }
-    public void setSecondaryBG(vec3 bg) { bgSecondary = bg; }
-    private vec3 background    = new vec3(255),
-                 bgSecondary   = new vec3(0);
-    
-    private int   maxSteps      = 1024,
+    public int   maxSteps       = 1024,
                   maxDist       =  128,
                   shadowSteps   =   64,
                   fogFalloff    =    5,
-                  maxDepth         =    3;
+                  maxDepth      =    3;
     
-    public void setShadowAmount(float s) { shadowAmount = s; }
-    public float getShadowAmount() { return shadowAmount; }
-    private float shadowAmount  = 0.66f;
+    public float shadowAmount      = 0.66f,
+                 skyBoxLightAmount = 50.0f;
     
-    public void setSeeLight(boolean b) { seeLight = b; }
-    public void setUseGradient(boolean b) { gradient = b; }
-    public void setGradUseZ(boolean b) { gradUseZ = b; }
-    private boolean seeLight = true,
-                    gradient = true,
-                    gradUseZ = false;
+    public boolean seeLight = true,
+                    gradient = false,
+                    gradUseZ = true;
     
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
@@ -138,13 +129,22 @@ public class RayMarcher {
     }
 
     private vec3 calcBackground(vec3 dir) {
-        if (!gradient) return background;
+        if (!gradient && !seeLight) return background;
         
-        if (gradUseZ)
-            return background.blend(bgSecondary, 0.50f - (dir.z / 2.0f));
-        else
-            return background.blend(bgSecondary, 0.50f + (dir.dot(light.getSceneLighting()) / 2.0f));
-          
+        vec3 bg = background;
+        
+        if (gradUseZ && gradient)
+            bg = bg.blend(bgSecondary, 0.50f - (dir.z / 2.0f));
+        else if (gradient)
+            bg = bg.blend(bgSecondary, 0.50f + (dir.dot(light.getSceneLighting()) / 2.0f));
+        
+        if (seeLight) {
+            float k = Math.max(0.0f, dir.dot(light.getSceneLighting().negate()));
+            k = (float) Math.pow(k, (1.0f / skyBoxLightAmount) * 50);
+            bg = bg.add(light.getLightColor().scale(k));
+        }
+        
+        return bg;
     }
     
     private vec3 calcColor(HitInfo hit, vec3 dir, int depth) {

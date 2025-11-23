@@ -3,27 +3,26 @@ package Render;
 import File.FileManager;
 import SDFs.SDF;
 import Utility.*;
-import java.util.Arrays;
 
 public class Scene {
     
-    private Light       light;
-    private SDFManager  sdfManager;
-    private Camera      camera 
+    private final Light       light;
+    private final SDFManager  sdfManager;
+    private final Camera      camera 
 		= new Camera(
 	  new vec3(-4.0f,  3.0f,  1.0f),        //Position in space
 	  new vec3( 0.0f,  0.0f, -0.8f),        //Where it is pointing
           new vec3( 0.0f,  0.0f,  1.0f),        //Up vector
           90                                    //Field of view
 	  );
-    private RayMarcher  rayMarcher;
+    private final RayMarcher  raymchr;
     
-    private int w, h;
+    private int w, h; //Width & height
     
     public Scene(int width, int height) {
         light = new Light();                                    //Instatiate a new light
         sdfManager = new SDFManager();                          //Instatiate a new SDFManager
-        rayMarcher = new RayMarcher(camera, light, sdfManager); //Instatiate a new RayMarcher        
+        raymchr = new RayMarcher(camera, light, sdfManager); //Instatiate a new RayMarcher        
         FileManager.setScene(this);     //Send this scene to the file manager
         w = width; h = height;
     }
@@ -35,49 +34,65 @@ public class Scene {
     
     public void collectGarbageSDFs() { sdfManager.gc(); }
     
+    //Light object abstraction
     public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
     public vec3 getSceneLighting()              { return light.getSceneLighting(); }
-    public void setAmbientLighting(float k)     { light.setAmbientLight(k); }
-    public float getAmbientLighting()           { return light.getAmbeintLight(); }
+    public void setLightColor(vec3 l)           { light.setLightColor(l); }
+    public vec3 getLightColor()                 { return light.getLightColor(); }
+    public void  setAmbientLighting(float k)    { light.setAmbientLight(k); }
+    public float getAmbientLighting()           { return light.getAmbeintLight(); }  
     
+    //SDF Manager abstraction
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
     public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
     
+    //Camera abstraction
     public void moveCamera(vec3 m)              { camera.move(m); }
-    public vec3 getCameraPos()                  { return camera.getOrientation()[0]; }
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
     public void zoomCamera(float z)             { camera.zoom(z); }
+    
+    public vec3 getCameraPos()                  { return camera.getOrientation()[0]; }
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }
+    
     public void cameraObj(boolean add) {
         if (add) sdfManager.addSDF(camera);
         else sdfManager.removeSDF(camera);
     }
     
+    //Ray marcher abstraction
     public HitInfo marchRay(int x, int y, int w, int h) { 
         float nx = (x + 0.5f) / (float) w;
         float ny = (y + 0.5f) / (float) h;
         vec3 pos = camera.getOrientation()[3];
         vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
         
-        return rayMarcher.marchRaySkipCam(pos, dir);
+        return raymchr.marchRaySkipCam(pos, dir);
     }
-    public vec3[][] renderScene() { return rayMarcher.marchScreen(w, h); }
-    public vec3 getBackground() { return rayMarcher.getBackground(); }
-    public vec3 getSecondaryBG() { return rayMarcher.getSecondaryBG(); }
-    public void setBackground(vec3 bg) { rayMarcher.setBackground(bg); }
-    public void setSecondaryBG(vec3 bg) { rayMarcher.setSecondaryBG(bg); }
-    public float getShadowAmount() { return rayMarcher.getShadowAmount(); }
-    public void setShadowAmount(float f) { rayMarcher.setShadowAmount(f); }
-    public void setMarchParams(String[] params) { rayMarcher.setMarchParams(params); }
-    public String[] getMarchParams() { return rayMarcher.getMarchParams(); }
-    public void setSeeLight(boolean b) { rayMarcher.setSeeLight(b); }
-    public void setUseGradient(boolean b) { rayMarcher.setUseGradient(b); }
-    public void setGradUseZ(boolean b) { rayMarcher.setGradUseZ(b); }
+    public vec3[][] renderScene() { return raymchr.marchScreen(w, h); }
     
+    public vec3 getBackground()         { return raymchr.background; }
+    public void setBackground(vec3 bg)  { raymchr.background = bg; }
+    public vec3 getSecondaryBG()        { return raymchr.bgSecondary; }
+    public void setSecondaryBG(vec3 bg) { raymchr.bgSecondary = bg; }
+    
+    public float getShadowAmount()        { return raymchr.shadowAmount; }
+    public void  setShadowAmount(float f) { raymchr.shadowAmount = f; }
+    
+    public void setMarchParams(String[] params) { raymchr.setMarchParams(params); }
+    public String[] getMarchParams()            { return raymchr.getMarchParams(); }
+    
+    public void setSeeLight(boolean b)    { raymchr.seeLight = b; }
+    public void setUseGradient(boolean b) { raymchr.gradient = b; }
+    public void setGradUseZ(boolean b)    { raymchr.gradUseZ = b; }
+    
+    public float getSkyboxLightAmount()        { return raymchr.skyBoxLightAmount; }
+    public void  setSkyboxLightAmount(float f) { raymchr.skyBoxLightAmount = f; }
+    
+    //Packager & unpackager
     public String packageScene() {
         return  camera.packageCamera() +
-                rayMarcher.packRayMarcher() +
+                raymchr.packRayMarcher() +
                 light.packLight() +
                 Core.packagePostProcessor() +
                 sdfManager.packSDFs();
@@ -96,17 +111,17 @@ public class Scene {
         String[] rayMarcherPack = new String[]          //Get all the raymarcher parts
             { parts[7],  parts[8],  parts[9], parts[10], 
               parts[11], parts[12], parts[13] };
-        rayMarcher.unpackRayMarcher(rayMarcherPack);    //Update the raymarcher
+        raymchr.unpackRayMarcher(rayMarcherPack);    //Update the raymarcher
         
-        //Light parts 14 - 15
-        String[] lightPack = new String[] { parts[14], parts[15] }; //Get the light parts
+        //Light parts 14 - 16
+        String[] lightPack = new String[] { parts[14], parts[15], parts[16] }; //Get the light parts
         light.unpackLight(lightPack);                               //Update light
         
-        //Post proccesor parts 16 - 17
-        Core.setBloomSettings(new String[] { parts[16], parts[17] } );
+        //Post proccesor parts 17 - 18
+        Core.setBloomSettings(new String[] { parts[17], parts[18] } );
         
-        //Sdf pars 18 -> rest
-        String[] sdfs = Arrays.copyOfRange(parts, 18, parts.length);
+        //Sdf pars 19 -> rest
+        String[] sdfs = java.util.Arrays.copyOfRange(parts, 19, parts.length);
         sdfManager.unpackSDFs(sdfs);
     }
 }

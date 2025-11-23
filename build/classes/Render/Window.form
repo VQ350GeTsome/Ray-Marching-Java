@@ -154,6 +154,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sceneLighitngActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="setLightColor">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Scene Lighting Color"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="setLightColorActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="ambientLighting">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Change Ambient Lighting"/>
@@ -180,10 +188,18 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="seeLightCheck">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
-                <Property name="text" type="java.lang.String" value="See Light"/>
+                <Property name="text" type="java.lang.String" value="See Skybox Light"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="seeLightCheckActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="setLightAmount">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Change Skybox Light Amount"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="setLightAmountActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="backgroundColor">
@@ -196,12 +212,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="secondarybgColor">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Change Secondary Background"/>
+                <Property name="text" type="java.lang.String" value="Change Secondary Background (For Gradient)"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="secondarybgColorActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="gradientCheck">
               <Properties>
-                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Gradient"/>
               </Properties>
               <Events>
@@ -210,7 +228,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="useLightForGradCheck">
               <Properties>
-                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Use Light for Gradient"/>
               </Properties>
               <Events>

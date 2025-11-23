@@ -266,16 +266,16 @@ public class vec3 {
      * Turns the .toString() method back into a vec3 object
      * @param vector A String in the form {x:y:z} or (x, y, z)
      */
-    public vec3(String vector) { this(vector.trim().substring(1, vector.length() - 2).split("[,\\:]")); }
+    public vec3(String vector) { this(vector.trim().replaceAll("[(){}]", "").split("[,\\:]")); }
     /**
      * Turns the .toStringArray method back into a vec3 object
      * @param comp A length 3 array of Strings that are floats
      */
     public vec3(String[] comp) {
         try {
-            this.x = Float.parseFloat(comp[0].trim());
-            this.y = Float.parseFloat(comp[1].trim());
-            this.z = Float.parseFloat(comp[2].trim());
+            x = Float.parseFloat(comp[0].trim());
+            y = Float.parseFloat(comp[1].trim());
+            z = Float.parseFloat(comp[2].trim());
         } catch (NumberFormatException e) {
             System.err.println("Error parsing string for vec3 ...");
             System.err.println(e.getMessage());
