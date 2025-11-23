@@ -9,8 +9,8 @@ public class RayMarcher {
     private final Light       light;
     private final SDFManager  sdfMgr;
     
-    public vec3 background     = new vec3(0),
-                 bgSecondary   = new vec3(255);
+    public vec3 background     = new vec3(),
+                 bgSecondary   = new vec3(255.0f);
     
     public int   maxSteps       = 1024,
                   maxDist       =  128,
@@ -19,11 +19,11 @@ public class RayMarcher {
                   maxDepth      =    3;
     
     public float shadowAmount      = 0.66f,
-                 skyBoxLightAmount = 50.0f;
+                 skyboxLightAmount = 25.0f;
     
     public boolean seeLight = true,
-                    gradient = false,
-                    gradUseZ = true;
+                   gradient = false,
+                   gradUseZ = true;
     
     public RayMarcher(Camera camera, Light light, SDFManager sdfMgr) {
         this.camera     = camera;
@@ -140,7 +140,7 @@ public class RayMarcher {
         
         if (seeLight) {
             float k = Math.max(0.0f, dir.dot(light.getSceneLighting().negate()));
-            k = (float) Math.pow(k, (1.0f / skyBoxLightAmount) * 50);
+            k = (float) Math.pow(k, (1000.0f / skyboxLightAmount));
             bg = bg.add(light.getLightColor().scale(k));
         }
         
@@ -313,10 +313,13 @@ public class RayMarcher {
     }
     
     public String packRayMarcher() {
-        return  (int) background.x + ":" + (int) background.y + ":" + (int) background.z + "," +
-                (int) bgSecondary.x + ":" + (int) bgSecondary.y + ":" + (int) bgSecondary.z + "," +
-                maxSteps    + "," + maxDist + "," +
-                shadowSteps + "," + fogFalloff + "," + maxDepth + ",\n" ;
+        return  (int) background.x + ":" + (int) background.y + ":" + (int) background.z            + "," +
+                (int) bgSecondary.x + ":" + (int) bgSecondary.y + ":" + (int) bgSecondary.z         + "," +
+                maxSteps    + "," + maxDist + "," + shadowSteps + "," + fogFalloff + "," + maxDepth + "," +
+                shadowAmount + "," + skyboxLightAmount + "," + ((seeLight) ? 1 : 0)                 + "," + 
+                ((gradient) ? 1 : 0) + "," + ((gradUseZ) ? 1 : 0)
+                
+                + ",\n";
     }
     public void unpackRayMarcher(String[] parts) {
         int i = 0;
@@ -329,6 +332,13 @@ public class RayMarcher {
         shadowSteps    = Integer.parseInt(parts[i++].trim());
         fogFalloff     = Integer.parseInt(parts[i++].trim());
         maxDepth       = Integer.parseInt(parts[i++].trim());
+        
+        shadowAmount      = Float.parseFloat(parts[i++].trim());
+        skyboxLightAmount = Float.parseFloat(parts[i++].trim());
+        
+        seeLight = parts[i++].equals("1");
+        gradient = parts[i++].equals("1");
+        gradUseZ = parts[i++].equals("1");
         
     }
 

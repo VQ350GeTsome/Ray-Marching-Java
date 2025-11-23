@@ -86,8 +86,8 @@ public class Scene {
     public void setUseGradient(boolean b) { raymchr.gradient = b; }
     public void setGradUseZ(boolean b)    { raymchr.gradUseZ = b; }
     
-    public float getSkyboxLightAmount()        { return raymchr.skyBoxLightAmount; }
-    public void  setSkyboxLightAmount(float f) { raymchr.skyBoxLightAmount = f; }
+    public float getSkyboxLightAmount()        { return raymchr.skyboxLightAmount; }
+    public void  setSkyboxLightAmount(float f) { raymchr.skyboxLightAmount = f; }
     
     //Packager & unpackager
     public String packageScene() {
@@ -107,21 +107,24 @@ public class Scene {
               parts[4], parts[5], parts[6], };
         camera.unpackageCamera(cameraPack);     //Update the camera 
         
-        //RayMarcher parts 7 - 13
+        //RayMarcher parts 7 - 18
         String[] rayMarcherPack = new String[]          //Get all the raymarcher parts
-            { parts[7],  parts[8],  parts[9], parts[10], 
-              parts[11], parts[12], parts[13] };
+        { 
+            parts[7],  parts[8],  parts[9],  parts[10], 
+            parts[11], parts[12], parts[13], parts[14], 
+            parts[15], parts[16], parts[17], parts[18]
+        };
         raymchr.unpackRayMarcher(rayMarcherPack);    //Update the raymarcher
         
-        //Light parts 14 - 16
-        String[] lightPack = new String[] { parts[14], parts[15], parts[16] }; //Get the light parts
+        //Light parts 19 - 21
+        String[] lightPack = new String[] { parts[19], parts[20], parts[21] }; //Get the light parts
         light.unpackLight(lightPack);                               //Update light
         
-        //Post proccesor parts 17 - 18
-        Core.setBloomSettings(new String[] { parts[17], parts[18] } );
+        //Post proccesor parts 22 - 23
+        Core.setBloomSettings(new String[] { parts[22], parts[23] } );
         
-        //Sdf pars 19 -> rest
-        String[] sdfs = java.util.Arrays.copyOfRange(parts, 19, parts.length);
+        //Sdf pars 24 -> rest
+        String[] sdfs = java.util.Arrays.copyOfRange(parts, 24, parts.length);
         sdfManager.unpackSDFs(sdfs);
     }
 }
