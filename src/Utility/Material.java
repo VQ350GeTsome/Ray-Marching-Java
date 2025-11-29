@@ -3,7 +3,7 @@ package Utility;
 public class Material {
     
     public static final int FIELDS = 11;
-    public vec3 color, specularColor = new vec3(255.0f);
+    public vec3 color, specularColor = vec3.WHITE;
     public float    reflectivity    =  0.0f,
                     specular        =  0.5f,
                     shinyness       = 16.0f,
@@ -16,9 +16,9 @@ public class Material {
     //Light emission later ... maybe
     
     //<editor-fold defaultstate="collapsed" desc=" Common Defaults ">
-    private final vec3 gray = new vec3(128.0f);
-    
-    public final Material plastic = new Material(gray);
+    public final static Material PLASTIC = new Material(vec3.GRAY);
+    public final static Material MIRROR  = new Material(vec3.WHITE, 1.0f, 0.5f, 8.0f, 0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f);
+    public final static Material GLASS   = new Material(vec3.WHITE, 0.0f, 0.5f, 8.0f, 0.0f, 1.0f, 1.0f, 1.52f, 0.0f, 0.0f);
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Constructors ">
@@ -35,6 +35,7 @@ public class Material {
      * @param color The color of the material
      */
     public Material(vec3 color) { this.color = color; }
+    public Material(java.awt.Color color) { this.color = new vec3(color); }
     /**
      * Specific constructor, everything is as it's inputted.
      * @param color         The material color.
@@ -67,20 +68,21 @@ public class Material {
      * they all have a gray color.
      * 
      * @param color The new color.
-     * @param mat   The material.
+     * @param m   The material.
      */
-    public Material(vec3 color, Material mat) {
+    public Material(vec3 color, Material m) {
         this.color = color;
-        reflectivity    = mat.reflectivity;
-        specular        = mat.specular;
-        shinyness       = mat.shinyness;
-        roughness       = mat.roughness;
-        metalness       = mat.metalness;
-        opacity         = mat.opacity;
-        ior             = mat.ior;
-        texture         = mat.texture;
-        textureness     = mat.textureness;
+        reflectivity    = m.reflectivity;
+        specular        = m.specular;
+        shinyness       = m.shinyness;
+        roughness       = m.roughness;
+        metalness       = m.metalness;
+        opacity         = m.opacity;
+        ior             = m.ior;
+        texture         = m.texture;
+        textureness     = m.textureness;
     }
+    public Material(java.awt.Color color, Material m) { this(new vec3(color), m); }
     
     //</editor-fold>
     

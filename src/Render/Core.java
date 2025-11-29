@@ -124,8 +124,16 @@ public class Core extends JPanel {
         floor.setName("Scene Floor");
         scene.addSDF(floor);
         
-        SDF t = new Cylinder(new vec3(), 1.0f, 1.0f, sphereMat);
+        SDF t = new Cylinder(new vec3(), 1.0f, 1.0f, Material.GLASS);
         scene.addSDF(t);
+        
+        SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(Color.RED, Material.PLASTIC));
+        scene.addSDF(p);
+        
+        SDF q = new Cube(new vec3(2, -1, 2), 1.0f, Material.GLASS);
+        scene.addSDF(q);
+        
+        SDF z = new Sphere(new vec3(0, 0, -1), 0.333f, new Material(Color.GREEN, Material.PLASTIC));
     }
     
     /**

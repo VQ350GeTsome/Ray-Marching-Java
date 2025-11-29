@@ -281,5 +281,8 @@ public class vec3 {
             System.err.println(e.getMessage());
         }
     }
+    
+    public final static vec3 WHITE = new vec3(255.0f);
+    public final static vec3 GRAY  = new vec3(128.0f);
 
 }

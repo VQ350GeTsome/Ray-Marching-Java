@@ -2,7 +2,6 @@ package Render;
 
 import SDFs.*;
 import Utility.*;
-import java.awt.Color;
 import java.util.ArrayList;
 
 public class SDFManager {

@@ -154,26 +154,21 @@ public class RayMarcher {
         
         //Calculate the normal here, so we can use it in multiple methods without having to recalculate it.
         vec3 norm = estimateNormal(hit);   
-
-        //Get the diffused color & specular color
-        vec3 diffusedColor = diffuse(hit, norm).scale(shadow);                       
-        vec3 specularColor = specular(norm, dir, objMat).scale(shadow);
         
-        //Using recursion calculate the color of the reflected ray
-        vec3 reflectionColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth) : diffusedColor;
+        vec3 baseColor = diffuse(hit, norm)
+                         .add(specular(norm, dir, objMat))
+                         .scale(shadow);
         
-        vec3 behindColor = (objMat.opacity > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth) : calcBackground(dir);
+        //Using recursion calculate the color of the reflected ray & the transmitted ray
+        vec3 reflectColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth).scale(objMat.reflectivity) : new vec3();
+        vec3 transmitColor = (objMat.opacity > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth).scale(objMat.opacity) : new vec3();
         
-        vec3 finalColor = diffusedColor
-                          .blend(reflectionColor, objMat.reflectivity)
-                          .add(specularColor); //Add specular color last so you can see the light in reflections & refractions
-        finalColor = finalColor.blend(behindColor, objMat.opacity);
+        vec3 finalColor = baseColor.blend(reflectColor.add(transmitColor), Math.max(objMat.reflectivity, objMat.opacity) );
 
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
-        fog = (float) Math.pow(fog, fogFalloff);                //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
+        fog = (float) Math.pow(fog, fogFalloff);       //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
 
-        finalColor =  vec3.blend(finalColor, calcBackground(dir), fog);
-        return finalColor;
+        return finalColor.blend(calcBackground(dir), fog);
     }
     
     private vec3 opacity(HitInfo entryHit, vec3 norm, vec3 inDir, int depth) {
@@ -181,22 +176,25 @@ public class RayMarcher {
         
         inDir = inDir.normalize();
         Material mat = entryHit.mat;
-
+        
         vec3 refractDirIn = refract(inDir, norm, 1.0f, mat.ior);
         if (refractDirIn == null) return reflect(entryHit, norm, inDir, depth - 1);
 
         vec3 surface = entryHit.hit.add(norm.scale(-Core.getEps()));
         HitInfo exitHit = marchThrough(surface, refractDirIn);
-                
+        
+        if (exitHit.sdf == null) return calcBackground(refractDirIn);
+        
         vec3 exitNorm = estimateNormal(exitHit);
         
         vec3 surfaceExitPos = exitHit.hit.add(exitNorm.scale(Core.getEps()*2.0f));
  
-        vec3 refractDirExit = refract(refractDirIn, exitNorm, mat.ior, 1.0f);
+        vec3 refractDirExit = refract(refractDirIn.negate(), exitNorm, mat.ior, 1.0f);
         if (refractDirExit == null) {
-            vec3 insideReflectDir = refractDirIn.subtract(exitNorm.scale(refractDirIn.dot(exitNorm)*2.0f)).normalize();
+            vec3 insideReflectDir = refractDirIn.subtract(exitNorm.scale(refractDirIn.dot(exitNorm.negate())*2.0f)).normalize();
             HitInfo reflectHit = marchRay(surfaceExitPos, insideReflectDir);
-            return calcBackground(refractDirExit);
+            return (reflectHit.sdf == null) ? calcBackground(insideReflectDir) 
+                                            : calcColor(reflectHit, insideReflectDir, depth - 1);
         }
 
         refractDirExit = refractDirExit.negate();
@@ -291,11 +289,6 @@ public class RayMarcher {
     }
     private float clamp(float v, float lo, float hi) {
         return v < lo ? lo : (v > hi ? hi : v);
-    }
-    private float fresnelSchlick(float cosTheta, float ior) {
-        float r0 = (1.0f - ior) / (1.0f + ior);
-        r0 = r0 * r0;
-        return r0 + (1.0f - r0) * (float)Math.pow(1.0f - cosTheta, 5.0f);
     }
     
     /**
