@@ -299,9 +299,11 @@ public class Window extends javax.swing.JFrame {
             blended = true;
         }
         
+        Utility.Material objMat = obj.getMaterial(hit);
+        
         String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
                                             "Metalness: ", "Opacity: ", "IOR: ", "Texture: ", "Textureness: " };
-        String[] defaults = ArrayMath.subArray(obj.getMaterial(hit).toStringArray(), 2, Material.FIELDS);
+        String[] defaults = ArrayMath.subArray(objMat.toStringArray(), 2, Material.FIELDS); //Use subarray to not include the first two colors
         String[] inputs = createOptionsPane
             (   
                     "Enter New Material Settings For " 
@@ -311,19 +313,21 @@ public class Window extends javax.swing.JFrame {
         
         if (inputs == null) return; 
         
-        //Parse the new material settings into a material obj
-        Utility.Material m = obj.getMaterial(hit);
+        //Parse the new material settings into a NEW material obj
+        Utility.Material m = new Utility.Material();
+        m.color         = objMat.color;
+        m.specularColor = objMat.specularColor;
         try {
             int i = 0;
-            m.reflectivity = Float.parseFloat(inputs[i++].trim());
-            m.specular = Float.parseFloat(inputs[i++].trim());
-            m.shinyness = Float.parseFloat(inputs[i++].trim());
-            m.roughness = Float.parseFloat(inputs[i++].trim());
-            m.metalness = Float.parseFloat(inputs[i++].trim());
-            m.opacity = Float.parseFloat(inputs[i++].trim());
-            m.ior = Float.parseFloat(inputs[i++].trim()); 
-            m.texture = Float.parseFloat(inputs[i++].trim()); 
-            m.textureness = Float.parseFloat(inputs[i++].trim()); 
+            m.reflectivity  = Float.parseFloat(inputs[i++].trim());
+            m.specular      = Float.parseFloat(inputs[i++].trim());
+            m.shinyness     = Float.parseFloat(inputs[i++].trim());
+            m.roughness     = Float.parseFloat(inputs[i++].trim());
+            m.metalness     = Float.parseFloat(inputs[i++].trim());
+            m.opacity       = Float.parseFloat(inputs[i++].trim());
+            m.ior           = Float.parseFloat(inputs[i++].trim()); 
+            m.texture       = Float.parseFloat(inputs[i++].trim()); 
+            m.textureness   = Float.parseFloat(inputs[i++].trim()); 
         } catch (NumberFormatException e) {
             System.err.println("Error Parsing New Material ...");
             System.err.println(e.getMessage());
@@ -907,10 +911,10 @@ public class Window extends javax.swing.JFrame {
 
     private void bloomSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomSettingsActionPerformed
         String[] options  = new String[] { "Bloom Sensitivity: " , "Bloom Radius: " };
-        String[] defaults = Core.getBloomSettings();
+        String[] defaults = PostProcessor.getBloomSettings();
         String[] inputs   = createOptionsPane("Enter New Bloom Settings: ", options, defaults, 3);
         
-        Core.setBloomSettings(inputs);
+        PostProcessor.setBloomSettings(inputs);
     }//GEN-LAST:event_bloomSettingsActionPerformed
 
     private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed

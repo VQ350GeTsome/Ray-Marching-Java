@@ -62,24 +62,9 @@ public class Core extends JPanel {
         scene.collectGarbageSDFs(); //Deletes any SDFs that need to be 
         renderScene();
     }
-    
-    //Postprocessing settings 
-    private static int   bloomSensitivity    = 150,
-                         bloomRadius         =  25;
-    
+
     private static boolean crosshair = false;
     
-    public static String[] getBloomSettings() { return new String[] { ""+bloomSensitivity, ""+bloomRadius }; }
-    public static void setBloomSettings(String[] settings) {
-        try {
-            bloomSensitivity = Integer.parseInt(settings[0].trim());
-            bloomRadius      = Integer.parseInt(settings[1].trim());
-        } catch (NumberFormatException e) {
-            System.err.println("Error Parsing New Bloom Settings ...");
-            System.err.println(e.getMessage());
-        }
-    }
-    public static String packagePostProcessor() { return bloomSensitivity + "," + bloomRadius + ",\n"; }
     public String[] getResoultion() { return new String[] { ""+width, ""+height }; }
     
     /**
@@ -91,15 +76,14 @@ public class Core extends JPanel {
      */
     private void renderScene() {        
         vec3[][] vec3Image = scene.renderScene();
-        Color[][] colorImage = null;
               
         //Adds bloom to the image using the current settings
         if (bloom)
-            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomSensitivity, bloomRadius);
+            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
         if (crosshair)
             vec3Image = PostProcessor.addCrossHair(vec3Image, new vec3(255.0f), 0.005f);
         
-        colorImage = PostProcessor.convertToColor(vec3Image);
+        Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
         
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
             screen.setRGB(x, y, colorImage[x][y].getRGB());  //Process the image to the screen
@@ -164,11 +148,10 @@ public class Core extends JPanel {
         changeResolution(hiResW, hiResH);
         
         vec3[][] vec3Image = scene.renderScene();
-        Color[][] colorImage = null;
               
         if (bloom)
-            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground(), bloomSensitivity, bloomRadius);
-        colorImage = PostProcessor.convertToColor(vec3Image);
+            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
+        Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
         
         File.ScreenShot.exportImage(colorImage);
         

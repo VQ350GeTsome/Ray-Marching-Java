@@ -32,14 +32,20 @@ public class ScreenShot {
         if (dir.isBlank() || finalDir.isBlank()) getCurrentDirectory(); //If the directories have yet to be found find it
         
         try {
+            System.out.println("\nScreen shotting ...\n");
             BufferedImage bi = image;
             File outputfile = new File("ScreenShot.png");
             ImageIO.write(bi, "png", outputfile);
             String rename = dir + "\\" + "images" + "\\" + frame + Math.round(Math.random() * 10000) + ".png";
             outputfile.renameTo(new File(rename));
             frame++;
-            System.out.println("\nScreen Shot successful !!!\nSaved to: " + rename + "\n");
-        } catch (IOException e) { System.err.println(dir + "is broken / not a valid path."); }        
+            System.out.println("\nScreen shot successful !!!\nSaved to: " + rename + "\n");
+        } catch (IOException e) { 
+            System.err.println(dir + "is broken / not a valid path."); 
+        } catch (Exception e) {
+            System.err.println("Error in exporting image ...");
+            System.err.println(e.getMessage());
+        }
     }
     public static void exportImage(java.awt.Color[][] screen) { exportImage(TwoDColorToBufferedImage(screen)); }
     

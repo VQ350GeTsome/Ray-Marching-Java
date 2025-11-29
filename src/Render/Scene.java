@@ -94,7 +94,7 @@ public class Scene {
         return  camera.packageCamera() +
                 raymchr.packRayMarcher() +
                 light.packLight() +
-                Core.packagePostProcessor() +
+                PostProcessor.packagePostProcessor() +
                 sdfManager.packSDFs();
                 
     }
@@ -121,7 +121,7 @@ public class Scene {
         light.unpackLight(lightPack);                               //Update light
         
         //Post proccesor parts 22 - 23
-        Core.setBloomSettings(new String[] { parts[22], parts[23] } );
+        PostProcessor.setBloomSettings(new String[] { parts[22], parts[23] } );
         
         //Sdf pars 24 -> rest
         String[] sdfs = java.util.Arrays.copyOfRange(parts, 24, parts.length);

@@ -20,23 +20,25 @@ public class PostProcessor {
         centerW = w / 2; centerH = h / 2;
     }
     
+    private static float bloomSens = 0, bloomRadius = 0;
+    
     /**
      * Isolates the brightest areas, blurs them, then adds them back on to image
+     * 
      * @param bg                The background color ( what to ignore ).
      * @param image             The image we're adding bloom to.
-     * @param bloomSens  How bright a color must be for it to be isolated.
-     * @param blurRadius        How much to blur by
-     * @return                  The final image
+     * @return                  The final image.
      */
-    public static vec3[][] addBloom(vec3[][] image, vec3 bg, float bloomSens, int blurRadius) {
+    public static vec3[][] addBloom(vec3[][] image, vec3 bg) {
         
         vec3[][] brightRegions = isolateBright(image, bloomSens);               
-        vec3[][] blurredBright = boxBlur(bg, brightRegions, blurRadius, true);
+        int blurRadiusPX = (int) (bloomRadius * height);
+        vec3[][] blurredBright = boxBlur(bg, brightRegions, blurRadiusPX, true);
        
         vec3[][] finalImage = new vec3[width][height];                                //Initalize a new screen that we'll end up returning               
         
-        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)                //Loop the image & add the isolated bright regions
-            finalImage[x][y] = image[x][y].add(blurredBright[x][y]);         //that we blurred back to the original image
+        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)              //Loop the image & add the isolated bright regions
+            finalImage[x][y] = image[x][y].add(blurredBright[x][y]);                  //that we blurred back to the original image
         
         return finalImage;
     }
@@ -140,5 +142,18 @@ public class PostProcessor {
         for (int x = 0; width > x; x++) for (int y = 0; height > y; y++) 
             color[x][y] = image[x][y].toAwtColor();
         return color;
+    }
+    
+    public static String packagePostProcessor() { return bloomSens + "," + bloomRadius + ",\n"; }
+    public static String[] getBloomSettings() { return new String[] { ""+bloomSens, ""+bloomRadius }; }
+    public static void setBloomSettings(String[] settings) {
+        try {
+            bloomSens         = Float.parseFloat(settings[0].trim());
+            float bloomRadius = (int) (Float.parseFloat(settings[1].trim()) * height);
+            
+        } catch (NumberFormatException e) {
+            System.err.println("Error Parsing New Bloom Settings ...");
+            System.err.println(e.getMessage());
+        }
     }
 }

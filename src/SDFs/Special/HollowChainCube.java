@@ -40,7 +40,7 @@ public class HollowChainCube extends SDFs.SDF {
     
     @Override
     public String[] getSettingsAndCurrent() { 
-        String[] current = ArrayMath.subArray(this.toString().split(","),1, 6);
+        String[] current = ArrayMath.subArray(this.toString().split(","), START, START + 3);
         return ArrayMath.add(super.getSettingsAndCurrent(), current);
     }
     
