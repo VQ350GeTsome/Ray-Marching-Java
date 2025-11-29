@@ -3,7 +3,6 @@ package Utility;
 public class Material {
     
     public static final int FIELDS = 11;
-    
     public vec3 color, specularColor = new vec3(255.0f);
     public float    reflectivity    =  0.0f,
                     specular        =  0.5f,
@@ -16,8 +15,74 @@ public class Material {
                     textureness     =  0.0f;
     //Light emission later ... maybe
     
+    //<editor-fold defaultstate="collapsed" desc=" Common Defaults ">
+    private final vec3 gray = new vec3(128.0f);
+    
+    public final Material plastic = new Material(gray);
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc=" Constructors ">
+    
+    /**
+     * Default Constructor, everything is 0.0f except the color ( white ) specular, ( 0.5f ),
+     * shinyness, ( 16.0f ), & ior, ( 1.5f ).
+     */
     public Material() { color = new vec3(0.0f); }
+    /**
+     * Color only Constructor, everything is 0.0f except the color ( input ) specular, ( 0.5f ),
+     * shinyness, ( 16.0f ), & ior, ( 1.5f ).
+     * 
+     * @param color The color of the material
+     */
     public Material(vec3 color) { this.color = color; }
+    /**
+     * Specific constructor, everything is as it's inputted.
+     * @param color         The material color.
+     * @param reflect       The reflectivity.
+     * @param spec          The specular.
+     * @param shiny         The shinyness.
+     * @param rough         The roughness.
+     * @param metal         The metalness.
+     * @param opacity       The opacity.
+     * @param ior           The index of refraction.
+     * @param texture       The texture.
+     * @param textureness   The textureness ( size of texture ).
+     */
+    public Material(vec3 color, float reflect, float spec, float shiny, float rough, float metal,
+        float opacity, float ior, float texture, float textureness) {
+        this.color = color; 
+        reflectivity = reflect;
+        specular = spec;
+        shinyness = shiny;
+        roughness = rough;
+        metalness = metal;
+        this.opacity = opacity;
+        this.ior = ior;
+        this.texture = texture;
+        this.textureness = textureness;
+    }
+    /**
+     * Copy constructor with a custom color.
+     * This is intended to be used with the common default materials as 
+     * they all have a gray color.
+     * 
+     * @param color The new color.
+     * @param mat   The material.
+     */
+    public Material(vec3 color, Material mat) {
+        this.color = color;
+        reflectivity    = mat.reflectivity;
+        specular        = mat.specular;
+        shinyness       = mat.shinyness;
+        roughness       = mat.roughness;
+        metalness       = mat.metalness;
+        opacity         = mat.opacity;
+        ior             = mat.ior;
+        texture         = mat.texture;
+        textureness     = mat.textureness;
+    }
+    
+    //</editor-fold>
     
     public Material blend(Material b, float w) {
         Material m = new Material(color.blend(b.color, w));
@@ -61,7 +126,6 @@ public class Material {
             ""+texture, ""+textureness
         };
     }
-    
     public String colorString(vec3 color) {
         return (int) color.x + ":" + (int) color.y + ":" + (int) color.z;
     }
