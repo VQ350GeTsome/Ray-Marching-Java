@@ -216,21 +216,21 @@ public class RayMarcher {
     
     private vec3 reflect(HitInfo hit, vec3 norm, vec3 dir, int depth) {
         //Calculate the direction of a reflected ray
-        vec3 reflected = dir.subtract(norm.scale(2.0f * dir.dot(norm))).normalize();
+        vec3 reflectDir = dir.subtract(norm.scale(2.0f * dir.dot(norm))).normalize();
 
         //If the material is rough add a random vector seeded with the normal & hit position
         if (hit.mat.roughness > 0.01f)
-            reflected = reflected.add(vec3.randomHemisphere(norm, hit.hit).scale(customClamp(hit.mat.roughness, 2))).normalize();
+            reflectDir = reflectDir.add(vec3.randomHemisphere(norm, hit.hit).scale(customClamp(hit.mat.roughness, 2))).normalize();
 
         //Start the ray a little off the surface
         vec3 origin = hit.hit.add(norm.scale(Core.getEps() * 2.0f));
 
         //March that reflected ray
-        HitInfo reflectHit = marchRay(origin, reflected);
+        HitInfo reflectHit = marchRay(origin, reflectDir);
 
         //Use recursion if we hit an object
-        if (reflectHit.sdf == null) return calcBackground(dir);   
-        else return calcColor(reflectHit, reflected, depth - 1);
+        if (reflectHit.sdf == null) return calcBackground(reflectDir);   
+        else return calcColor(reflectHit, reflectDir, depth - 1);
     }
         
     private vec3 diffuse(HitInfo hit, vec3 normal) {
@@ -241,18 +241,17 @@ public class RayMarcher {
     }
     
     private float getShadow(vec3 orgin) {
-        float ambientLight = light.getAmbeintLight();       //Get the scenes ambient lighting
-        
-        float lighting = 1.0f - ambientLight;               //Minus the starting light % by the ambient light, for it will be added back later ... 
-        float t = 0.1f;                                     //Start slightly off the surface ... this must be greater than epsilon
-        final float softness = 1 / shadowAmount;                        //Penumbra width ... i think
-        vec3 lightDir = light.getSceneLighting()
-                        .negate();                          //Flip lighting around
+        float ambientLight = light.getAmbeintLight();           //Get the scenes ambient lighting
+        float lighting = 1.0f - ambientLight;                   //Minus the starting light % by the ambient light, for it will be added back later ... 
+        float t = 0.1f;                                         //Start slightly off the surface ... this must be greater than epsilon
+        final float softness = 1 / shadowAmount;                //Penumbra width ... i think
+        vec3 lightDir = light.getSceneLighting().negate();      //Flip lighting around
         for (int i = 0; shadowSteps > i; i++) {
-            vec3 pos =  orgin.add(lightDir 
-                                  .scale(t));
+            vec3 pos = orgin.add(lightDir.scale(t));
             float minDist = sdfMgr.getClosestSDFDist(pos);
-            if (minDist < Core.getEps()) { return ambientLight; }
+            if (minDist < Core.getEps()) { 
+                return ambientLight; 
+            }
             lighting = Math.min(lighting, softness * minDist / t);
             t += minDist;
             if (lighting > maxDist) break; 
@@ -271,8 +270,8 @@ public class RayMarcher {
         float shinyness = mat.shinyness;
         float spec = (float)Math.pow(specAngle, shinyness);
 
-        // Use normalized white highlight
         vec3 highlightColor = mat.specularColor.blend(mat.color, mat.metalness);
+        highlightColor = light.getLightColor().blend(highlightColor, 0.50f);
         return highlightColor.scale(spec * mat.specular);
     }
     

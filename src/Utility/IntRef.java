@@ -3,6 +3,7 @@ package Utility;
 /**
  * Small class that's analogous to a integer reference
  * so I can pass by reference instead of pass by value
+ * 
  * @author Harrison
  */
 public class IntRef {

@@ -9,7 +9,10 @@ public class SDFParser {
     
     public static SDF getSDF(Material mat, String type, String[] info, IntRef i) {
         
-        Quaternion q = new Quaternion(info[i.i++]);
+        //If a quaternion isn't included, just use the unit quat and decrement i.i
+        Quaternion q;
+        try { q = new Quaternion(info[i.i++]); } 
+        catch (Exception e) { q = new Quaternion(); i.i--; }
        
         switch (type) {
             case "sphere":

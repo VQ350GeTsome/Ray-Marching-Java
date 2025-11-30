@@ -114,7 +114,7 @@ public class Core extends JPanel {
         SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(Color.RED, Material.PLASTIC));
         scene.addSDF(p);
         
-        SDF q = new Cube(new vec3(2, -1, 2), 1.0f, Material.GLASS);
+        SDF q = new Cube(new vec3(2, -1, 2), 1.0f, Material.MIRROR);
         scene.addSDF(q);
         
         SDF z = new Sphere(new vec3(0, 0, -1), 0.333f, new Material(Color.GREEN, Material.PLASTIC));
@@ -153,7 +153,7 @@ public class Core extends JPanel {
             vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
         Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
         
-        File.ScreenShot.exportImage(colorImage);
+        File.ScreenShot.screenshot(colorImage);
         
         changeResolution(pWidth, pHeight);
         
@@ -161,7 +161,7 @@ public class Core extends JPanel {
     }
     
     public void screenShotAsIs() {
-        File.ScreenShot.exportImage(screen);
+        File.ScreenShot.screenshot(screen);
     }
     
 }

@@ -28,11 +28,11 @@ public class ScreenShot {
         } 
     }
     
-    public static void exportImage(BufferedImage image){
+    public static void screenshot(BufferedImage image){
         if (dir.isBlank() || finalDir.isBlank()) getCurrentDirectory(); //If the directories have yet to be found find it
         
         try {
-            System.out.println("\nScreen shotting ...\n");
+            System.out.println("\nScreen shotting ...");
             BufferedImage bi = image;
             File outputfile = new File("ScreenShot.png");
             ImageIO.write(bi, "png", outputfile);
@@ -47,7 +47,7 @@ public class ScreenShot {
             System.err.println(e.getMessage());
         }
     }
-    public static void exportImage(java.awt.Color[][] screen) { exportImage(TwoDColorToBufferedImage(screen)); }
+    public static void screenshot(java.awt.Color[][] screen) { screenshot(TwoDColorToBufferedImage(screen)); }
     
     private static BufferedImage TwoDColorToBufferedImage(java.awt.Color[][] colors) {
         int width = colors.length, height = colors[0].length;

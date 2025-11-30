@@ -148,8 +148,8 @@ public class PostProcessor {
     public static String[] getBloomSettings() { return new String[] { ""+bloomSens, ""+bloomRadius }; }
     public static void setBloomSettings(String[] settings) {
         try {
-            bloomSens         = Float.parseFloat(settings[0].trim());
-            float bloomRadius = (int) (Float.parseFloat(settings[1].trim()) * height);
+            bloomSens   = Float.parseFloat(settings[0].trim());
+            bloomRadius = (int) (Float.parseFloat(settings[1].trim()) * height);
             
         } catch (NumberFormatException e) {
             System.err.println("Error Parsing New Bloom Settings ...");

@@ -392,7 +392,7 @@ public class Window extends javax.swing.JFrame {
     
     private void addSDF(int type) {
         final int   SPHERE = 0, CUBE = 1, TORUS = 2,
-                    PLANE  = 3;
+                    PLANE  = 3, CYLINDER = 4;
         
         //This will be applicable for primitives & repeating
         String[] choices = SDFs.SDFParser.getImplementedPrimitives();  
@@ -417,21 +417,21 @@ public class Window extends javax.swing.JFrame {
         switch (choice) {
             case SPHERE:
                 placeHolder.add("1.0"); //Radius
-                t = "sphere";
-                break;
+                t = "sphere"; break;
             case CUBE:
                 placeHolder.add("1.0"); //Size
-                t = "cube";
-                break;
+                t = "cube"; break;
             case TORUS:
                 placeHolder.add("1.0"); //Major Radius
                 placeHolder.add("0.5"); //Minor Radius
-                t = "torus";
-                break;
+                t = "torus"; break;
             case PLANE:
                 placeHolder.add("(0.0, 0.0, 1.0)"); //Normal vector
-                t = "plane";
-                break;        
+                t = "plane"; break;      
+            case CYLINDER:
+                placeHolder.add("1.0"); //Radius
+                placeHolder.add("1.0"); //Height
+                t = "cylinder"; break;
         }
         if (type == 1) t = "repeat" + t;
         String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, type == 1), placeHolder.toArray(String[]::new), 1);
@@ -560,7 +560,12 @@ public class Window extends javax.swing.JFrame {
         });
         objectsMenu.add(addNewObj);
 
-        seeAllObj.setText("List All Objects");
+        seeAllObj.setText("View All Objects");
+        seeAllObj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                seeAllObjActionPerformed(evt);
+            }
+        });
         objectsMenu.add(seeAllObj);
 
         menuBar.add(objectsMenu);
@@ -1066,6 +1071,11 @@ public class Window extends javax.swing.JFrame {
     private void setLightColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setLightColorActionPerformed
         core.scene.setLightColor(new vec3(getColor(core.scene.getLightColor().toAwtColor())));
     }//GEN-LAST:event_setLightColorActionPerformed
+
+    private void seeAllObjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeAllObjActionPerformed
+        //Get all objects and display them to the user so that they can then select from that
+        //and delete them, merge them, or edit them.
+    }//GEN-LAST:event_seeAllObjActionPerformed
 
     /**
      * @param args the command line arguments
