@@ -1,6 +1,8 @@
 package SDFs.Special;
 
-import Utility.*;
+import Util.vec3;
+import Util.ArrayMath;
+import Util.Material;
 
 public class HollowChainCube extends SDFs.SDF {
 

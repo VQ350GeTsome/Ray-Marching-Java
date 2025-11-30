@@ -1,6 +1,7 @@
 package SDFs;
 
-import Utility.*;
+import Util.vec3;
+import Util.Material;
 
 public class BlendedSDF extends SDF {
     

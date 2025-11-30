@@ -1,6 +1,9 @@
 package SDFs.Primitives;
 
-import Utility.*;
+import Util.vec3;
+import Util.ArrayMath;
+import Util.Material;
+import Util.vec2;
 
 public class Cylinder extends SDFs.SDF {
 

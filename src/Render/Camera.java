@@ -1,6 +1,6 @@
 package Render;
 
-import Utility.vec3;
+import Util.vec3;
 
 public class Camera extends SDFs.SDF {
     
@@ -49,7 +49,7 @@ public class Camera extends SDFs.SDF {
         this.fov = (float)(fov * DEG_TO_RAD);       //Store FOV in radians
         tanOfHalfFov = (float)Math.tan(this.fov / 2.0);
         
-        m = new Utility.Material(new vec3(200.0f));
+        m = new Util.Material(new vec3(200.0f));
         type = "camera";
     }
     /**

@@ -1,4 +1,4 @@
-package Utility;
+package Util;
 
 import java.util.stream.IntStream;
 

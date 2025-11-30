@@ -1,6 +1,8 @@
 package SDFs.Primitives;
 
-import Utility.*;
+import Util.vec3;
+import Util.ArrayMath;
+import Util.Material;
 
 public class Plane extends SDFs.SDF {
     

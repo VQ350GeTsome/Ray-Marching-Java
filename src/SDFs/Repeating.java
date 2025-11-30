@@ -1,6 +1,8 @@
 package SDFs;
 
-import Utility.*;
+import Util.vec3;
+import Util.ArrayMath;
+import Util.Material;
 
 public class Repeating extends SDFs.SDF{
 

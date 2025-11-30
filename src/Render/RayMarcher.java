@@ -1,6 +1,8 @@
 package Render;
 
-import Utility.*;
+import Util.HitInfo;
+import Util.vec3;
+import Util.Material;
 import java.util.stream.IntStream;
 
 public class RayMarcher {
@@ -9,8 +11,8 @@ public class RayMarcher {
     private final Light       light;
     private final SDFManager  sdfMgr;
     
-    public vec3 background     = new vec3(),
-                 bgSecondary   = new vec3(255.0f);
+    public vec3 background      = new vec3(),
+                bgSecondary     = new vec3(255.0f);
     
     public int   maxSteps       = 1024,
                   maxDist       =  128,
@@ -241,22 +243,35 @@ public class RayMarcher {
     }
     
     private float getShadow(vec3 orgin) {
-        float ambientLight = light.getAmbeintLight();           //Get the scenes ambient lighting
+        float ambientLight = light.getAmbientLight();           //Get the scenes ambient lighting
         float lighting = 1.0f - ambientLight;                   //Minus the starting light % by the ambient light, for it will be added back later ... 
-        float t = 0.1f;                                         //Start slightly off the surface ... this must be greater than epsilon
+        float t = 0.10f;                                        //Start slightly off the surface ... this must be greater than epsilon
         final float softness = 1 / shadowAmount;                //Penumbra width ... i think
         vec3 lightDir = light.getSceneLighting().negate();      //Flip lighting around
+        float accumOpac = 1.0f;
+        
         for (int i = 0; shadowSteps > i; i++) {
             vec3 pos = orgin.add(lightDir.scale(t));
             float minDist = sdfMgr.getClosestSDFDist(pos);
-            if (minDist < Core.getEps()) { 
-                return ambientLight; 
+            
+            if (minDist < Core.getEps()) {                      //If we hit an object.
+                HitInfo info = sdfMgr.getNearestSDFAtPos(pos);  //Get the obj we hit.
+                float objOpac = info.mat.opacity;               //As well as its opacity.
+                
+                if (objOpac < 0) return ambientLight;           //If we hit a solid object return the ambient light
+                
+                accumOpac *= objOpac;
+                
+                HitInfo mt = marchThrough(pos.add(lightDir.scale(Core.getEps() * 2.0f)), lightDir);
+                orgin = mt.hit;
+                orgin = orgin.add(lightDir.scale(Core.getEps() * 2.0f));
+                t += mt.totalDist;
             }
             lighting = Math.min(lighting, softness * minDist / t);
             t += minDist;
             if (lighting > maxDist) break; 
         }
-        return lighting + ambientLight;
+        return Math.min(1.0f, ambientLight + lighting*accumOpac);
     }
     
     private vec3 specular(vec3 norm, vec3 viewDir, Material mat) {
@@ -271,7 +286,7 @@ public class RayMarcher {
         float spec = (float)Math.pow(specAngle, shinyness);
 
         vec3 highlightColor = mat.specularColor.blend(mat.color, mat.metalness);
-        highlightColor = light.getLightColor().blend(highlightColor, 0.50f);
+        highlightColor = light.getLightColor().blend(highlightColor, 0.50f);        //Add a little bit of color from the lights color
         return highlightColor.scale(spec * mat.specular);
     }
     

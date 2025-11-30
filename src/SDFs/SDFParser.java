@@ -1,8 +1,12 @@
 package SDFs;
 
+import Util.IntRef;
+import Util.vec3;
+import Util.ArrayMath;
+import Util.Material;
+import Util.Quaternion;
 import SDFs.Primitives.*;
 import SDFs.Special.*;
-import Utility.*;
 import java.util.ArrayList;
 
 public class SDFParser {

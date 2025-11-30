@@ -1,8 +1,10 @@
 package Render;
 
+import Util.HitInfo;
+import Util.vec3;
+import Util.PostProcessor;
 import File.FileManager;
 import SDFs.SDF;
-import Utility.*;
 
 public class Scene {
     
@@ -40,7 +42,7 @@ public class Scene {
     public void setLightColor(vec3 l)           { light.setLightColor(l); }
     public vec3 getLightColor()                 { return light.getLightColor(); }
     public void  setAmbientLighting(float k)    { light.setAmbientLight(k); }
-    public float getAmbientLighting()           { return light.getAmbeintLight(); }  
+    public float getAmbientLighting()           { return light.getAmbientLight(); }  
     
     //SDF Manager abstraction
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }

@@ -1,6 +1,11 @@
 package Render;
 
-import Utility.*;
+import Util.HitInfo;
+import Util.vec3;
+import Util.PostProcessor;
+import Util.ArrayMath;
+import Util.Material;
+import Util.Quaternion;
 import File.*;
 import SDFs.BlendedSDF;
 import java.awt.Color;
@@ -299,7 +304,7 @@ public class Window extends javax.swing.JFrame {
             blended = true;
         }
         
-        Utility.Material objMat = obj.getMaterial(hit);
+        Util.Material objMat = obj.getMaterial(hit);
         
         String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
                                             "Metalness: ", "Opacity: ", "IOR: ", "Texture: ", "Textureness: " };
@@ -314,7 +319,7 @@ public class Window extends javax.swing.JFrame {
         if (inputs == null) return; 
         
         //Parse the new material settings into a NEW material obj
-        Utility.Material m = new Utility.Material();
+        Util.Material m = new Util.Material();
         m.color         = objMat.color;
         m.specularColor = objMat.specularColor;
         try {

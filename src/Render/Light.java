@@ -1,6 +1,6 @@
 package Render;
 
-import Utility.vec3;
+import Util.vec3;
 
 public class Light {
 
@@ -14,7 +14,7 @@ public class Light {
     public vec3 getLightColor()             { return lightColor; }
     
     public void setAmbientLight(float l)    { ambientLight = l; }
-    public float getAmbeintLight()          { return ambientLight; }
+    public float getAmbientLight()          { return ambientLight; }
     
     public String packLight() {
         return  sceneLight.toString()   + "," +

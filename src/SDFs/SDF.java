@@ -10,10 +10,10 @@ package SDFs;
  */
 public abstract class SDF {
     
-    protected Utility.Material m;
-    protected Utility.Quaternion rotQuat = new Utility.Quaternion();
+    protected Util.Material m;
+    protected Util.Quaternion rotQuat = new Util.Quaternion();
     protected String name, type;
-    protected final static int START = Utility.Material.FIELDS + 2;
+    protected final static int START = Util.Material.FIELDS + 2;
     
     /**
      * Takes in a point and returns the distance 
@@ -21,7 +21,7 @@ public abstract class SDF {
      * @param point The point we are using to calculate the distance.
      * @return The distance to the surface.
      */
-    public abstract float sdf(Utility.vec3 point);
+    public abstract float sdf(Util.vec3 point);
     /**
      * Returns a String array full of the name of each
      * setting, for a Torus it'd be something like
@@ -39,14 +39,14 @@ public abstract class SDF {
      * @param p The position of the vector
      * @return The material.
      */
-    public Utility.Material getMaterial(Utility.vec3 p) { return m; }
-    public void setMaterial(Utility.Material material) { m = material; }
+    public Util.Material getMaterial(Util.vec3 p) { return m; }
+    public void setMaterial(Util.Material material) { m = material; }
     
-    public Utility.Quaternion getRotQuat() { return rotQuat; }
-    public void setRotQuat(Utility.Quaternion q) { rotQuat = q; }
+    public Util.Quaternion getRotQuat() { return rotQuat; }
+    public void setRotQuat(Util.Quaternion q) { rotQuat = q; }
     
-    public void setColor(Utility.vec3 color) { m.color = color; }
-    public void setHighlightColor(Utility.vec3 color) { m.specularColor = color; }
+    public void setColor(Util.vec3 color) { m.color = color; }
+    public void setHighlightColor(Util.vec3 color) { m.specularColor = color; }
     /**
      * Gets the type of SDF as a String
      * @return The type, i.e., "sphere"

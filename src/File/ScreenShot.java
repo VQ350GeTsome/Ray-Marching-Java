@@ -1,9 +1,6 @@
 package File;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class ScreenShot {
     
@@ -34,13 +31,13 @@ public class ScreenShot {
         try {
             System.out.println("\nScreen shotting ...");
             BufferedImage bi = image;
-            File outputfile = new File("ScreenShot.png");
-            ImageIO.write(bi, "png", outputfile);
+            java.io.File outputfile = new java.io.File("ScreenShot.png");
+            javax.imageio.ImageIO.write(bi, "png", outputfile);
             String rename = dir + "\\" + "images" + "\\" + frame + Math.round(Math.random() * 10000) + ".png";
-            outputfile.renameTo(new File(rename));
+            outputfile.renameTo(new java.io.File(rename));
             frame++;
             System.out.println("\nScreen shot successful !!!\nSaved to: " + rename + "\n");
-        } catch (IOException e) { 
+        } catch (java.io.IOException e) { 
             System.err.println(dir + "is broken / not a valid path."); 
         } catch (Exception e) {
             System.err.println("Error in exporting image ...");

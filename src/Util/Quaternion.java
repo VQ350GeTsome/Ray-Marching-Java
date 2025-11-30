@@ -1,4 +1,4 @@
-package Utility;
+package Util;
 
 public class Quaternion {
     

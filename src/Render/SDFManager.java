@@ -1,7 +1,8 @@
 package Render;
 
+import Util.IntRef;
+import Util.vec3;
 import SDFs.*;
-import Utility.*;
 import java.util.ArrayList;
 
 public class SDFManager {
@@ -53,14 +54,26 @@ public class SDFManager {
     
     /**
      * Returns The SDF at an input position, else null.
-     * @param pos The input position.
+     * @param p The input position.
      * @return An SDF is one is found ... else null.
      */
-    public SDF getSDFAtPos(vec3 pos) {
-        for (SDF sdf : sdfs) {                                   //For each SDF
-            if (sdf.sdf(pos) <= Core.getEps() * 100) { return sdf; }      //If the SDF is within epsilon, return that sdf
+    public SDF getSDFAtPos(vec3 p) {
+        for (SDF s : sdfs) {                                             //For each SDF
+            if (Core.getEps() * 3.0f > s.sdf(p)) { return s; }      //If the SDF is within epsilon, return that sdf
         }
-        return null;                                                //If no SDF is found return null
+        return null;                                                        //If no SDF is found return null
+    }
+    public Util.HitInfo getNearestSDFAtPos(vec3 p) {
+        float minDist = Float.MAX_VALUE, d;
+        SDF near = null;
+        for (SDF s : sdfs) {
+            d = s.sdf(p);
+            if (minDist > d) {
+                minDist = d;
+                near = s;
+            }
+        }
+        return new Util.HitInfo(p, minDist, near);
     }
     
     /**

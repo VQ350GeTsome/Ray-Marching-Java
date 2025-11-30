@@ -1,4 +1,4 @@
-package Utility;
+package Util;
 
 /**
  * Small class that's analogous to a integer reference
