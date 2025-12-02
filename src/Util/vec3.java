@@ -1,7 +1,7 @@
 package Util;
 
 /**
- * A three component vector class, with most common operations.
+ * A three component vector class, with many common operations & operators.
  * 
  * @author Harrison
  */
@@ -45,26 +45,7 @@ public class vec3 {
      */
     public vec3(java.awt.Color c) { x = c.getRed(); y = c.getGreen(); z = c.getBlue(); }
     //</editor-fold>
-    
-    /**
-     * Component wise addition.
-     * 
-     * @param p The first addend vector.
-     * @param q The second addend vector.
-     * @return A new vector equal to ( p.x + q.x , p.y + q.y , p.z + q.z ) .
-     */
-    public static vec3 add(vec3 p, vec3 q) { return p.add(q); }
-    
-    /**
-     * Component wise subtraction.
-     * 
-     * @param p The minuend vector.
-     * @param q The subtrahend vector. 
-     * @return A new vector equal to ( p.x - q.x , p.y - q.y , p.z - q.z ) .
-     */
-    public static vec3 subtract(vec3 p, vec3 q) { return p.add(q.scale(-1.0f)); }
-    
-    
+
     //<editor-fold defaultstate="collapsed" desc=" 4-Function Scalar Operators (Object & Static) ">
     //Object methods
     /**
@@ -147,57 +128,194 @@ public class vec3 {
     public vec3 divide(vec3 o) { return new vec3( x / o.x , y / o.y , z / o.z ); }
     
     //Static methods
+    /**
+     * Component wise addition.
+     * 
+     * @param p The first addend vector.
+     * @param q The second addend vector.
+     * @return A new vector equal to ( p.x + q.x , p.y + q.y , p.z + q.z ) .
+     */
+    public static vec3 add(vec3 p, vec3 q) { return p.add(q); }
+    /**
+     * Component wise subtraction.
+     * 
+     * @param p The minuend vector.
+     * @param q The subtrahend vector. 
+     * @return A new vector equal to ( p.x - q.x , p.y - q.y , p.z - q.z ) .
+     */
+    public static vec3 subtract(vec3 p, vec3 q) { return p.add(q.scale(-1.0f)); }
     //</editor-fold>
     
+    //<editor-fold defaultstate="collapsed" desc=" Special Scalar Operators ">
+    /**
+     * Component-wise max ( Java's % operator ) .
+     * 
+     * @param m The dividend.
+     * @return A new vector that is equal to ( x % m , y % m , z % m ) .
+     */
+    public vec3 remainder(float m) { return new vec3(x % m, y % m, z % m); }
+    /**
+     * Component-wise mathematical modulus ( Always positive ) .
+     * 
+     * @param m The dividend.
+     * @return A new vector equal to ( x mod m , y mod m , z mod m ) .
+     */
+    public vec3 modulus(float m) { 
+        return new vec3(
+                ((x % m) + m) % m,
+                ((y % m) + m) % m,
+                ((z % m) + m) % m
+        );
+    }
+    /**
+     * Per-component maximum operation.
+     * 
+     * @param f The scalar.
+     * @return A new vector that's equal to ( max(x , f) , max(y , f) , max(z , f) ) .
+     */
+    public vec3 max(float f) { return new vec3( Math.max(x, f) , Math.max(y, f) , Math.max(z, f) ); }
+    /**
+     * Per-component minimum operation.
+     * 
+     * @param f The scalar.
+     * @return A new vector that's equal to ( min(x , f) , min(y , f) , min(z , f) ) .
+     */
+    public vec3 min (float f) { return new vec3( Math.min(x, f) , Math.min(y, f) , Math.min(z, f) ); }
+    /**
+     * Per-component clamping operation.
+     * Throws an error is h is less than l.
+     * 
+     * @param l The lowest allowed value.
+     * @param h The highest allowed value.
+     * @return A new vector where each component is within [l, h].
+     */
+    public vec3 clamp(float l, float h) { 
+        if (h < l) throw new ArithmeticException("Highest allowed value cannot be less than the lowest allowed value ... " + h + " < " + l);
+        return this.max(l).min(h); 
+    }
+    //</editor-fold>
     
-    
-    public vec3 modulo(float m) { return new vec3(x % m, y % m, z % m); }
-    
-    public float average() { return (x + y + z) / 3.0f; }
-    
-    public vec3 clamp(float l, float h) {
-        float nx = Math.min(Math.max(x, l), h),
-              ny = Math.min(Math.max(y, l), h),
-              nz = Math.min(Math.max(z, l), h);
-        return new vec3(nx, ny, nz);
+    //<editor-fold defaultstate="collapsed" desc=" Special Vector Operators ">
+    //Object methods
+    /**
+     * Per-component maximum against another vector.
+     * 
+     * @param o The other vector whose components will be used.
+     * @return A new vector that's equal to ( max(x , o.x) , max(y , o.y) , max(z , o.z) ) .
+     */
+    public vec3 max(vec3 o) { return new vec3(Math.max(x, o.x), Math.max(y, o.y), Math.max(z, o.z)); }
+    /**
+     * Per-component minimum against another vector.
+     * 
+     * @param o The other vector whose components will be used.
+     * @return A new vector that's equal to ( min(x , o.x) , min(y , o.y) , min(z , o.z) ) .
+     */
+    public vec3 min(vec3 o) { return new vec3(Math.min(x, o.x), Math.min(y, o.y), Math.min(z, o.z)); }
+    /**
+     * Per-component clamping operation.
+     * Throws an error if any component of h is less 
+     * than the corresponding component of l. For example
+     * if you try to clamp some vector in between [ (1, 2, 3) , (0 , 3, 5) ]
+     * this will throw an error because l.x > h.x .
+     * 
+     * @param l The other vector whose components will be used for the low.
+     * @param h The other vector whose components will be used for the high.
+     * @return A new vector where each component is within [l, h].
+     */
+    public vec3 clamp(vec3 l, vec3 h) {
+        if (h.x < l.x) throw new ArithmeticException("Highest allowed value cannot be less than the lowest allowed value... " + h.x + " < " + l.x);
+        if (h.y < l.y) throw new ArithmeticException("Highest allowed value cannot be less than the lowest allowed value... " + h.y + " < " + l.y);
+        if (h.z < l.z) throw new ArithmeticException("Highest allowed value cannot be less than the lowest allowed value... " + h.z + " < " + l.z);
+        return this.max(l).min(h);
     }
     
-    public float getDist(vec3 other) { return (float)Math.sqrt(Math.pow(other.x - x, 2) + Math.pow(other.y - y, 2) + Math.pow(other.z - z, 2)); }
+    /**
+     * Calculates the cross product between this vector and another.
+     * 
+     * @param o The other vector
+     * @return A new vector orthogonal to both this and the other vector (o)
+     */
+    public vec3 cross(vec3 o){
+        return new vec3(
+                y * o.z - z * o.y,
+                z * o.x - x * o.z,
+                x * o.y - y * o.x
+        );
+    }
+    /**
+     * Calculates the dot product of this vector and another.
+     * 
+     * @param o The other vector.
+     * @return Returns a float that is equal to ( x * o.x + y * o.y + z * o.z ) .
+     */
+    public float dot(vec3 o) { return x * o.x + y * o.y + z * o.z; } 
+    
+    public vec3 blend(vec3 o, float w) {
+        //Clamp the weight
+        w = Math.min(w, 1.0f);
+        w = Math.max(w, 0.0f);
+        
+        float nx = (1 - w) * x + w * o.x;
+        float ny = (1 - w) * y + w * o.y;
+        float nz = (1 - w) * z + w * o.z;
+        return new vec3(nx, ny, nz); 
+    }
+    
+    //Static methods
+    /**
+     * Calculates the cross product given two vectors.
+     * 
+     * @param p The first vector.
+     * @param q The second vector.
+     * @return A new vector orthogonal to both p & q.
+     */
+    public static vec3 cross(vec3 p, vec3 q) {
+        return new vec3(
+                p.y * q.z - p.z * q.y,
+                p.z * q.x - p.x * q.z,
+                p.x * q.y - p.y * q.x
+        );
+    }
+    
+    public static vec3 blend(vec3 p, vec3 q, float w) {
+        //Clamp weight
+        w = Math.min(w, 1.0f);
+        w = Math.max(w, 0.0f);
+        
+        float nx = (1 - w) * p.x + w * q.x;
+        float ny = (1 - w) * p.y + w * q.y;
+        float nz = (1 - w) * p.z + w * q.z;
+        return new vec3(nx, ny, nz); 
+    }
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc=" Information Getter Methods ">
+    /**
+     * Calculates the average of each component.
+     * 
+     * @return The average as a float.
+     */
+    public float average() { return (x + y + z) / 3.0f; }
+
+    public float getDist(vec3 o) { return (float) Math.sqrt(getDistSqrd(o)); }
+    public float getDistSqrd(vec3 o) { return (float) (Math.pow(o.x - x, 2) + Math.pow(o.y - y, 2) + Math.pow(o.z - z, 2)); }
+    
+    public float length() { return (float)Math.sqrt(lengthSqrd()); }
+    public float lengthSqrd() { return x*x + y*y + z*z; }
+    //</editor-fold>
+
+    
     
     public vec3 abs() { return new vec3(Math.abs(x), Math.abs(y), Math.abs(z)); }
     public vec3 negate() { return this.scale(-1.0f); }
     
-    public float length() { return (float)Math.sqrt(x*x + y*y + z*z); }
-    public float lengthSqr() { return x*x + y*y + z*z; }
     
-    public vec3 max(vec3 other) { return new vec3(Math.max(this.x, other.x), Math.max(this.y, other.y), Math.max(this.z, other.z)); }
-    public vec3 max(float q) {
-        return new vec3(
-                Math.max(x, q),
-                Math.max(y, q),
-                Math.max(z, q)
-            );
-    }
-    
+
     public vec3 normalize(){
         float length = length();
         if (length == 0) { return new vec3(); }
         return new vec3(x / length, y / length, z / length);
     }
-    
-    public vec3 cross(vec3 other){
-        return new vec3(y * other.z - z * other.y,
-        z * other.x - x * other.z,
-        x * other.y - y * other.x);
-    }
-    public static vec3 cross(vec3 p, vec3 q) {
-        return new vec3(
-            p.y * q.z - p.z * q.y,
-            p.z * q.x - p.x * q.z,
-            p.x * q.y - p.y * q.x
-            );
-    }
-    public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
     public static vec3 randomHemisphere(vec3 normal, vec3 pos) {
         float u = hash(pos, 1);   
@@ -232,30 +350,9 @@ public class vec3 {
         return perp.normalize();
     }
 
-    public static vec3 blend(vec3 p, vec3 q, float w) {
-        //Clamp weight
-        w = Math.min(w, 1.0f);
-        w = Math.max(w, 0.0f);
-        
-        float nx = (1 - w) * p.x + w * q.x;
-        float ny = (1 - w) * p.y + w * q.y;
-        float nz = (1 - w) * p.z + w * q.z;
-        return new vec3(nx, ny, nz); 
-    }
-    public vec3 blend(vec3 o, float w) {
-        //Clamp the weight
-        w = Math.min(w, 1.0f);
-        w = Math.max(w, 0.0f);
-        
-        float nx = (1 - w) * x + w * o.x;
-        float ny = (1 - w) * y + w * o.y;
-        float nz = (1 - w) * z + w * o.z;
-        return new vec3(nx, ny, nz); 
-    }
-
     public java.awt.Color toAwtColor() { 
-        vec3 clamped = this.clamp(0, 255);
-        return new java.awt.Color((int) clamped.x, (int) clamped.y, (int) clamped.z);
+        vec3 c = clamp(0, 255);
+        return new java.awt.Color( (int) c.x , (int) c.y , (int) c.z );
     }
     
     public static vec3 round(vec3 other, int places) {
@@ -284,9 +381,8 @@ public class vec3 {
         return new vec3(nx, ny, nz);
     }
     public vec3 round() { return this.round(0); }
-    
-    public boolean equals(vec3 o) { return x == o.x && y == o.y && z == o.z; }
-    
+
+    //<editor-fold defaultstate="collapsed" desc=" String methods & constructors ">
     @Override
     public String toString() { return "(" + x + " : " + y + " : " + z + ")"; }
     public String[] toStringArray() { return new String[] { ""+x, ""+y, ""+z }; }
@@ -308,6 +404,16 @@ public class vec3 {
             System.err.println("Error parsing string for vec3 ...");
             System.err.println(e.getMessage());
         }
+    }
+    //</editor-fold>
+    
+    @Override
+    public boolean equals(Object obj) { 
+        if (!(obj instanceof vec3)) return false;
+        if (this == obj) return true;
+        vec3 o = (vec3) obj;
+        return x == o.x && y == o.y && z == o.z; 
+        
     }
     
     public final static vec3 WHITE = new vec3(255.0f);
