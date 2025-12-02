@@ -1,9 +1,16 @@
 package Util;
 
+/**
+ * A three component vector class, with most common operations.
+ * 
+ * @author Harrison
+ */
 public class vec3 {
     
+    //The three components
     public float x, y, z;
 
+    //<editor-fold defaultstate="collapsed" desc=" Constructors ">
     /**
      * Default constructor. { 0.0 , 0.0 , 0.0 } .
      */
@@ -31,23 +38,14 @@ public class vec3 {
         y = copy.y;
         z = copy.z;
     }
-    
-    public vec3(java.awt.Color c) { x = c.getRed(); y = c.getGreen(); z = c.getBlue(); }
- 
     /**
-     * Component wise addition.
+     * From java.awt.Color constructor. { r , g , b }
      * 
-     * @param o The other vector to add.
-     * @return A new vector equal to ( x + o.x , y + o.y , z + o.z ) .
+     * @param c a java.awt.Color that'll be used to create a new vec3
      */
-    public vec3 add(vec3 o) { 
-        return new vec3
-            (
-                    x + o.x, 
-                    y + o.y, 
-                    z + o.z
-            ); 
-    }
+    public vec3(java.awt.Color c) { x = c.getRed(); y = c.getGreen(); z = c.getBlue(); }
+    //</editor-fold>
+    
     /**
      * Component wise addition.
      * 
@@ -56,36 +54,7 @@ public class vec3 {
      * @return A new vector equal to ( p.x + q.x , p.y + q.y , p.z + q.z ) .
      */
     public static vec3 add(vec3 p, vec3 q) { return p.add(q); }
-    /**
-     * Adds a scalar to each component.
-     * 
-     * @param f The scalar to add.
-     * @return A new vector equal to ( x + f , y + f , z + f ) .
-     */
-    public vec3 add(float f) {
-        return new vec3
-            (
-                    x + f,
-                    y + f,
-                    z + f
-            );
-    }
-    /**
-     * Adds a scalar to each component.
-     * 
-     * @param o The vector.
-     * @param f The scalar.
-     * @return A new vector equal to ( o.x + f , o.y + f , o.z f ) .
-     */
-    public static vec3 add(vec3 o, float f) { return o.add(f); }
     
-    /**
-     * Component wise subtraction.
-     * 
-     * @param o The subtrahend vector.
-     * @return A new vector equal to ( x - o.x , y - o.y , z - o.z ) .
-     */
-    public vec3 subtract(vec3 o) { return this.add(o.scale(-1.0f)); }
     /**
      * Component wise subtraction.
      * 
@@ -94,13 +63,48 @@ public class vec3 {
      * @return A new vector equal to ( p.x - q.x , p.y - q.y , p.z - q.z ) .
      */
     public static vec3 subtract(vec3 p, vec3 q) { return p.add(q.scale(-1.0f)); }
+    
+    
+    //<editor-fold defaultstate="collapsed" desc=" 4-Function Scalar Operators (Object & Static) ">
+    //Object methods
+    /**
+     * Adds a scalar to each component.
+     * 
+     * @param f The scalar to add.
+     * @return A new vector equal to ( x + f , y + f , z + f ) .
+     */
+    public vec3 add(float f) { return new vec3 ( x + f , y + f , z + f ); }
     /**
      * Subtracts a scalar from each component.
      * 
      * @param f The subtrahend scalar.
      * @return A new vector equal to ( x - f , y - f , z - f) .
      */
-    public vec3 subtract(float f) { return this.add(-f); }
+    public vec3 subtract(float f) { return this.add( -f ); }
+    /**
+     * Scales ( multiplies ) each component by a scalar.
+     * 
+     * @param f The scalar to scale
+     * @return A new vector equal to ( x * f , y * f , z * f )
+     */
+    public vec3 scale(float f) { return new vec3( x * f , y * f , z * f ); }
+    /**
+     * Divides each component by a scalar.
+     * 
+     * @param f
+     * @return 
+     */
+    public vec3 divide(float f) { return this.scale( 1.0f / f ); }
+    
+    //Static methods
+    /**
+     * Adds a scalar to each component.
+     * 
+     * @param o The vector.
+     * @param f The scalar.
+     * @return A new vector equal to ( o.x + f , o.y + f , o.z f ) .
+     */
+    public static vec3 add(vec3 o, float f) { return o.add(f); }
     /**
      * Subtracts a scalar from each component.
      * 
@@ -109,19 +113,43 @@ public class vec3 {
      * @return A new vector equal to ( o.x - f , o.y - f , o.z - f ) .
      */
     public static vec3 subtract(vec3 o, float f) { return o.add(-f); }
+    //</editor-fold>
     
-    public vec3 scale(float p) { return new vec3(x * p, y * p, z * p); }
-    public vec3 negate() { return this.scale(-1.0f); }
-    public vec3 multiply(vec3 o) {
-        return new vec3
-                (
-                        x * o.x,
-                        y * o.y,
-                        z * o.z
-                );
-    }
+    //<editor-fold defaultstate="collapsed" desc=" 4-Function Vector Operators (Object & Static) ">
+    //Object methods
+    /**
+     * Component wise addition.
+     * 
+     * @param o The other vector to add.
+     * @return A new vector equal to ( x + o.x , y + o.y , z + o.z ) .
+     */
+    public vec3 add(vec3 o) { return new vec3( x + o.x , y + o.y , z + o.z ); }
+    /**
+     * Component wise subtraction.
+     * 
+     * @param o The subtrahend vector.
+     * @return A new vector equal to ( x - o.x , y - o.y , z - o.z ) .
+     */
+    public vec3 subtract(vec3 o) { return this.add(o.scale(-1.0f)); }
+    /**
+     * Multiplies a vector with another. ( Per-component / Hadamard product )
+     * 
+     * @param o The multiplicator vector.
+     * @return A new vector equal to ( x * o.x , y * o.y , z * z.y ) .
+     */
+    public vec3 multiply(vec3 o) { return new vec3( x * o.x , y * o.y , z * o.z ); }
+    /**
+     * Divideds a vector by another ( Per-component / Hadamard quotient )
+     * 
+     * @param o The dividend.
+     * @return A new vector equal to ( x / o.x , y / o.y , z / o.z )
+     */
+    public vec3 divide(vec3 o) { return new vec3( x / o.x , y / o.y , z / o.z ); }
     
-    public vec3 divide(float f) { return new vec3(x / f, y / f, z / f); }
+    //Static methods
+    //</editor-fold>
+    
+    
     
     public vec3 modulo(float m) { return new vec3(x % m, y % m, z % m); }
     
@@ -137,6 +165,7 @@ public class vec3 {
     public float getDist(vec3 other) { return (float)Math.sqrt(Math.pow(other.x - x, 2) + Math.pow(other.y - y, 2) + Math.pow(other.z - z, 2)); }
     
     public vec3 abs() { return new vec3(Math.abs(x), Math.abs(y), Math.abs(z)); }
+    public vec3 negate() { return this.scale(-1.0f); }
     
     public float length() { return (float)Math.sqrt(x*x + y*y + z*z); }
     public float lengthSqr() { return x*x + y*y + z*z; }
@@ -168,7 +197,6 @@ public class vec3 {
             p.x * q.y - p.y * q.x
             );
     }
-    
     public float dot(vec3 other) { return x * other.x + y * other.y + z * other.z; } 
     
     public static vec3 randomHemisphere(vec3 normal, vec3 pos) {
