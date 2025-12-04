@@ -415,7 +415,7 @@ public class Window extends javax.swing.JFrame {
         vec3[] camOrien = core.scene.getCameraOrien();  
         vec3 forward    = camOrien[0];
         vec3 pos        = camOrien[3];
-        placeHolder.add(vec3.round(pos.add(forward.scale(n))).toString());
+        placeHolder.add((pos.add(forward.scale(n))).round().toString());
 
         //Now we fill the placeholder with more values and prompt the user for any changes
         String t = "";

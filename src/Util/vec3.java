@@ -10,7 +10,7 @@ public class vec3 {
     //The three components
     public float x, y, z;
 
-    //<editor-fold defaultstate="collapsed" desc=" Constructors ">
+    //<editor-fold defaultstate="collapsed" desc=" Regular Constructors ">
     /**
      * Default constructor. { 0.0 , 0.0 , 0.0 } .
      */
@@ -38,16 +38,9 @@ public class vec3 {
         y = copy.y;
         z = copy.z;
     }
-    /**
-     * From java.awt.Color constructor. { r , g , b }
-     * 
-     * @param c a java.awt.Color that'll be used to create a new vec3
-     */
-    public vec3(java.awt.Color c) { x = c.getRed(); y = c.getGreen(); z = c.getBlue(); }
     //</editor-fold>
 
-    //<editor-fold defaultstate="collapsed" desc=" 4-Function Scalar Operators (Object & Static) ">
-    //Object methods
+    //<editor-fold defaultstate="collapsed" desc=" 4-Function Scalar Operators ">
     /**
      * Adds a scalar to each component.
      * 
@@ -76,28 +69,9 @@ public class vec3 {
      * @return 
      */
     public vec3 divide(float f) { return this.scale( 1.0f / f ); }
-    
-    //Static methods
-    /**
-     * Adds a scalar to each component.
-     * 
-     * @param o The vector.
-     * @param f The scalar.
-     * @return A new vector equal to ( o.x + f , o.y + f , o.z f ) .
-     */
-    public static vec3 add(vec3 o, float f) { return o.add(f); }
-    /**
-     * Subtracts a scalar from each component.
-     * 
-     * @param o The minuend vector.
-     * @param f The subtrahend scalar.
-     * @return A new vector equal to ( o.x - f , o.y - f , o.z - f ) .
-     */
-    public static vec3 subtract(vec3 o, float f) { return o.add(-f); }
     //</editor-fold>
     
-    //<editor-fold defaultstate="collapsed" desc=" 4-Function Vector Operators (Object & Static) ">
-    //Object methods
+    //<editor-fold defaultstate="collapsed" desc=" 4-Function Vector Operators ">
     /**
      * Component wise addition.
      * 
@@ -126,24 +100,6 @@ public class vec3 {
      * @return A new vector equal to ( x / o.x , y / o.y , z / o.z )
      */
     public vec3 divide(vec3 o) { return new vec3( x / o.x , y / o.y , z / o.z ); }
-    
-    //Static methods
-    /**
-     * Component wise addition.
-     * 
-     * @param p The first addend vector.
-     * @param q The second addend vector.
-     * @return A new vector equal to ( p.x + q.x , p.y + q.y , p.z + q.z ) .
-     */
-    public static vec3 add(vec3 p, vec3 q) { return p.add(q); }
-    /**
-     * Component wise subtraction.
-     * 
-     * @param p The minuend vector.
-     * @param q The subtrahend vector. 
-     * @return A new vector equal to ( p.x - q.x , p.y - q.y , p.z - q.z ) .
-     */
-    public static vec3 subtract(vec3 p, vec3 q) { return p.add(q.scale(-1.0f)); }
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Special Scalar Operators ">
@@ -297,25 +253,81 @@ public class vec3 {
      */
     public float average() { return (x + y + z) / 3.0f; }
 
+    /**
+     * Calculates the distance between this vector and another.
+     * 
+     * @param o The other vector.
+     * @return The distance between the two vectors.
+     */
     public float getDist(vec3 o) { return (float) Math.sqrt(getDistSqrd(o)); }
+    /**
+     * Calculates the distance between this vector and another, but does NOT
+     * take it's square root leading to a cheaper calculation.
+     * 
+     * @param o The other vector
+     * @return The distance between the two vectors squared.
+     */
     public float getDistSqrd(vec3 o) { return (float) (Math.pow(o.x - x, 2) + Math.pow(o.y - y, 2) + Math.pow(o.z - z, 2)); }
     
+    /**
+     * @return The length of this vector. ( The square root of the sum of each component squared )
+     */
     public float length() { return (float)Math.sqrt(lengthSqrd()); }
+    /**
+     * @return The length of this vector without taking the square root. Which is effectively
+     * the sum of each component squared. This is a cheaper calculation.
+     */
     public float lengthSqrd() { return x*x + y*y + z*z; }
     //</editor-fold>
-
     
-    
+    //<editor-fold defaultstate="collapsed" desc=" Transformers ">
+    /**
+     * @return A new vector that's the absolute value of this vector.
+     */
     public vec3 abs() { return new vec3(Math.abs(x), Math.abs(y), Math.abs(z)); }
+    /**
+     * @return A new vector that is equal to ( -x , -y , -z ) .
+     */
     public vec3 negate() { return this.scale(-1.0f); }
     
-    
-
+    /**
+     * Calculates the length of this vector and divides each 
+     * component by the length. If the length is 0 it returns
+     * ( 0 , 0 , 0 ) .
+     * 
+     * @return A new vector that's this vector but normalized.
+     */
     public vec3 normalize(){
         float length = length();
         if (length == 0) { return new vec3(); }
-        return new vec3(x / length, y / length, z / length);
+        return divide(length);
     }
+   
+    /**
+     * Default round method. Calls & returns round(0).
+     * 
+     * @return A new vector where each component is rounded to the nearest whole number.
+     */
+    public vec3 round() { return round(0); }
+    /**
+     * Rounds each component to some amount of places.
+     * 
+     * @param places The amount of places to round to.
+     * @return A new vector with each component rounded.
+     */
+    public vec3 round(int places) {
+        int q = 1;
+        for (int i = 0; places > i; i++) q *= 10;
+        
+        float nx = x, ny = y, nz = z;
+        
+        nx = Math.round(nx * q) / (float) q;
+        ny = Math.round(ny * q) / (float) q;
+        nz = Math.round(nz * q) / (float) q;
+        
+        return new vec3(nx, ny, nz);
+    }
+    //</editor-fold>
     
     public static vec3 randomHemisphere(vec3 normal, vec3 pos) {
         float u = hash(pos, 1);   
@@ -350,37 +362,25 @@ public class vec3 {
         return perp.normalize();
     }
 
+    //<editor-fold defaultstate="collapsed" desc=" java.awt.Color methods & constructors ">
+    /**
+     * From java.awt.Color constructor. { r , g , b }
+     * 
+     * @param c a java.awt.Color that'll be used to create a new vec3
+     */
+    public vec3(java.awt.Color c) { x = c.getRed(); y = c.getGreen(); z = c.getBlue(); }
+    /**
+     * Calculates a vector that's this clamped between [0, 255] 
+     * and then creates a java.awt.Color object using 
+     * x as red, y as green, & z as blue.
+     * 
+     * @return The java.awt.Color object.
+     */
     public java.awt.Color toAwtColor() { 
         vec3 c = clamp(0, 255);
         return new java.awt.Color( (int) c.x , (int) c.y , (int) c.z );
     }
-    
-    public static vec3 round(vec3 other, int places) {
-        int q = 1;
-        for (int i = 0; places > i; i++) q *= 10;
-        
-        float nx = other.x, ny = other.y, nz = other.z;
-        
-        nx = Math.round(nx * q) / (float) q;
-        ny = Math.round(ny * q) / (float) q;
-        nz = Math.round(nz * q) / (float) q;
-        
-        return new vec3(nx, ny, nz);
-    }
-    public static vec3 round(vec3 o) { return round(o, 0); }
-    public vec3 round(int places) {
-        int q = 1;
-        for (int i = 0; places > i; i++) q *= 10;
-        
-        float nx = x, ny = y, nz = z;
-        
-        nx = Math.round(nx * q) / (float) q;
-        ny = Math.round(ny * q) / (float) q;
-        nz = Math.round(nz * q) / (float) q;
-        
-        return new vec3(nx, ny, nz);
-    }
-    public vec3 round() { return this.round(0); }
+    //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc=" String methods & constructors ">
     @Override
