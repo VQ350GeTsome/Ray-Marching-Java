@@ -21,7 +21,7 @@ public class Cylinder extends SDFs.SDF {
         p = p.subtract(c);
         p = rotQuat.rotate(p);
         
-        float rad = new vec2(p.x, p.y).length() - r;
+        float rad = p.xy().length() - r;
 
         float vert = Math.abs(p.z) - h;
 

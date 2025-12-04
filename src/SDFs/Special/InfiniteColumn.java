@@ -21,7 +21,7 @@ public class InfiniteColumn extends SDFs.SDF {
         p = p.subtract(c);
         p = rotQuat.rotate(p);
         
-        float d = new vec2(p.x, p.y).length() - r;
+        float d = p.xy().length() - r;
         d = Math.max(d, Math.abs(p.y) - r);
         
         return d;

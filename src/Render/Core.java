@@ -1,8 +1,6 @@
 package Render;
 
-import Util.vec3;
-import Util.PostProcessor;
-import Util.Material;
+import Util.*;
 import SDFs.Primitives.*;
 import SDFs.Special.*;
 import SDFs.*;

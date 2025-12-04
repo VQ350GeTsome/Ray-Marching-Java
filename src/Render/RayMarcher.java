@@ -222,7 +222,7 @@ public class RayMarcher {
 
         //If the material is rough add a random vector seeded with the normal & hit position
         if (hit.mat.roughness > 0.01f)
-            reflectDir = reflectDir.add(vec3.randomHemisphere(norm, hit.hit).scale(customClamp(hit.mat.roughness, 2))).normalize();
+            reflectDir = reflectDir.add(randomHemisphere(norm, hit.hit).scale(customClamp(hit.mat.roughness, 2))).normalize();
 
         //Start the ray a little off the surface
         vec3 origin = hit.hit.add(norm.scale(Core.getEps() * 2.0f));
@@ -298,12 +298,10 @@ public class RayMarcher {
      */
     private float customClamp(float f, int n) {
         float result = (float) Math.pow(f, n);
-        
         return result / (result + 1.0f);
     }
-    private float clamp(float v, float lo, float hi) {
-        return v < lo ? lo : (v > hi ? hi : v);
-    }
+    private float clamp(float v, float lo, float hi) { return v < lo ? lo : (v > hi ? hi : v); }
+    private float fract(float x) { return x - (float)Math.floor(x); }
     
     /**
      * Estimates a normal based off of an SDF and a position.
@@ -317,6 +315,36 @@ public class RayMarcher {
         float y = i.sdf.sdf(i.hit.add(new vec3(0.0f, e, 0.0f))) - i.sdf.sdf(i.hit.subtract(new vec3(0.0f, e, 0.0f)));
         float z = i.sdf.sdf(i.hit.add(new vec3(0.0f, 0.0f, e))) - i.sdf.sdf(i.hit.subtract(new vec3(0.0f, 0.0f, e)));
         return new vec3(x, y, z).normalize();
+    }
+    
+    public vec3 randomHemisphere(vec3 normal, vec3 pos) {
+        float u = hash(pos, 1);   
+        float v = hash(pos, 2);     
+        
+        float r = (float)Math.sqrt(u);
+        float theta = 2.0f * (float)Math.PI * v;
+
+        float x = r * (float)Math.cos(theta);
+        float y = r * (float)Math.sin(theta);
+        float z = (float)Math.sqrt(1.0f - u);
+
+        vec3 tangent = anyPerpendicular(normal).normalize();
+        vec3 bitangent = normal.cross(tangent).normalize();
+
+        vec3 dir = tangent.scale(x)
+                    .add(bitangent.scale(y))
+                    .add(normal.scale(z));
+
+        return dir.normalize();
+    }
+    private float hash(vec3 p, float q) {
+        float dot = p.x * 127.1f * q + p.y * 311.7f * q + p.z * 74.7f * q;
+        return fract((float)Math.sin(dot) * 43758.5453f);
+    }
+    private vec3 anyPerpendicular(vec3 a) {
+        vec3 axis = (Math.abs(a.x) < 0.9f) ? new vec3(1,0,0) : new vec3(0,1,0);
+        vec3 perp = a.cross(axis);
+        return perp.normalize();
     }
     
     public String packRayMarcher() {

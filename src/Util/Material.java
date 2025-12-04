@@ -3,7 +3,7 @@ package Util;
 public class Material {
     
     public static final int FIELDS = 11;
-    public vec3 color, specularColor = vec3.WHITE;
+    public vec3 color, specularColor = new vec3(255);
     public float    reflectivity    =  0.0f,
                     specular        =  0.5f,
                     shinyness       = 16.0f,
@@ -16,9 +16,9 @@ public class Material {
     //Light emission later ... maybe
     
     //<editor-fold defaultstate="collapsed" desc=" Common Defaults ">
-    public final static Material PLASTIC = new Material(vec3.GRAY);
-    public final static Material MIRROR  = new Material(vec3.WHITE, 1.0f, 0.5f, 8.0f, 0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f);
-    public final static Material GLASS   = new Material(vec3.WHITE, 0.0f, 0.5f, 8.0f, 0.0f, 1.0f, 1.0f, 1.52f, 0.0f, 0.0f);
+    public final static Material PLASTIC = new Material(new vec3(128));
+    public final static Material MIRROR  = new Material(new vec3(255), 1.0f, 0.5f, 8.0f, 0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f);
+    public final static Material GLASS   = new Material(new vec3(255), 0.0f, 0.5f, 8.0f, 0.0f, 1.0f, 1.0f, 1.52f, 0.0f, 0.0f);
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Constructors ">

@@ -5,7 +5,7 @@ package Util;
  * 
  * @author Harrison
  */
-public class vec3 {
+public class vec3 implements Comparable<vec3> {
     
     //The three components
     public float x, y, z;
@@ -328,39 +328,6 @@ public class vec3 {
         return new vec3(nx, ny, nz);
     }
     //</editor-fold>
-    
-    public static vec3 randomHemisphere(vec3 normal, vec3 pos) {
-        float u = hash(pos, 1);   
-        float v = hash(pos, 2);     
-        
-        float r = (float)Math.sqrt(u);
-        float theta = 2.0f * (float)Math.PI * v;
-
-        float x = r * (float)Math.cos(theta);
-        float y = r * (float)Math.sin(theta);
-        float z = (float)Math.sqrt(1.0f - u);
-
-        vec3 tangent = normal.anyPerpendicular().normalize();
-        vec3 bitangent = normal.cross(tangent).normalize();
-
-        vec3 dir = tangent.scale(x)
-                    .add(bitangent.scale(y))
-                    .add(normal.scale(z));
-
-        return dir.normalize();
-    }
-    private static float hash(vec3 p, float q) {
-        float dot = p.x * 127.1f * q + p.y * 311.7f * q + p.z * 74.7f * q;
-        return fract((float)Math.sin(dot) * 43758.5453f);
-    }
-    private static float fract(float x) {
-        return x - (float)Math.floor(x);
-    }
-    private vec3 anyPerpendicular() {
-        vec3 axis = (Math.abs(x) < 0.9f) ? new vec3(1,0,0) : new vec3(0,1,0);
-        vec3 perp = cross(axis);
-        return perp.normalize();
-    }
 
     //<editor-fold defaultstate="collapsed" desc=" java.awt.Color methods & constructors ">
     /**
@@ -407,6 +374,18 @@ public class vec3 {
     }
     //</editor-fold>
     
+    //<editor-fold defaultstate="collapsed" desc=" Swizzle Methods ">
+    public vec2 xy() { return new vec2(x, y); }
+    public vec2 xz() { return new vec2(x, z); }
+    
+    public vec2 yx() { return new vec2(y, x); }
+    public vec2 yz() { return new vec2(y, z); }
+    
+    public vec2 zx() { return new vec2(z, x); }
+    public vec2 zy() { return new vec2(z, y); }
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc=" Equal Operators ">
     @Override
     public boolean equals(Object obj) { 
         if (!(obj instanceof vec3)) return false;
@@ -415,8 +394,28 @@ public class vec3 {
         return x == o.x && y == o.y && z == o.z; 
         
     }
-    
-    public final static vec3 WHITE = new vec3(255.0f);
-    public final static vec3 GRAY  = new vec3(128.0f);
+    /**
+     * Compares if two vectors are approximately equal.
+     * 
+     * @param o     The other vector.
+     * @param eps   Epsilon, how far away each component can be.
+     * @return      True if all components differ by at most eps.
+     */
+    public boolean epsilonEquals(vec3 o, float eps) {
+        if (o == null) return false;
+        return Math.abs(x - o.x) < eps &&
+               Math.abs(y - o.y) < eps &&
+               Math.abs(z - o.z) < eps;
+    }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc=" Hashing & Comparing ">
+    @Override
+    public int hashCode() { return java.util.Objects.hash(x, y, z); }
+    @Override
+    public int compareTo(vec3 o) {
+        return Float.compare(lengthSqrd(), o.lengthSqrd());
+    }
+    //</editor-fold>
+    
 }
