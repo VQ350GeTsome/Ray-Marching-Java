@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import Vectors.vec3;
+
 public class Core extends JPanel {
 
     private static float eps = 1e-4f;

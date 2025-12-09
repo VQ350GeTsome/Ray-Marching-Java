@@ -1,7 +1,7 @@
 package Render;
 
 import Util.HitInfo;
-import Util.vec3;
+import Vectors.vec3;
 import Util.PostProcessor;
 import File.FileManager;
 import SDFs.SDF;

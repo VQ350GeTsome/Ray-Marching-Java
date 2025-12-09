@@ -1,9 +1,8 @@
 package SDFs.Special;
 
-import Util.vec3;
+import Vectors.vec3;
 import Util.ArrayMath;
 import Util.Material;
-import Util.vec2;
 
 public class InfiniteColumn extends SDFs.SDF {
 

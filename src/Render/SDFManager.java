@@ -1,7 +1,7 @@
 package Render;
 
 import Util.IntRef;
-import Util.vec3;
+import Vectors.vec3;
 import SDFs.*;
 import java.util.ArrayList;
 

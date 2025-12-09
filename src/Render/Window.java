@@ -1,11 +1,11 @@
 package Render;
 
 import Util.HitInfo;
-import Util.vec3;
+import Vectors.vec3;
+import ComplexNumbers.Quaternion;
 import Util.PostProcessor;
 import Util.ArrayMath;
 import Util.Material;
-import Util.Quaternion;
 import File.*;
 import SDFs.BlendedSDF;
 import java.awt.Color;

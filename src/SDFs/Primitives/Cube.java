@@ -1,6 +1,6 @@
 package SDFs.Primitives;
 
-import Util.vec3;
+import Vectors.vec3;
 import Util.ArrayMath;
 import Util.Material;
 

@@ -1,5 +1,7 @@
 package Util;
 
+import Vectors.vec3;
+
 public class Material {
     
     public static final int FIELDS = 11;

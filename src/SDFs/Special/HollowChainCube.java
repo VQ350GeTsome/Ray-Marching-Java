@@ -1,6 +1,6 @@
 package SDFs.Special;
 
-import Util.vec3;
+import Vectors.vec3;
 import Util.ArrayMath;
 import Util.Material;
 
@@ -35,7 +35,7 @@ public class HollowChainCube extends SDFs.SDF {
         }
         vec3 one = new vec3(1.0f);
         vec3 n = one.normalize();                
-        vec3 cr = vec3.cross(p, n);             
+        vec3 cr = p.cross(n);
         float dist = cr.length();
         return (dist / s) - 0.003f;
     }

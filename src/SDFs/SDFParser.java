@@ -1,10 +1,10 @@
 package SDFs;
 
 import Util.IntRef;
-import Util.vec3;
+import Vectors.vec3;
 import Util.ArrayMath;
 import Util.Material;
-import Util.Quaternion;
+import ComplexNumbers.Quaternion;
 import SDFs.Primitives.*;
 import SDFs.Special.*;
 import java.util.ArrayList;

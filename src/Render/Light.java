@@ -1,6 +1,6 @@
 package Render;
 
-import Util.vec3;
+import Vectors.vec3;
 
 public class Light {
 
