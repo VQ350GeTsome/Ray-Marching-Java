@@ -7,7 +7,6 @@ import Util.Material;
 public class Repeating extends SDFs.SDF{
 
     private float s;
-    
     private SDFs.SDF p;
     
     public Repeating(SDFs.SDF primitive, float spacing) {
@@ -18,14 +17,21 @@ public class Repeating extends SDFs.SDF{
 
     @Override
     public float sdf(vec3 pos) {
+        // Cell index
+        vec3 id = (pos.divide(s).round());
 
-        //Wrap each coordinate into a cell centered at 0
-        float rx = pos.x - s * (float)Math.floor(pos.x / s + 0.5f);
-        float ry = pos.y - s * (float)Math.floor(pos.y / s + 0.5f);
-        float rz = pos.z - s * (float)Math.floor(pos.z / s + 0.5f);
+        // Neighbor offset direction 
+        vec3 o = pos.subtract(id.scale(s)).sign();
 
-        vec3 local = new vec3(rx, ry, rz);
-        return p.sdf(local); //Query SDF of the p in local wrapped space
+        float d = Float.MAX_VALUE;
+
+        // Check 2 neighbors in each axis ... so 8 times.
+        for (int k = 0; k < 2; k++) for (int j = 0; j < 2; j++) for (int i = 0; i < 2; i++) {
+            vec3 rid = id.add(new vec3(i, j, k).multiply(o));
+            vec3 r   = pos.subtract(rid.scale(s));
+            d = Math.min(d, p.sdf(r));
+        }
+        return d;
     }
     
     @Override

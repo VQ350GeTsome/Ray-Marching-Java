@@ -48,14 +48,11 @@ public class Core extends JPanel {
      * what is on screen.
      */
     public void mainLoop(){
-        timer = 
-            new Timer(42, //About 24 fps
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) { 
-                        run(); 
-                    }
-                }
-            );
+        timer = new Timer
+        (
+              42, //About 24 fps
+             (ActionEvent e) -> { run(); }
+        );
         timer.start(); /* Start timer */
     }
     public void refresh() { run(); }
@@ -108,16 +105,19 @@ public class Core extends JPanel {
         floorMat.reflectivity = 0.25f;
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
-        scene.addSDF(floor);
+        //scene.addSDF(floor);
         
         SDF t = new Sphere(new vec3(), 1.0f, Material.GLASS);
-        scene.addSDF(t);
+        //scene.addSDF(t);
         
         SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(Color.RED, Material.PLASTIC));
-        scene.addSDF(p);
+        //scene.addSDF(p);
         
-        SDF q = new Cube(new vec3(2, -1, 2), 1.0f, Material.MIRROR);
+        SDF q = new Cube(new vec3(2, -1, 2), 1.0f,  new Material(Color.RED, Material.PLASTIC));
         //scene.addSDF(q);
+        
+        SDF e = new Repeating(p, 10.0f);
+        scene.addSDF(e);
     }
     
     /**
