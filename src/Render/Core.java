@@ -99,25 +99,23 @@ public class Core extends JPanel {
         SDF blend = new BlendedSDF(sphere, cube, 2.1f);
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
-        
+
         
         Material floorMat = new Material(new vec3(100.0f));
         floorMat.reflectivity = 0.25f;
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
-        //scene.addSDF(floor);
+        scene.addSDF(floor);
         
         SDF t = new Sphere(new vec3(), 1.0f, Material.GLASS);
-        //scene.addSDF(t);
+        scene.addSDF(t);
         
         SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(Color.RED, Material.PLASTIC));
-        //scene.addSDF(p);
+        scene.addSDF(p);
         
-        SDF q = new Cube(new vec3(2, -1, 2), 1.0f,  new Material(Color.RED, Material.PLASTIC));
-        //scene.addSDF(q);
+        SDF q = new Cube(new vec3(2, -1, 2), 1.0f,  Material.PLASTIC);
+        scene.addSDF(q);
         
-        SDF e = new Repeating(p, 10.0f);
-        scene.addSDF(e);
     }
     
     /**
@@ -141,6 +139,8 @@ public class Core extends JPanel {
     public String[] getF2Res() { return new String[] { ""+hiResW, ""+hiResH }; }
     public void screenShotHiRes() {
         timer.stop();
+        
+        System.out.println("Screenshotting ...");
         
         //Saves the current width & height
         int pWidth = width, pHeight = height;

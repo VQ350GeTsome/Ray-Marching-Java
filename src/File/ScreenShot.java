@@ -29,14 +29,13 @@ public class ScreenShot {
         if (dir.isBlank() || finalDir.isBlank()) getCurrentDirectory(); //If the directories have yet to be found find it
         
         try {
-            System.out.println("\nScreen shotting ...");
             BufferedImage bi = image;
             java.io.File outputfile = new java.io.File("ScreenShot.png");
             javax.imageio.ImageIO.write(bi, "png", outputfile);
             String rename = dir + "\\" + "images" + "\\" + frame + Math.round(Math.random() * 10000) + ".png";
             outputfile.renameTo(new java.io.File(rename));
             frame++;
-            System.out.println("\nScreen shot successful !!!\nSaved to: " + rename + "\n");
+            System.out.println("\nScreenshot successful !!!\nSaved to: " + rename + "\n");
         } catch (java.io.IOException e) { 
             System.err.println(dir + "is broken / not a valid path."); 
         } catch (Exception e) {

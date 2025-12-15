@@ -1,14 +1,10 @@
 package Render;
 
-import Util.HitInfo;
+import Util.*;
 import Vectors.vec3;
 import ComplexNumbers.Quaternion;
-import Util.PostProcessor;
-import Util.ArrayMath;
-import Util.Material;
 import File.*;
 import SDFs.BlendedSDF;
-import java.awt.Color;
 
 import java.io.File;
 import javax.swing.JColorChooser;
@@ -33,6 +29,7 @@ public class Window extends javax.swing.JFrame {
         core.mainLoop();
     }
     
+    //<editor-fold defaultstate="collapsed" desc=" Camera Modifiers ">
     private void cameraMover(int input, boolean shift) {
         float   grain = Core.cameraMoveGrain;               //Get the current camera grain (sensitivity)
         vec3[]  orien = core.scene.getCameraOrien();        //Get the three orientation vectors
@@ -98,7 +95,9 @@ public class Window extends javax.swing.JFrame {
         }
         core.scene.zoomCamera(zoom);
     }
+    //</editor-fold>
     
+    //<editor-fold defaultstate="collpased" desc=" Pane Creators ">
     private String[] createOptionsPane(String title, String[] options, String[] defaults, int inputsPerRow) {  
         int length = options.length;
         JTextField[] fields = new JTextField[length];               //Initialize the feilds we will use
@@ -145,7 +144,6 @@ public class Window extends javax.swing.JFrame {
         
         return createOptionsPane(title, options, defaults, inputsPerRow);
     }
-    
     private int createButtonsPane(String prompt, String[] options) {
         int choice = JOptionPane.showOptionDialog(
             null,
@@ -160,6 +158,7 @@ public class Window extends javax.swing.JFrame {
         if (choice >= 0) return choice;
         else return -1;
     }
+    //</editor-fold>
             
     private void rightClick(int x, int y, int w, int h) {
         HitInfo info = core.scene.marchRay(x, y, w, h);
@@ -198,7 +197,7 @@ public class Window extends javax.swing.JFrame {
         return popup;
     }
     private void changeBG() {
-        Color input = getColor(core.scene.getBackground().toAwtColor());
+        java.awt.Color input = getColor(core.scene.getBackground().toAwtColor());
         if (input == null) return;
         
         vec3 newBG = new vec3(input);
@@ -206,7 +205,7 @@ public class Window extends javax.swing.JFrame {
         core.scene.setBackground(newBG);
     }
     private void changeSecBG() {
-        Color input = getColor(core.scene.getSecondaryBG().toAwtColor());
+        java.awt.Color input = getColor(core.scene.getSecondaryBG().toAwtColor());
         if (input == null) return;
         
         vec3 newBG = new vec3(input);
@@ -289,7 +288,7 @@ public class Window extends javax.swing.JFrame {
         if (obj instanceof SDFs.BlendedSDF) obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         
         //Prompts the user with a color chooser with a random color to start
-        Color color = getColor();
+        java.awt.Color color = getColor();
         if (color == null) return;
         
         if (baseColor) obj.setColor(new vec3(color));
@@ -449,12 +448,12 @@ public class Window extends javax.swing.JFrame {
         catch (Exception e) { System.err.print(e.getMessage()); }
     }
     
-    private Color getColor() {
-        Color arg = new Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random()));
+    private java.awt.Color getColor() {
+        java.awt.Color arg = new java.awt.Color( (int) (255 * Math.random()), (int) (255 * Math.random()), (int) (255 * Math.random()));
         return getColor(arg);
     }
-    private Color getColor(Color defaultArg) {
-        Color color = JColorChooser.showDialog(rootPane, "Choose a Color: ", defaultArg);
+    private java.awt.Color getColor(java.awt.Color defaultArg) {
+        java.awt.Color color = JColorChooser.showDialog(rootPane, "Choose a Color: ", defaultArg);
         return color;
     }
     
@@ -1078,8 +1077,9 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_setLightColorActionPerformed
 
     private void seeAllObjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeAllObjActionPerformed
-        //Get all objects and display them to the user so that they can then select from that
-        //and delete them, merge them, or edit them.
+        // Get all objects and display them to the user so that they can then select from that
+        // and delete them, merge them, or edit them.
+        
     }//GEN-LAST:event_seeAllObjActionPerformed
 
     /**
