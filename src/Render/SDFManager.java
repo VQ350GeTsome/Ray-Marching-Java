@@ -2,6 +2,7 @@ package Render;
 
 public class SDFManager {
     
+    // The internal container of SDFs.
     private final java.util.List<SDFs.SDF> sdfs = new java.util.ArrayList<>();
     
     /**
@@ -19,31 +20,33 @@ public class SDFManager {
      */
     public boolean removeSDF(SDFs.SDF sdf)   { return sdfs.remove(sdf); }
     /**
-     * Sets an
-     * @param s
-     * @param n
-     * @return 
+     * Replaces an SDF. 
+     * 
+     * @param removeSDF The SDF to remove.
+     * @param newSDF The SDF to add.
+     * @return If the operation was completed.
      */
-    public boolean setSDF(SDFs.SDF s, SDFs.SDF n) {
-        return sdfs.remove(s) &&
-               sdfs.add(n);
+    public boolean setSDF(SDFs.SDF removeSDF, SDFs.SDF newSDF) {
+        return sdfs.remove(removeSDF) &&
+               sdfs.add(newSDF);
     }
     
     /**
-     * Returns the distance to the closest surface of the SDFs
-     * from the input vector.
+     * Calculates the signed distance to the surface of each SDF
+     * and returns the minimum.
      * 
-     * @param pos The input vector, a point in space.
-     * @return How close that point in space is to an SDF object.
+     * @param p The position vector.
+     * @return The distance to the nearest SDF's surface, 
+     *      {@link Float#Max_VALUE} if no SDF's are in this manager.
      */
-    public float getClosestSDFDist(Vectors.vec3 pos) {
-        float minDist = Float.MAX_VALUE, dist;
-        for (SDFs.SDF sdf : sdfs) {          //For each SDF
-            dist = sdf.sdf(pos);        //Get the distance to surface
-            minDist = (minDist > dist)  //Store the closest surface
-                    ? dist : minDist;
-        }
-        return minDist;                 //Return the closest surface
+    public float getClosestSDFDist(Vectors.vec3 p) {       
+        // For each SDF calculate the distance to it's surface.
+        // Return the closest surface, if there is no closest
+        // surface return Float.MAX_VALUE.
+        return sdfs.stream()
+               .map(sdf -> sdf.sdf(p))
+               .min(Float::compare)
+               .orElse(Float.MAX_VALUE);               
     }
     /**
      * Returns the closest surface of the SDFs contained
@@ -63,17 +66,31 @@ public class SDFManager {
     }
     
     /**
-     * Returns The SDF at an input position, else null.
+     * Returns the first SDF that's calculated to be 
+     * within a small distance of the input vector.
+     * If none is found it returns null.
      * 
-     * @param p The input position.
-     * @return An SDF is one is found ... else null.
+     * @param p The vector position.
+     * @return An SDF is one is near, else null.
      */
     public SDFs.SDF getSDFAtPos(Vectors.vec3 p) {
-        for (SDFs.SDF s : sdfs) {                                             //For each SDF
-            if (Core.getEps() * 3.0f > s.sdf(p)) { return s; }      //If the SDF is within epsilon, return that sdf
-        }
-        return null;                                                        //If no SDF is found return null
-    }
+        // Stream the SDF's
+        return sdfs.stream()
+                   // Find the first SDF that's close to the input
+                   // vector. If none is found return null.
+                   .filter(sdf -> sdf.sdf(p) < Core.getEps() * 3.0f)
+                   .findFirst()
+                   .orElse(null);
+    }   
+    /**
+     * Calculates the closest SDF and returns it inside a 
+     * {@link Util.HitInfo} object along with the it's distance
+     * and the position vector.
+     * 
+     * @param p The position vector.
+     * @return A {@link Util.HitInfo} that contains the position vector, 
+     *      the distance to the closest SDF, and the closest SDF.
+     */
     public Util.HitInfo getNearestSDFAtPos(Vectors.vec3 p) {
         float minDist = Float.MAX_VALUE, d;
         SDFs.SDF near = null;
@@ -88,37 +105,42 @@ public class SDFManager {
     }
     
     /**
-     * Garbage collector. Checks if any blended SDFs
-     * need to be collected and trashed.
+     * Removes any SDFs that need to be removed.
      */
-    public void gc() {
-        java.util.List<SDFs.SDF> toRemove = new java.util.ArrayList<>();
-        for (SDFs.SDF sdf : sdfs) {
-            if (sdf instanceof SDFs.BlendedSDF && ((SDFs.BlendedSDF) sdf).needsCollected()) {
-                toRemove.add(sdf);
-            }
-        }
-        sdfs.removeAll(toRemove);
+    public void garbageCollector() {
+        sdfs.removeIf(sdf -> 
+                sdf instanceof SDFs.BlendedSDF && ((SDFs.BlendedSDF) sdf).needsCollected()
+        );
     }
     
     /**
-     * Packs SDFs into one big String
-     * using their .toString()
-     * @return 
+     * Packs all the SDFs contained into one String representation, with CSVs.
+     * 
+     * The {@link Camera} object's SDF will be skipped.
+     * 
+     * Any special SDF's such as {@link SDFs.BlendedSDF} will be tagged as such
+     * with their special values, like the blending factor.
+     * 
+     * @return A String array that contains the newly packed SDFs.
+     * 
+     * @see #unpackSDFs(String[]) .
      */
     public String packSDFs() {
         String str = "";
         // Loop through all SDFs skipping the camera SDF.
         for (SDFs.SDF sdf : sdfs) if (!sdf.getType().equals("camera")) { 
-            if (sdf instanceof SDFs.BlendedSDF) {    //If of type blended append the blended tag
-                float k = ((SDFs.BlendedSDF) sdf).getK();    //Blending factor
-                boolean needsTagged = !((SDFs.BlendedSDF) sdf).needsUnblended(); //If we need to tag the new SDF as blended
+            // If the SDF is a special blended SDF
+            // we must parse its blending factor as
+            // well as tagging it as blended.
+            if (sdf instanceof SDFs.BlendedSDF blendedSDF) {    
+                float k = blendedSDF.getK();    //Blending factor
+                boolean needsTagged = !blendedSDF.needsUnblended();
                 if (needsTagged) str += "blended," + k + ",\n";
                 str += sdf.toString();
                 if (needsTagged) str += "endblend,\n";
-            } else {
-                str += sdf.toString();
-            }
+            } 
+            // Else we just append the SDF to the String.
+            else str += sdf.toString();
         }
         return str;
     }
@@ -129,7 +151,7 @@ public class SDFManager {
      * 
      * @param s String array that contains packed SDFs.
      * 
-     * @see #packSDFs()
+     * @see #packSDFs() .
      */
     public void unpackSDFs(String[] s) { 
         // Clear all current SDFs to load the new scene

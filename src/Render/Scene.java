@@ -34,7 +34,7 @@ public class Scene {
         this.h = h;
     }
     
-    public void collectGarbageSDFs() { sdfManager.gc(); }
+    public void collectGarbageSDFs() { sdfManager.garbageCollector(); }
     
     //Light object abstraction
     public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
