@@ -40,6 +40,7 @@ public abstract class SDF {
      * @return The material.
      */
     public Util.Material getMaterial(Vectors.vec3 p) { return m; }
+    public Util.Material getMaterial() { return m; }
     public void setMaterial(Util.Material material) { m = material; }
     
     public ComplexNumbers.Quaternion getRotQuat() { return rotQuat; }

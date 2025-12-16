@@ -82,6 +82,8 @@ public class BlendedSDF extends SDF {
         if (a == null) a = n;
         if (b == null) b = n;
     }
+    public SDFs.SDF getChildA() { return a; }
+    public SDFs.SDF getChildB() { return b; }
     
     public void editChild(String[] inputs, SDF c) {
         //Just like remove(), we first check if the child we are trying

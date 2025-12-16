@@ -15,7 +15,7 @@ public class Core extends javax.swing.JPanel {
     public boolean bloom = true;
     
     private java.awt.image.BufferedImage screen;               //What we will use as the screen
-    private int width = 150, height = width;    //screens dimensions
+    private int width = 125, height = width;    //screens dimensions
     
     public Scene scene;
     public javax.swing.Timer timer;
@@ -100,21 +100,15 @@ public class Core extends javax.swing.JPanel {
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
 
-        
         Material floorMat = new Material(new vec3(100.0f));
         floorMat.reflectivity = 0.25f;
         SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
-        scene.addSDF(floor);
+        //scene.addSDF(floor);
         
-        SDF t = new Sphere(new vec3(), 1.0f, Material.GLASS);
-        scene.addSDF(t);
-        
-        SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(java.awt.Color.RED, Material.PLASTIC));
-        scene.addSDF(p);
-        
-        SDF q = new Cube(new vec3(2, -1, 2), 1.0f,  Material.PLASTIC);
-        scene.addSDF(q);
+        SDF blendBlend = new BlendedSDF(blend, floor, 1.0f);
+        scene.addSDF(blendBlend);
+        blendBlend.setName("Double Blended Test Object");
         
     }
     

@@ -313,20 +313,22 @@ public class Window extends javax.swing.JFrame {
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
         SDFs.SDF parent = null;
-        boolean blended = false;
         if (obj instanceof SDFs.BlendedSDF) {
             parent = obj;
             obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
-            blended = true;
         }
         
-        Util.Material defaultArgs = obj.getMaterial(hit),
-                      newMaterial = this.getMaterial(defaultArgs);
+        // Prompt the user for a new material, using
+        // the current material settings as the 
+        // default arguements.
+        Util.Material newMaterial = this.getMaterial(obj.getMaterial(hit));
         
         // If the new material is null return.
         if (newMaterial == null) return;
          
-        if (blended) ((SDFs.BlendedSDF) parent).setMaterial(obj, newMaterial);
+        // If the object is blended inform the parent.
+        // Else inform the object itself.
+        if (parent != null) ((SDFs.BlendedSDF) parent).setMaterial(obj, newMaterial);
         else obj.setMaterial(newMaterial);
     }
     private void regEditClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
@@ -381,65 +383,124 @@ public class Window extends javax.swing.JFrame {
     }
     //</editor-fold>
     
-    private void generalEditSDF(SDFs.SDF sdf) {
+    private void generalEditSDF(SDFs.SDF obj) {       
         // Make a list that'll be later turnt into an array
         // to be used to create a button panel.
         java.util.List<String> choices = new java.util.ArrayList<>();
-
-        // Get the sdf specific options, & the current settings.
-        String[] options = sdf.getSettingsAndCurrent(),
-                 current = Util.ArrayMath.subArray(options, options.length / 2, options.length);
-        options = Util.ArrayMath.subArray(options, 0, options.length / 2);
         
-        // Add the sdf specific options to the choices list.
-        for (String s : options) {
-            String trim = s.trim();
-            trim = trim.substring(0, trim.length() - 1);
-            choices.add(trim);
-        }
-        
-        // Univeral options
-        choices.add("Color");       final int COLOR = 0;
-        choices.add("Name");        final int NAME = 1;    
-        choices.add("Material");    final int MATERIAL = 2;
-        choices.add("Delete");      final int DELETE = 3;
-        
-        // If it's a blended SDF we will add the option to view the children.
-        if (sdf instanceof SDFs.BlendedSDF) choices.add("View Children");
-        
-        // Prompt the user & check input.
-        int input = this.createButtonsPane("Select an Option ...", choices.toArray(String[]::new), 1);
-        if (input == -1) return;
-        
-        // If the input is within the SDF specific options parse it as such.
-        // Else parse it as a special or univeral option.
-        if (input < current.length) {
-            // Prompt the user for a new parameter.
-            String[] option = new String[] { choices.get(input) };
-            String[] currentArg = new String[] { current[input] };
-            String newParam = createInputsPane("New Parameter: ", option, currentArg, 1)[0];
+        // If the object it a blended SDF.
+        if (obj instanceof SDFs.BlendedSDF blendObj) {
             
-            // If nothing was inputted return.
-            if (newParam == null) return;
+            final int BLENDING_FACTOR = 0, CHILD_A = 1, CHILD_B = 2;
             
-            // Pass new parameter into the sdf.
-            current[input] = newParam.trim();
-            sdf.parseNewParams(current);
-        } else {
-            // Adjust the input.
-            input -= current.length;
+            // Get the children of the blended object, get 
+            // their name ( if any, if not their type )
+            // add them to the choices list.
+            choices.add("Blending Factor");
+            SDFs.SDF a = blendObj.getChildA(), b = blendObj.getChildB();
+            String nameA = a.getName(),
+                   nameB = b.getName();
+            if (nameA == null) nameA = a.getType();
+            if (nameB == null) nameB = b.getType();
+            choices.add("Edit " + nameA);
+            choices.add("Edit " + nameB);
+            
+            // Prompt the user & check input.
+            int input = this.createButtonsPane("Select an Option ...", choices.toArray(String[]::new), 1);
+            if (input == -1) return;
+            
+            // Parse the input.
             switch (input) {
-                case COLOR:
-                    this.promptChangeColor(sdf);
+                case BLENDING_FACTOR:
+                    // Prompt user for new blending factor ( k ) .
+                    String newFactor = this.createInputsPane(
+                        "Enter New Blending Factor: ", 
+                        new String[] { "Blending Factor: "}, 
+                        new String[] { ""+blendObj.getK() }, 
+                        1
+                    )[0];
+                    
+                    // Parse the new k
+                    float k;
+                    try { k = Float.parseFloat(newFactor.trim()); }
+                    catch (Exception e) { 
+                        System.err.println("Error parsing new blending factor...");
+                        System.err.println(e.getMessage());
+                        return;
+                    }
+                    
+                    // Inform the blended object.
+                    blendObj.setK(k);
                     break;
-                case NAME:
-                    this.promptChangeName(sdf);
+                case CHILD_A:
+                    this.generalEditSDF(a);
                     break;
-                case MATERIAL:
-                    this.promptChangeMaterial(sdf);
+                case CHILD_B:
+                    this.generalEditSDF(b);
                     break;
-                case DELETE:
-                    this.promptDelete(sdf);
+            }
+        
+        } 
+        // If the object is a regular SDF.
+        else {
+            // Input constants.
+            final int COLOR = 0, NAME = 1, MATERIAL = 2, DELETE = 3;
+            
+            // Get the sdf specific options, & the current settings.
+            String[] options = obj.getSettingsAndCurrent(),
+                     current = Util.ArrayMath.subArray(options, options.length / 2, options.length);
+            options = Util.ArrayMath.subArray(options, 0, options.length / 2);
+
+            // Add the sdf specific options to the choices list.
+            for (String s : options) {
+                String trim = s.trim();
+                trim = trim.substring(0, trim.length() - 1);
+                choices.add(trim);
+            }
+
+            // Univeral options
+            choices.add("Color");       
+            choices.add("Name");           
+            choices.add("Material");    
+            choices.add("Delete");    
+            
+            // Prompt the user & check input.
+            int input = this.createButtonsPane("Select an Option ...", choices.toArray(String[]::new), 1);
+            if (input == -1) return;
+
+            // If the input is within the SDF specific options parse it as such.
+            // Else parse it as a special or univeral option.
+            if (input < current.length) {
+                // Prompt the user for a new parameter.
+                String[] option = new String[] { choices.get(input) };
+                String[] currentArg = new String[] { current[input] };
+                String newParam = createInputsPane("New Parameter: ", option, currentArg, 1)[0];
+
+                // If nothing was inputted return.
+                if (newParam == null) return;
+
+                // Pass new parameter into the sdf.
+                current[input] = newParam.trim();
+                obj.parseNewParams(current);
+            } else {
+                // Adjust the input.
+                input -= current.length;
+                
+                // Parse the input
+                switch (input) {
+                    case COLOR:
+                        this.promptChangeColor(obj);
+                        break;
+                    case NAME:
+                        this.promptChangeName(obj);
+                        break;
+                    case MATERIAL:
+                        this.promptChangeMaterial(obj);
+                        break;
+                    case DELETE:
+                        this.promptDelete(obj);
+                        break;
+                }
             }
         }
     }
@@ -558,7 +619,8 @@ public class Window extends javax.swing.JFrame {
         obj.setName(newName);
     }
     private void promptChangeMaterial(SDFs.SDF obj) {
-        
+        Util.Material newMaterial = this.getMaterial(obj.getMaterial());
+        obj.setMaterial(newMaterial);
     }
     private void promptDelete(SDFs.SDF obj) {
         
