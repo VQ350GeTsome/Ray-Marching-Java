@@ -1,6 +1,6 @@
 package SDFs;
 
-import Util.IntRef;
+import Util.IntWrapper;
 import Vectors.vec3;
 import Util.ArrayMath;
 import Util.Material;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class SDFParser {
     
-    public static SDF getSDF(Material mat, String type, String[] info, IntRef i) {
+    public static SDF getSDF(Material mat, String type, String[] info, IntWrapper i) {
         
         //If a quaternion isn't included, just use the unit quat and decrement i.i
         Quaternion q;
@@ -41,12 +41,12 @@ public class SDFParser {
         }
         return null;
     }
-    public static SDF getSDF(String type, String[] info, IntRef i) {
+    public static SDF getSDF(String type, String[] info, IntWrapper i) {
         Material mat = parseMaterial(info, i);
         return getSDF(mat, type, info, i);
     }
-    public static SDF getSDF(String type, String[] info) { return getSDF(type, info, new IntRef(0)); }
-    public static SDF getSDF(Material mat, String type, String[] info) { return getSDF(mat, type, info, new IntRef(0)); }
+    public static SDF getSDF(String type, String[] info) { return getSDF(type, info, new IntWrapper(0)); }
+    public static SDF getSDF(Material mat, String type, String[] info) { return getSDF(mat, type, info, new IntWrapper(0)); }
     
     public static String[] getTypes() {
         return new String[] { "Primitive", "Repeating" };
@@ -87,7 +87,7 @@ public class SDFParser {
                 objDependant : ArrayMath.add(objDependant, new String[] { "Spacing: " } );
     }
     
-    private static Material parseMaterial(String[] info, IntRef i) {
+    private static Material parseMaterial(String[] info, IntWrapper i) {
         
         //Use the color to instantiate the material then fill the fields.
         vec3 color = parseColor(info[i.i++]);
@@ -118,7 +118,7 @@ public class SDFParser {
         return new vec3(r,g,b);
     }
     
-    public static SDF parseBlended(String[] info, float k, IntRef i) {
+    public static SDF parseBlended(String[] info, float k, IntWrapper i) {
         ArrayList<SDF> sdfsToBlend = new ArrayList<>(2);
         while (true) {
             String type = info[i.i++].trim(); //Read the type
@@ -136,32 +136,32 @@ public class SDFParser {
         return new BlendedSDF(a, mergeBlended(sdfs, k), k);
     }
 
-    private static SDF parseSphere(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parseSphere(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 center = new vec3(info[i.i++]);
         float radius = Float.parseFloat(info[i.i++].trim());
         SDF s = new Sphere(center, radius, m); s.setRotQuat(q);
         return s;
     }
-    private static SDF parseCube(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parseCube(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
         SDF s = new Cube(center, size, m); s.setRotQuat(q);
         return s;
     }
-    private static SDF parseTorus(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parseTorus(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 center = new vec3(info[i.i++]);
         float majorR = Float.parseFloat(info[i.i++].trim());
         float minorR = Float.parseFloat(info[i.i++].trim());
         SDF s = new Torus(center, majorR, minorR, m); s.setRotQuat(q);
         return s;
     }
-    private static SDF parsePlane(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parsePlane(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 pos = new vec3(info[i.i++]);
         vec3 normal = new vec3(info[i.i++]);
         SDF s = new Plane(pos, normal, m); s.setRotQuat(q);
         return s;
     }
-    private static SDF parseCylinder(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parseCylinder(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 center = new vec3(info[i.i++]);
         float radius = Float.parseFloat(info[i.i++].trim());
         float height = Float.parseFloat(info[i.i++].trim());
@@ -169,14 +169,14 @@ public class SDFParser {
         return s;
     }
     
-    private static SDF parseHollowCC(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parseHollowCC(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 center = new vec3(info[i.i++]);
         float scale = Float.parseFloat(info[i.i++]);
         float n     = Float.parseFloat(info[i.i++]);
         SDF s = new HollowChainCube(center, scale, n, m); s.setRotQuat(q);
         return s;
     } 
-    private static SDF parseKHCube(String[] info, Material m, Quaternion q, IntRef i) {
+    private static SDF parseKHCube(String[] info, Material m, Quaternion q, IntWrapper i) {
         vec3 center = new vec3(info[i.i++]);
         float size = Float.parseFloat(info[i.i++].trim());
         SDF s = new KindaHyperCube(center, size, m); s.setRotQuat(q);

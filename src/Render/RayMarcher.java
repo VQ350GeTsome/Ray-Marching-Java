@@ -3,24 +3,23 @@ package Render;
 import Util.HitInfo;
 import Vectors.vec3;
 import Util.Material;
-import java.util.stream.IntStream;
 
 public class RayMarcher {
 
-    private final Camera      camera;
-    private final Light       light;
-    private final SDFManager  sdfMgr;
+    private final Camera camera;
+    private final Light light;
+    private final SDFManager sdfMgr;
     
-    public vec3 background      = new vec3(),
-                bgSecondary     = new vec3(255.0f);
+    public vec3 background  = new vec3(),
+                bgSecondary = new vec3(255.0f);
     
-    public int   maxSteps       = 1024,
-                  maxDist       =  128,
-                  shadowSteps   =   64,
-                  fogFalloff    =    5,
-                  maxDepth      =    3;
+    public int maxSteps     = 1024,
+               maxDist      =  128,
+               shadowSteps  =   64,
+               fogFalloff   =    5,
+               maxDepth     =    3;
     
-    public float shadowAmount      = 0.66f,
+    public float shadowAmount = 0.66f,
                  skyboxLightAmount = 25.0f;
     
     public boolean seeLight = true,
@@ -104,27 +103,31 @@ public class RayMarcher {
         return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
     }
     
+    
     public vec3[][] marchScreen(int w, int h) {
-        vec3[][] image = new vec3[w][h];                                 //2D array for image of size { width , height }
+        // 2D array for image of size { width , height }
+        vec3[][] image = new vec3[w][h];                                 
         
-        IntStream.range(0, w).parallel().forEach(x -> {                     //Parellelize each x row and call the for loop for each y column
-            for (int y = 0; h > y; y++) {                                   //This works each column out in parallel
+        // Parellelize each x row and call the for loop for each y column
+        java.util.stream.IntStream.range(0, w).parallel().forEach(x -> {
+            // Calculate the colors of each pixel in the column
+            for (int y = 0; h > y; y++) {                                
+                // Normalized screen-space coordinates.
+                // Add 0.50 so we use the center of the pixel.
+                float nx = (x + 0.5f) / (float) w,
+                      ny = (y + 0.5f) / (float) h;
                 
-                float nx = (x + 0.5f) / (float) w;
-                float ny = (y + 0.5f) / (float) h;
-                vec3 pos = camera.getOrientation()[3];
-                vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
+                // Get the camera position and the direction 
+                // of the ray we will march.
+                vec3 pos = camera.getPosition(),
+                     dir = camera.getRayDirection(nx, ny, w / (float) h); 
                                 
-                /*
-                March a ray in the direction, from the camera position. If we don't hit
-                an object just set the pixels color to the background, else calculate the 
-                color at that pixel depending on the object & its material.
-                */
+                // March a ray in the direction, from the camera position. If we don't hit
+                // an object just set the pixels color to the background, else calculate the 
+                // color at that pixel depending on the object & its material.
                 HitInfo hit = marchRaySkipCam(pos, dir);                                                          
-                if (hit.sdf == null) 
-                    image[x][y] = calcBackground(dir);
-                else 
-                    image[x][y] = calcColor(hit, dir, maxDepth);
+                image[x][y] = (hit.sdf == null) ? calcBackground(dir) 
+                                                : calcColor(hit, dir, maxDepth);
             }
         });
         return image;

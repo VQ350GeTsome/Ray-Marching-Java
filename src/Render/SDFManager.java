@@ -1,5 +1,10 @@
 package Render;
 
+/**
+ * 
+ * 
+ * @author Harrison Davis
+ */
 public class SDFManager {
     
     // The internal container of SDFs.
@@ -159,14 +164,13 @@ public class SDFManager {
         // Unpack all the SDFs in s 
         unpack(s);          
     }
-    
     /**
      * Parses through a String array
      * @param String array that contains packed SDFs
      */
     private void unpack(String[] s) {
         // Create an integer referance 
-        Util.IntRef i = new Util.IntRef();
+        Util.IntWrapper i = new Util.IntWrapper();
         
         // Loop through all SDF tokens
         while (i.i < s.length) {    

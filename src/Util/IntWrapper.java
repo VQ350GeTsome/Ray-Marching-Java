@@ -6,7 +6,7 @@ package Util;
  * 
  * @author Harrison Davis
  */
-public class IntRef {
+public class IntWrapper {
     /**
      * The integer being stored / kept track of.
      */
@@ -16,10 +16,10 @@ public class IntRef {
      * 
      * @param i What to intialize the internal integer at.
      */
-    public IntRef(int i) { this.i = i; }
+    public IntWrapper(int i) { this.i = i; }
     /**
      * Default constructor. The internal integer will
      * be set to 0.
      */
-    public IntRef() { this.i = 0; }
+    public IntWrapper() { this.i = 0; }
 }

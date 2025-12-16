@@ -1,22 +1,33 @@
 package Render;
 
-import Vectors.vec3;
-
+/**
+ * Camera object class. Stores it's forward, up, & right vectors,
+ * its position, the yaw & pitch, & finally the field of view.
+ * 
+ * This Camera is mainly used to calculate a ray direction given 
+ * its fields, and ray position given its position.
+ * 
+ * @author Harrison Davis
+ */
 public class Camera extends SDFs.SDF {
     
-    private static final float DEG_TO_RAD = (float)(Math.PI / 180.0),
-                               RAD_TO_DEG = (float)(180.0 / Math.PI);
+    private static final float DEG_TO_RAD = (float) (Math.PI / 180.0),
+                               RAD_TO_DEG = (float) (180.0 / Math.PI);
 
-    private vec3    pos,
-                    forward,
-                    up,
-                    right;
-    private final vec3 worldUp = new vec3(0.0f, 0.0f, 1.0f);
+    // Position vector & camera axes ( the basic vectors ) .
+    private Vectors.vec3 pos,
+                         forward,
+                         up,
+                         right;
     
+    // World up vector.
+    private final Vectors.vec3 worldUp = new Vectors.vec3(0.0f, 0.0f, 1.0f);
+    
+    // Camera ( or viewing ) parameters.
     private float   yaw,
                     pitch,
                     fov,
-                    tanOfHalfFov;   //Storing this saves some computing power ...
+                    tanOfHalfFov;
     
     /**
      * Camera constructor. It takes in some general information about
@@ -27,7 +38,7 @@ public class Camera extends SDFs.SDF {
      * @param up The up vector of the camera
      * @param fov The field of view
      */
-    public Camera(vec3 pos, vec3 target, vec3 up, int fov) {
+    public Camera(Vectors.vec3 pos, Vectors.vec3 target, Vectors.vec3 up, int fov) {
         this.pos = pos;
         forward =   target
                     .subtract( pos )
@@ -49,9 +60,63 @@ public class Camera extends SDFs.SDF {
         this.fov = (float)(fov * DEG_TO_RAD);       //Store FOV in radians
         tanOfHalfFov = (float)Math.tan(this.fov / 2.0);
         
-        m = new Util.Material(new vec3(200.0f));
+        m = new Util.Material(new Vectors.vec3(200.0f));
         type = "camera";
     }
+    
+    /**
+     * Uses normalized screen-space coordinates, along with the fields of 
+     * this {@link Camera} to calculate the direction of the ray.
+     * 
+     * @param x x coordinate on the screen-space.
+     * @param y y coordinate on the screen-space.
+     * @param aspectRatio width of canvas divided by the height.
+     * @return A normalized vector that is the direction we will march.
+     */
+    public Vectors.vec3 getRayDirection(float x, float y, float aspectRatio) {
+        float px = (float)((2.0f * x - 1.0f) * tanOfHalfFov * aspectRatio),
+              py = (float)((1.0f - 2.0f * y) * tanOfHalfFov);
+        return  right.scale(px)
+                .add(up.scale(py))
+                .add(forward)
+                .normalize();
+    }
+    
+    /**
+     * Moves the camera by some movement vector.
+     * 
+     * @param movement The movement vector.
+     */
+    public void move(Vectors.vec3 movement) {
+        // Add movement vector.
+        this.pos = this.pos.add(movement);
+    }
+    /**
+     * Rotates this {@link Camera} horizontally and / or vertically.
+     * 
+     * @param yawDelta Horizontal rotation.
+     * @param pitchDelta Vertical rotation.
+     */
+    public void rotate(float yawDelta, float pitchDelta) {
+        forward = rotateAroundAxis(forward, right, pitchDelta);
+        forward = rotateAroundAxis(forward, worldUp, yawDelta);
+        forward = forward.normalize();
+        right = forward.cross(worldUp).normalize();
+        up = right.cross(forward).normalize();
+    }
+    /**
+     * Zooms this {@link Camera} in or out by some percent.
+     * 
+     * @param zoomDeltaPercent The change in zoom in percent.
+     */
+    public void zoom(float zoomDeltaPercent) { 
+        // Calculate the new field of view, cap it so it's
+        // below 3.13 ( pi ), then update it.
+        float newFov = fov * (1 + zoomDeltaPercent);
+        newFov = (newFov > 3.13f) ? 3.13f : newFov;     
+        updateFov(newFov); 
+    }
+    
     /**
      * Updates FOV. Takes in FOV in radians, calculates
      * the tangent of half of FOV, and stores both.
@@ -61,35 +126,7 @@ public class Camera extends SDFs.SDF {
         this.fov = fov;
         tanOfHalfFov = (float)Math.tan(this.fov / 2.0);
     }
-    /**
-     * Uses the arguments to calculate the direction of the ray to cast.
-     * @param x x coord on the canvas.
-     * @param y y coord on the canvas.
-     * @param aspectRatio width of canvas divided by the height.
-     * @return A normalized vector that is the direction we will march.
-     */
-    public vec3 getRayDirection(float x, float y, float aspectRatio) {
-        float px = (float)((2.0f * x - 1.0f) * tanOfHalfFov * aspectRatio);
-        float py = (float)((1.0f - 2.0f * y) * tanOfHalfFov);
-        return  right.scale( px )
-                .add ( up.scale( py ) )
-                .add ( forward )
-                .normalize();
-    }
-    
-    public void move(vec3 m) {
-        pos =   pos
-                .add(m);    //Move camera
-    }
-    public void rotate(float yawDelta, float pitchDelta) {
-        forward = rotateAroundAxis(forward, right, pitchDelta);
-        forward = rotateAroundAxis(forward, worldUp, yawDelta);
-        forward = forward.normalize();
-        right = forward.cross(worldUp).normalize();
-        up = right.cross(forward).normalize();
-    }
-    
-    private vec3 rotateAroundAxis(vec3 v, vec3 axis, float angleDeg) {
+    private Vectors.vec3 rotateAroundAxis(Vectors.vec3 v, Vectors.vec3 axis, float angleDeg) {
         float angleRad = angleDeg * DEG_TO_RAD;
         float cos = (float)Math.cos(angleRad);
         float sin = (float)Math.sin(angleRad);
@@ -97,24 +134,22 @@ public class Camera extends SDFs.SDF {
                 .add(axis.cross(v).scale(sin))
                 .add(axis.scale(axis.dot(v) * (1 - cos)));
     }
-    public void zoom(float zoom) { 
-        float newFov = fov * (1 + zoom);
-        newFov = (newFov > 3.13f) ? 3.13f : newFov;     //Cap it so it cannot go above pi, which is 180 degrees ... remember
-        updateFov(newFov); 
-    }
+    
     
     /**
-     * Packages the forward, up, right vectors into an array
+     * Packages the basic vectors into an array 
+     * and returns it.
+     * 
      * @return The array of size 3
      */
-    public vec3[] getOrientation() {
-        vec3[] arr = new vec3[4];
+    public Vectors.vec3[] getOrientation() {
+        Vectors.vec3[] arr = new Vectors.vec3[3];
         arr[0] = forward;
         arr[1] = right;
         arr[2] = up;
-        arr[3] = pos;
         return arr;
     }
+    public Vectors.vec3 getPosition() { return pos; }
     
     public String packageCamera() {
         return  pos.toString()      + "," +
@@ -126,21 +161,19 @@ public class Camera extends SDFs.SDF {
                          
     }
     public void unpackageCamera(String[] parts) {
-        pos     = new vec3(parts[0]);
-        forward = new vec3(parts[1]);
-        up      = new vec3(parts[2]);
-        right   = new vec3(parts[3]);
+        pos     = new Vectors.vec3(parts[0]);
+        forward = new Vectors.vec3(parts[1]);
+        up      = new Vectors.vec3(parts[2]);
+        right   = new Vectors.vec3(parts[3]);
         yaw     = Float.parseFloat(parts[4]);
         pitch   = Float.parseFloat(parts[5]);
         updateFov((float) Double.parseDouble(parts[6]));
     }
     
-    private SDFs.Primitives.Cube body = new SDFs.Primitives.Cube(new vec3(0.0f), 0.1f, m);
+    private SDFs.Primitives.Cube body = new SDFs.Primitives.Cube(new Vectors.vec3(0.0f), 0.1f, m);
     
     @Override 
-    public float sdf(vec3 p) {
-        return body.sdf(p.subtract(pos));
-    }
+    public float sdf(Vectors.vec3 p) { return body.sdf(p.subtract(pos)); }
     
     @Override
     public boolean parseNewParams(String[] p) { return false; }
