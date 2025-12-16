@@ -30,7 +30,10 @@ public class Sphere extends SDFs.SDF{
             c = new vec3(inputs[0].trim());
             r = Float.parseFloat(inputs[1].trim());
             return true;
-        } catch (Exception e) { return false; }
+        } catch (Exception e) { 
+            System.out.println(e.getMessage());
+            return false; 
+        }
     }
     
     @Override

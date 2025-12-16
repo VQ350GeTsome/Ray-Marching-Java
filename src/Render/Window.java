@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 
 public class Window extends javax.swing.JFrame {
        
-    //Input constants
+    // Input constants
     private final int   SPACE_BAR     =   32, LEFT_ARROW    =   37, UP_ARROW      =   38, RIGHT_ARROW   =   39,
                         DOWN_ARROW    =   40, LEFT_CLICK    =    1, MIDDLE_CLICK  =    2, RIGHT_CLICK   =    3,
                         W_KEY         =   87, A_KEY         =   65, S_KEY         =   83, D_KEY         =   68,
@@ -202,10 +202,10 @@ public class Window extends javax.swing.JFrame {
         
         javax.swing.JPopupMenu popup = null;
         if (clickedObj == null) popup = nothingClicked();
-        else popup = objectClicked(clickedObj, info);
+        else popup = this.objectClicked(clickedObj, info);
             
-        int nw = core.getWidth(),
-            nh = core.getHeight(),
+        int nw = this.core.getWidth(),
+            nh = this.core.getHeight(),
             nx = (int) Math.round((x + 0.5f) * (nw / (float) w)),
             ny = (int) Math.round((y + 0.5f) * (nh / (float) h));
 
@@ -236,38 +236,38 @@ public class Window extends javax.swing.JFrame {
 
         JMenuItem delete = new JMenuItem("Delete");     //Define a menu item    
         delete.addActionListener(evt -> {               //Add an event on click
-            deleteClicked(clickedObj, info.hit);
+            this.deleteClicked(clickedObj, info.hit);
         });
         popup.add(delete);                              //Add the menu item to the popup menu
         
         JMenuItem color = new JMenuItem("Change Color");
         color.addActionListener(evt -> {
-            colorClicked(clickedObj, info.hit);
+            this.colorClicked(clickedObj, info.hit);
         });
         popup.add(color);
         
         JMenuItem matEdit = new JMenuItem("Edit Material");
         matEdit.addActionListener(evt -> {
-            matEditClicked(clickedObj, info.hit);
+            this.matEditClicked(clickedObj, info.hit);
         });
         popup.add(matEdit);
         
         JMenuItem edit = new JMenuItem("Edit Properties");
         edit.addActionListener(evt -> {
-            regEditClicked(clickedObj, info.hit, true);
+            this.regEditClicked(clickedObj, info.hit, true);
         });
         popup.add(edit);
         
         JMenuItem rotate = new JMenuItem("Edit Rotation");
         rotate.addActionListener(evt -> {
-            rotateClicked(clickedObj, info.hit);
+            this.rotateClicked(clickedObj, info.hit);
         });
         popup.add(rotate);
         
         if (clickedObj instanceof SDFs.BlendedSDF) {
             JMenuItem blendedEdit = new JMenuItem("Edit Blended Properties");
             blendedEdit.addActionListener(evt -> {
-                regEditClicked(clickedObj, info.hit, false);
+                this.regEditClicked(clickedObj, info.hit, false);
             });
             popup.add(blendedEdit);
         }
@@ -275,6 +275,8 @@ public class Window extends javax.swing.JFrame {
         return popup;
     }
     private void deleteClicked(SDFs.SDF obj, vec3 hit) {
+        // Keep track if the object is blended.
+        // If it is we need to keep track of the parent.
         boolean blended = false;                        //This will keep track if our object is blended
         SDFs.SDF parent = null;                         //This will keep track of the parent incase it's blended
         
@@ -292,25 +294,22 @@ public class Window extends javax.swing.JFrame {
             JOptionPane.QUESTION_MESSAGE
         );
         
-        if (confirm != JOptionPane.YES_OPTION) return;  //If confirm wasn't pressed just return
+        // Return if unconfirmed.
+        if (confirm != JOptionPane.YES_OPTION) return;  
         
+        // If the object isn't blended we can just inform the scene.
+        // Else we need to inform the parent instead.
         if (!blended) core.scene.removeSDF(obj);
         else ((BlendedSDF) parent).remove(obj);
         
     }
     private void colorClicked(SDFs.SDF obj, vec3 hit) {
-        int choice = createButtonsPane("Base Color or Highlight Color ?", new String[] { "Base", "Highlight" }, 1 );
-        if (choice == -1) return;
-        boolean baseColor = choice == 0;
-        
+        // If the object is blended get the closest child.
         if (obj instanceof SDFs.BlendedSDF) obj = ((SDFs.BlendedSDF) obj).getClosest(hit);
         
-        //Prompts the user with a color chooser with a random color to start
-        java.awt.Color color = getColor();
-        if (color == null) return;
-        
-        if (baseColor) obj.setColor(new vec3(color));
-        else obj.setHighlightColor(new vec3(color));
+        // Prompt the user for either base or highlight color
+        // as well as what color.
+        promptChangeColor(obj);
     }
     private void matEditClicked(SDFs.SDF obj, vec3 hit) {
         SDFs.SDF parent = null;
@@ -359,7 +358,6 @@ public class Window extends javax.swing.JFrame {
         //Set the clicked on objects material to it
         if (blended) ((SDFs.BlendedSDF) parent).setMaterial(obj, m);
         else obj.setMaterial(m);
-        
     }
     private void regEditClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
         boolean blended = false;                        //This will keep track if our object is blended
@@ -415,8 +413,65 @@ public class Window extends javax.swing.JFrame {
     
     private void generalEditSDF(SDFs.SDF sdf) {
         // Make a list that'll be later turnt into an array
-        // to be used to create a buttno
+        // to be used to create a button panel.
         java.util.List<String> choices = new java.util.ArrayList<>();
+
+        // Get the sdf specific options, & the current settings.
+        String[] options = sdf.getSettingsAndCurrent(),
+                 current = Util.ArrayMath.subArray(options, options.length / 2, options.length);
+        options = Util.ArrayMath.subArray(options, 0, options.length / 2);
+        
+        // Add the sdf specific options to the choices list.
+        for (String s : options) {
+            String trim = s.trim();
+            trim = trim.substring(0, trim.length() - 1);
+            choices.add(trim);
+        }
+        
+        // Univeral options
+        choices.add("Color");       final int COLOR = 0;
+        choices.add("Name");        final int NAME = 1;    
+        choices.add("Material");    final int MATERIAL = 2;
+        choices.add("Delete");      final int DELETE = 3;
+        
+        // If it's a blended SDF we will add the option to view the children.
+        if (sdf instanceof SDFs.BlendedSDF) choices.add("View Children");
+        
+        // Prompt the user & check input.
+        int input = this.createButtonsPane("Select an Option ...", choices.toArray(String[]::new), 1);
+        if (input == -1) return;
+        
+        // If the input is within the SDF specific options parse it as such.
+        // Else parse it as a special or univeral option.
+        if (input < current.length) {
+            // Prompt the user for a new parameter.
+            String[] option = new String[] { choices.get(input) };
+            String[] currentArg = new String[] { current[input] };
+            String newParam = createInputsPane("New Parameter: ", option, currentArg, 1)[0];
+            
+            // If nothing was inputted return.
+            if (newParam == null) return;
+            
+            // Pass new parameter into the sdf.
+            current[input] = newParam.trim();
+            sdf.parseNewParams(current);
+        } else {
+            // Adjust the input.
+            input -= current.length;
+            switch (input) {
+                case COLOR:
+                    this.promptChangeColor(sdf);
+                    break;
+                case NAME:
+                    this.promptChangeName(sdf);
+                    break;
+                case MATERIAL:
+                    this.promptChangeMaterial(sdf);
+                    break;
+                case DELETE:
+                    this.promptDelete(sdf);
+            }
+        }
     }
     
     private void addSDF(int type) {
@@ -479,6 +534,33 @@ public class Window extends javax.swing.JFrame {
     private java.awt.Color getColor(java.awt.Color defaultArg) {
         java.awt.Color color = JColorChooser.showDialog(rootPane, "Choose a Color: ", defaultArg);
         return color;
+    }
+    
+    private void promptChangeColor(SDFs.SDF obj) {
+        int choice = createButtonsPane("Base Color or Highlight Color ?", new String[] { "Base", "Highlight" }, 1 );
+        if (choice == -1) return;
+        boolean baseColor = choice == 0;
+        
+        // Prompts the user with a color chooser with a random color to start
+        java.awt.Color color = getColor();
+        if (color == null) return;
+        
+        if (baseColor) obj.setColor(new vec3(color));
+        else obj.setHighlightColor(new vec3(color));
+    }
+    private void promptChangeName(SDFs.SDF obj) {
+        String name = obj.getName();
+        if (name == null) name = obj.getType();
+        String newName = this.createInputsPane(
+                "Enter a New Name...", new String[] { "Enter New Name: " }, new String[] { name }, 1
+        )[0];
+        obj.setName(newName);
+    }
+    private void promptChangeMaterial(SDFs.SDF obj) {
+        
+    }
+    private void promptDelete(SDFs.SDF obj) {
+        
     }
     
     private void changeBG() {
