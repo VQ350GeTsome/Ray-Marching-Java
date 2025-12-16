@@ -320,44 +320,14 @@ public class Window extends javax.swing.JFrame {
             blended = true;
         }
         
-        Util.Material objMat = obj.getMaterial(hit);
+        Util.Material defaultArgs = obj.getMaterial(hit),
+                      newMaterial = this.getMaterial(defaultArgs);
         
-        String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
-                                            "Metalness: ", "Opacity: ", "IOR: ", "Texture: ", "Textureness: " };
-        String[] defaults = ArrayMath.subArray(objMat.toStringArray(), 2, Material.FIELDS); //Use subarray to not include the first two colors
-        String[] inputs = createInputsPane
-            (   
-                    "Enter New Material Settings For " 
-                    + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " ... ",
-                    settings, defaults, 1
-            );
-        
-        if (inputs == null) return; 
-        
-        //Parse the new material settings into a NEW material obj
-        Util.Material m = new Util.Material();
-        m.color         = objMat.color;
-        m.specularColor = objMat.specularColor;
-        try {
-            int i = 0;
-            m.reflectivity  = Float.parseFloat(inputs[i++].trim());
-            m.specular      = Float.parseFloat(inputs[i++].trim());
-            m.shinyness     = Float.parseFloat(inputs[i++].trim());
-            m.roughness     = Float.parseFloat(inputs[i++].trim());
-            m.metalness     = Float.parseFloat(inputs[i++].trim());
-            m.opacity       = Float.parseFloat(inputs[i++].trim());
-            m.ior           = Float.parseFloat(inputs[i++].trim()); 
-            m.texture       = Float.parseFloat(inputs[i++].trim()); 
-            m.textureness   = Float.parseFloat(inputs[i++].trim()); 
-        } catch (NumberFormatException e) {
-            System.err.println("Error Parsing New Material ...");
-            System.err.println(e.getMessage());
-            return;
-        }
+        // If the new material is null return.
+        if (newMaterial == null) return;
          
-        //Set the clicked on objects material to it
-        if (blended) ((SDFs.BlendedSDF) parent).setMaterial(obj, m);
-        else obj.setMaterial(m);
+        if (blended) ((SDFs.BlendedSDF) parent).setMaterial(obj, newMaterial);
+        else obj.setMaterial(newMaterial);
     }
     private void regEditClicked(SDFs.SDF obj, vec3 hit, boolean isolateChild) {
         boolean blended = false;                        //This will keep track if our object is blended
@@ -534,6 +504,37 @@ public class Window extends javax.swing.JFrame {
     private java.awt.Color getColor(java.awt.Color defaultArg) {
         java.awt.Color color = JColorChooser.showDialog(rootPane, "Choose a Color: ", defaultArg);
         return color;
+    }
+    private Util.Material getMaterial(Util.Material defaultArgs) {
+        String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
+                                            "Metalness: ", "Opacity: ", "IOR: ", "Texture: ", "Textureness: " };
+        String[] defaults = ArrayMath.subArray(defaultArgs.toStringArray(), 2, Material.FIELDS); //Use subarray to not include the first two colors
+        String[] inputs = createInputsPane("Enter New Material Settings: ", settings, defaults, 1);
+        
+        // If no input / user exit return null.
+        if (inputs == null) return null; 
+        
+        // Parse the new material settings into a NEW material obj
+        Util.Material newMaterial = new Util.Material();
+        newMaterial.color         = defaultArgs.color;
+        newMaterial.specularColor = defaultArgs.specularColor;
+        try {
+            int i = 0;
+            newMaterial.reflectivity  = Float.parseFloat(inputs[i++].trim());
+            newMaterial.specular      = Float.parseFloat(inputs[i++].trim());
+            newMaterial.shinyness     = Float.parseFloat(inputs[i++].trim());
+            newMaterial.roughness     = Float.parseFloat(inputs[i++].trim());
+            newMaterial.metalness     = Float.parseFloat(inputs[i++].trim());
+            newMaterial.opacity       = Float.parseFloat(inputs[i++].trim());
+            newMaterial.ior           = Float.parseFloat(inputs[i++].trim()); 
+            newMaterial.texture       = Float.parseFloat(inputs[i++].trim()); 
+            newMaterial.textureness   = Float.parseFloat(inputs[i++].trim()); 
+        } catch (NumberFormatException e) {
+            System.err.println("Error Parsing New Material ...");
+            System.err.println(e.getMessage());
+            return null;
+        }
+        return newMaterial;
     }
     
     private void promptChangeColor(SDFs.SDF obj) {
