@@ -275,17 +275,16 @@ public class Window extends javax.swing.JFrame {
         return popup;
     }
     private void deleteClicked(SDFs.SDF obj, vec3 hit) {
-        // Keep track if the object is blended.
-        // If it is we need to keep track of the parent.
-        boolean blended = false;                        //This will keep track if our object is blended
-        SDFs.SDF parent = null;                         //This will keep track of the parent incase it's blended
+        // This will keep track of the parent if the object is blended.
+        SDFs.SDF parent = null;               
         
-        if (obj instanceof SDFs.BlendedSDF) {           //If the object we clicked is a blended object
-            parent = obj;                               //Save the parent
-            obj = ((BlendedSDF) obj).getClosest(hit);   //Gets the child that we clicked in the blended group
-            blended = true;
+        // If the object is blended get the closest child.
+        if (obj instanceof SDFs.BlendedSDF) {          
+            parent = obj;                           
+            obj = ((BlendedSDF) obj).getClosest(hit);   
         }
         
+        // Get user confirmation.
         int confirm = JOptionPane.showConfirmDialog(
             null,
             "Are you sure you want " + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " to be deleted?",
@@ -297,9 +296,10 @@ public class Window extends javax.swing.JFrame {
         // Return if unconfirmed.
         if (confirm != JOptionPane.YES_OPTION) return;  
         
-        // If the object isn't blended we can just inform the scene.
-        // Else we need to inform the parent instead.
-        if (!blended) core.scene.removeSDF(obj);
+        // If the parent is null ( the object isn't blended ) 
+        // we can just inform the scene. Else we need to
+        // inform the parent instead.
+        if (parent == null) core.scene.removeSDF(obj);
         else ((BlendedSDF) parent).remove(obj);
         
     }
@@ -623,7 +623,19 @@ public class Window extends javax.swing.JFrame {
         obj.setMaterial(newMaterial);
     }
     private void promptDelete(SDFs.SDF obj) {
+        // Confirmation
+        int confirm = JOptionPane.showConfirmDialog(
+            null,
+            "Are you sure you want " + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " to be deleted?",
+            "Confirmation",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
         
+        // Return if unconfirmed.
+        if (confirm != JOptionPane.YES_OPTION) return; 
+        
+        core.scene.removeSDF(obj);
     }
     
     private void changeBG() {

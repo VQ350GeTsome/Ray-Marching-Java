@@ -1,11 +1,11 @@
 package SDFs;
 
-import Vectors.vec3;
-import Util.Material;
-
 public class BlendedSDF extends SDF {
     
+    // Our two children
     private SDF a, b;
+    
+    // The blending factor.
     private float k;
     
     public BlendedSDF(SDF a, SDF b, float k) {
@@ -15,7 +15,7 @@ public class BlendedSDF extends SDF {
     }
 
     @Override
-    public float sdf(vec3 p) {      
+    public float sdf(Vectors.vec3 p) {      
         if (a == null) return b.sdf(p);
         if (b == null) return a.sdf(p);
         
@@ -26,7 +26,7 @@ public class BlendedSDF extends SDF {
     }
     
     @Override
-    public Material getMaterial(vec3 p) {
+    public Util.Material getMaterial(Vectors.vec3 p) {
         if (a == null) return b.m;
         if (b == null) return a.m;
         
@@ -39,9 +39,9 @@ public class BlendedSDF extends SDF {
         //System.out.println("Dist of A: " + da + "\tDist of B: " + db + "\tCalculated H: " + h);
         
         //a & b's materials
-        Material aMat = a.getMaterial(p), bMat = b.getMaterial(p);
+        Util.Material aMat = a.getMaterial(p), bMat = b.getMaterial(p);
 
-        Material blendMat = aMat.blend(bMat, h);
+        Util.Material blendMat = aMat.blend(bMat, h);
         //System.out.println("Calculated H: " + h + "\tReflectivity: " + blendMat.reflectivity);
         return blendMat;
     }
@@ -49,7 +49,7 @@ public class BlendedSDF extends SDF {
     public float getK() { return k; }
     public void  setK(float k) { this.k = k; }
     
-    public SDF getClosest(vec3 p) {
+    public SDF getClosest(Vectors.vec3 p) {
         if (a == null) return b;
         if (b == null) return a;
         
@@ -60,17 +60,20 @@ public class BlendedSDF extends SDF {
         return closest;                                     //Return the closest one
     }
     
-    public void remove(SDF c) {
-        //If the child, c, we're trying to remove is a child
-        //of this, set it to null, removing it.
-             if (a == c) a = null;  
-        else if (b == c) b = null;
+    public boolean remove(SDF c) {
+        // If the child ( c ) we're trying to remove is a child
+        // of this, set it to null, removing it.
+             if (a == c) { a = null; return true; } 
+        else if (b == c) { b = null; return true; }
         
-        //If the child isn't a child of this, see if any of our
-        //children are blended themselves, ( meaning they themselves
-        //have children ), and if so remove it.
-        else if (a instanceof BlendedSDF) ((BlendedSDF) a).remove(c);      
-        else if (b instanceof BlendedSDF) ((BlendedSDF) b).remove(c);
+        // If the child isn't a child of this, see if any of our
+        // children are blended themselves, ( meaning they themselves
+        // have children ), and if so remove it.
+        else if (a instanceof BlendedSDF ab) ab.remove(c);
+        else if (b instanceof BlendedSDF bb) bb.remove(c);
+             
+        // If no child is found return false.
+        return false;
     }
     /**
      * If there is an empty child
@@ -110,7 +113,7 @@ public class BlendedSDF extends SDF {
      */
     public boolean needsUnblended() { return (a == null || b == null); }
     
-    public void setMaterial(SDF c, Material m) {
+    public void setMaterial(SDF c, Util.Material m) {
         //Just like remove() & editChild() use a recursive method to
         //search all our children & grandchildren and so on.
              if (a == c) a.setMaterial(m);

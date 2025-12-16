@@ -23,7 +23,13 @@ public class SDFManager implements Iterable<SDFs.SDF> {
      * @param sdf The SDF to remove.
      * @return If the operation was completed.
      */
-    public boolean removeSDF(SDFs.SDF sdf)   { return sdfs.remove(sdf); }
+    public boolean removeSDF(SDFs.SDF sdf)   { 
+        if (!sdfs.remove(sdf)) {
+            for (SDFs.SDF s : sdfs) if (s instanceof SDFs.BlendedSDF b) 
+                if (b.remove(sdf)) return true;
+        }
+        return false;
+    }
     /**
      * Replaces an SDF. 
      * 
