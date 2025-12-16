@@ -62,7 +62,7 @@ public class RayMarcher {
             //If the distance is less than our epsilon, or we go past our max distance,
             //increment the hit position & total distance, get the SDF at the hit pos,
             //if any, and return all that in a HitInfo object.
-            if (distance < Core.getEps() || totalDistance > maxDist) {
+            if (distance < Core.EPS || totalDistance > maxDist) {
                 vec3 hitPos = pos.add(dir.scale(distance));
                 totalDistance += distance;
                 return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(hitPos));
@@ -80,7 +80,7 @@ public class RayMarcher {
         float totalDist = 0.0f;
         for (int i = 0; maxSteps > i && maxDist > totalDist; i++) {
             float d = sdfMgr.getClosestSDFDist(pos); //Get the nearest surface
-            if (d > Core.getEps()) break;
+            if (d > Core.EPS) break;
             pos = pos.add(dir.scale(-d));
             totalDist += -d;
         }
@@ -91,7 +91,7 @@ public class RayMarcher {
         float totalDistance = 0.0f;
         for (int step = 0; step < maxSteps; step++) {
             float distance = sdfMgr.getClosestSDFDistSkipCam(pos);        
-            if (distance < Core.getEps() || totalDistance > maxDist) {
+            if (distance < Core.EPS || totalDistance > maxDist) {
                 vec3 hitPos = pos.add(dir.scale(distance));
                 totalDistance += distance;
                 return new HitInfo(hitPos, totalDistance, sdfMgr.getSDFAtPos(hitPos));
@@ -185,14 +185,14 @@ public class RayMarcher {
         vec3 refractDirIn = refract(inDir, norm, 1.0f, mat.ior);
         if (refractDirIn == null) return reflect(entryHit, norm, inDir, depth - 1);
 
-        vec3 surface = entryHit.hit.add(norm.scale(-Core.getEps()));
+        vec3 surface = entryHit.hit.add(norm.scale(-Core.EPS));
         HitInfo exitHit = marchThrough(surface, refractDirIn);
         
         if (exitHit.sdf == null) return calcBackground(refractDirIn);
         
         vec3 exitNorm = estimateNormal(exitHit);
         
-        vec3 surfaceExitPos = exitHit.hit.add(exitNorm.scale(Core.getEps()*2.0f));
+        vec3 surfaceExitPos = exitHit.hit.add(exitNorm.scale(Core.EPS*2.0f));
  
         vec3 refractDirExit = refract(refractDirIn.negate(), exitNorm, mat.ior, 1.0f);
         if (refractDirExit == null) {
@@ -228,7 +228,7 @@ public class RayMarcher {
             reflectDir = reflectDir.add(randomHemisphere(norm, hit.hit).scale(customClamp(hit.mat.roughness, 2))).normalize();
 
         //Start the ray a little off the surface
-        vec3 origin = hit.hit.add(norm.scale(Core.getEps() * 2.0f));
+        vec3 origin = hit.hit.add(norm.scale(Core.EPS * 2.0f));
 
         //March that reflected ray
         HitInfo reflectHit = marchRay(origin, reflectDir);
@@ -257,7 +257,7 @@ public class RayMarcher {
             vec3 pos = orgin.add(lightDir.scale(t));
             float minDist = sdfMgr.getClosestSDFDist(pos);
             
-            if (minDist < Core.getEps()) {                      //If we hit an object.
+            if (minDist < Core.EPS) {                      //If we hit an object.
                 HitInfo info = sdfMgr.getNearestSDFAtPos(pos);  //Get the obj we hit.
                 float objOpac = info.mat.opacity;               //As well as its opacity.
                 
@@ -265,9 +265,9 @@ public class RayMarcher {
                 
                 accumOpac *= objOpac;
                 
-                HitInfo mt = marchThrough(pos.add(lightDir.scale(Core.getEps() * 2.0f)), lightDir);
+                HitInfo mt = marchThrough(pos.add(lightDir.scale(Core.EPS * 2.0f)), lightDir);
                 orgin = mt.hit;
-                orgin = orgin.add(lightDir.scale(Core.getEps() * 2.0f));
+                orgin = orgin.add(lightDir.scale(Core.EPS * 2.0f));
                 t += mt.totalDist;
             }
             lighting = Math.min(lighting, softness * minDist / t);
@@ -313,7 +313,7 @@ public class RayMarcher {
      * @return      A normalized vec3 that it about the normal
      */
     private vec3 estimateNormal(HitInfo i) {
-        float e = Core.getEps();
+        float e = Core.EPS;
         float x = i.sdf.sdf(i.hit.add(new vec3(e, 0.0f, 0.0f))) - i.sdf.sdf(i.hit.subtract(new vec3(e, 0.0f, 0.0f)));
         float y = i.sdf.sdf(i.hit.add(new vec3(0.0f, e, 0.0f))) - i.sdf.sdf(i.hit.subtract(new vec3(0.0f, e, 0.0f)));
         float z = i.sdf.sdf(i.hit.add(new vec3(0.0f, 0.0f, e))) - i.sdf.sdf(i.hit.subtract(new vec3(0.0f, 0.0f, e)));

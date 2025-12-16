@@ -12,14 +12,15 @@ public class Scene {
     private final SDFManager  sdfManager;
     private final Camera      camera 
 		= new Camera(
-	  new vec3(-4.0f,  3.0f,  1.0f),        //Position in space
-	  new vec3( 0.0f,  0.0f, -0.8f),        //Where it is pointing
-          new vec3( 0.0f,  0.0f,  1.0f),        //Up vector
-          90                                    //Field of view
+	  new vec3(-4.0f,  3.0f,  1.0f),        // Position in space
+	  new vec3( 0.0f,  0.0f, -0.8f),        // Where it is pointing
+          new vec3( 0.0f,  0.0f,  1.0f),        // Up vector
+          90                                    // Field of view
 	  );
     private final RayMarcher  raymchr;
     
-    private int w, h; //Width & height
+    // Width & height
+    private int w, h; 
     
     public Scene(int width, int height) {
         light = new Light();                                    //Instatiate a new light
@@ -36,20 +37,23 @@ public class Scene {
     
     public void collectGarbageSDFs() { sdfManager.garbageCollector(); }
     
-    //Light object abstraction
+    //<editor-fold defaultstate="collapsed" desc=" Light Abstraction ">
     public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
     public vec3 getSceneLighting()              { return light.getSceneLighting(); }
     public void setLightColor(vec3 l)           { light.setLightColor(l); }
     public vec3 getLightColor()                 { return light.getLightColor(); }
     public void  setAmbientLighting(float k)    { light.setAmbientLight(k); }
     public float getAmbientLighting()           { return light.getAmbientLight(); }  
+    //</editor-fold>
     
-    //SDF Manager abstraction
+    //<editor-fold defaultstate="collapsed" desc=" SDF Manager Abstraction ">
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
     public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
+    public java.util.ArrayList<SDFs.SDF> getSDFsList() { return sdfManager.getSDFsCopy(); }
+    //</editor-fold>
     
-    //Camera abstraction
+    //<editor-fold defaultstate="collapsed" desc=" Camera Abstraction ">
     public void moveCamera(vec3 m)              { camera.move(m); }
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
     public void zoomCamera(float z)             { camera.zoom(z); }
@@ -61,8 +65,9 @@ public class Scene {
         if (add) sdfManager.addSDF(camera);
         else sdfManager.removeSDF(camera);
     }
+    //</editor-fold>
     
-    //Ray marcher abstraction
+    //<editor-fold defaultstate="collapsed" desc=" Ray Marcher Abstraction ">
     public HitInfo marchRay(int x, int y, int w, int h) { 
         float nx = (x + 0.5f) / (float) w;
         float ny = (y + 0.5f) / (float) h;
@@ -90,8 +95,9 @@ public class Scene {
     
     public float getSkyboxLightAmount()        { return raymchr.skyboxLightAmount; }
     public void  setSkyboxLightAmount(float f) { raymchr.skyboxLightAmount = f; }
+    //</editor-fold>
     
-    //Packager & unpackager
+    //<editor-fold defaultstate="collapsed" desc=" Package / Unpackage ">
     public String packageScene() {
         return  camera.packageCamera() +
                 raymchr.packRayMarcher() +
@@ -129,4 +135,5 @@ public class Scene {
         String[] sdfs = java.util.Arrays.copyOfRange(parts, 24, parts.length);
         sdfManager.unpackSDFs(sdfs);
     }
+    //</editor-fold>
 }

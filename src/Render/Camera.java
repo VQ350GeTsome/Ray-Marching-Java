@@ -149,6 +149,11 @@ public class Camera extends SDFs.SDF {
         arr[2] = up;
         return arr;
     }
+    /**
+     * Gets and returns the current position of 
+     * this {@link Camera}.
+     * @return The current vector position.
+     */
     public Vectors.vec3 getPosition() { return pos; }
     
     public String packageCamera() {
@@ -170,6 +175,7 @@ public class Camera extends SDFs.SDF {
         updateFov((float) Double.parseDouble(parts[6]));
     }
     
+    // SDFs for the camera.
     private SDFs.Primitives.Cube body = new SDFs.Primitives.Cube(new Vectors.vec3(0.0f), 0.1f, m);
     
     @Override 

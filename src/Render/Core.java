@@ -2,45 +2,38 @@ package Render;
 
 import Util.*;
 import SDFs.Primitives.*;
-import SDFs.Special.*;
 import SDFs.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import Vectors.vec3;
 
-public class Core extends JPanel {
+public class Core extends javax.swing.JPanel {
 
-    private static float eps = 1e-4f;
-    public static float getEps() { return eps; }
+    public static final float EPS = 1e-4f;
     
     public static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
     
     public boolean bloom = true;
     
-    private BufferedImage screen;               //What we will use as the screen
+    private java.awt.image.BufferedImage screen;               //What we will use as the screen
     private int width = 150, height = width;    //screens dimensions
     
     public Scene scene;
-    public Timer timer;
+    public javax.swing.Timer timer;
     
     public Core() {
-        imageSizer();                           //Size & initialize screen
-        scene = new Scene(width, height);       //Initialize scene
+        // Initalize screen / image and the scene.
+        this.imageSizer();                          
+        scene = new Scene(width, height);
         
-        //Default lighting
-        scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));  //Set the lighting
-        scene.setAmbientLighting(0.05f);                        //Set the ambient lighting 
+        // Default lighting
+        scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));
+        scene.setAmbientLighting(0.05f);                      
         
-        //Default SDFs
+        // Default SDFs
         addDefaultSDFs();
         
-        PostProcessor.setWidthHeight(width, height); //Initalize the post processor
+        // Initalize the post processor
+        PostProcessor.setWidthHeight(width, height); 
     }
     
     /**
@@ -48,17 +41,19 @@ public class Core extends JPanel {
      * what is on screen.
      */
     public void mainLoop(){
-        timer = new Timer
+        timer = new javax.swing.Timer
         (
               42, //About 24 fps
-             (ActionEvent e) -> { run(); }
+             (java.awt.event.ActionEvent e) -> { run(); }
         );
-        timer.start(); /* Start timer */
+        // Start timer.
+        timer.start(); 
     }
     public void refresh() { run(); }
     
     private void run() {
-        scene.collectGarbageSDFs(); //Deletes any SDFs that need to be 
+        //Deletes any SDFs that need to be 
+        scene.collectGarbageSDFs(); 
         renderScene();
     }
 
@@ -74,19 +69,24 @@ public class Core extends JPanel {
      * image ... and repaint it.
      */
     private void renderScene() {        
+        // Render the scene
         vec3[][] vec3Image = scene.renderScene();
               
-        //Adds bloom to the image using the current settings
+        // Add post processing depending on the settings.
         if (bloom)
             vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
         if (crosshair)
             vec3Image = PostProcessor.addCrossHair(vec3Image, new vec3(255.0f), 0.005f);
         
-        Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
+        // Conver the settings 2D array to a java.awt.Color 2D array.
+        java.awt.Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
         
-        for (int x = 0; width > x; x++) for (int y = 0; height > y; y++)    //Loop screen
-            screen.setRGB(x, y, colorImage[x][y].getRGB());  //Process the image to the screen
-        repaint();  //Update screen
+        // Fill in the actual screen using the 2D screen array and then update it.
+        java.util.stream.IntStream.range(0, this.width).parallel().forEach(x -> {
+            for (int y = 0; height > y; y++)
+                screen.setRGB(x, y, colorImage[x][y].getRGB());
+        });
+        repaint();  
     }
     
     private void addDefaultSDFs() {
@@ -110,7 +110,7 @@ public class Core extends JPanel {
         SDF t = new Sphere(new vec3(), 1.0f, Material.GLASS);
         scene.addSDF(t);
         
-        SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(Color.RED, Material.PLASTIC));
+        SDF p = new Sphere(new vec3(0, 1, 3), 1.0f, new Material(java.awt.Color.RED, Material.PLASTIC));
         scene.addSDF(p);
         
         SDF q = new Cube(new vec3(2, -1, 2), 1.0f,  Material.PLASTIC);
@@ -131,8 +131,8 @@ public class Core extends JPanel {
         PostProcessor.setWidthHeight(w, h);
     }
         
-    public void imageSizer() { screen = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
-    @Override public void paintComponent(Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
+    public void imageSizer() { screen = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_ARGB); }
+    @Override public void paintComponent(java.awt.Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
     
     private int hiResW = 2000, hiResH = 2000;
     public void changeF2Res(int w, int h) { hiResW = w; hiResH = h; }
@@ -142,7 +142,7 @@ public class Core extends JPanel {
         
         System.out.println("Screenshotting ...");
         
-        //Saves the current width & height
+        // Saves the current width & height
         int pWidth = width, pHeight = height;
         
         changeResolution(hiResW, hiResH);
@@ -151,7 +151,7 @@ public class Core extends JPanel {
               
         if (bloom)
             vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
-        Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
+        java.awt.Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
         
         File.ScreenShot.screenshot(colorImage);
         

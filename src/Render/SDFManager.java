@@ -5,7 +5,7 @@ package Render;
  * 
  * @author Harrison Davis
  */
-public class SDFManager {
+public class SDFManager implements Iterable<SDFs.SDF> {
     
     // The internal container of SDFs.
     private final java.util.List<SDFs.SDF> sdfs = new java.util.ArrayList<>();
@@ -83,7 +83,7 @@ public class SDFManager {
         return sdfs.stream()
                    // Find the first SDF that's close to the input
                    // vector. If none is found return null.
-                   .filter(sdf -> sdf.sdf(p) < Core.getEps() * 3.0f)
+                   .filter(sdf -> sdf.sdf(p) < Core.EPS * 3.0f)
                    .findFirst()
                    .orElse(null);
     }   
@@ -188,4 +188,14 @@ public class SDFManager {
             
         }
     }
+    
+    /**
+     * Copies the internal container and returns the copy.
+     * 
+     * @return The copied {@link java.util.ArrayList}.
+     */
+    public java.util.ArrayList<SDFs.SDF> getSDFsCopy() { return new java.util.ArrayList<>(sdfs); }
+    
+    @Override
+    public java.util.Iterator<SDFs.SDF> iterator() { return sdfs.iterator(); }
 }

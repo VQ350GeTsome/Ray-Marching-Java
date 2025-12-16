@@ -366,7 +366,7 @@ public class Window extends javax.swing.JFrame {
         if (!isolateChild && blended) {
             try { 
                 float k = Float.parseFloat(inputs[0]);
-                ((BlendedSDF) parent).setK((k <= 0) ? Core.getEps() : k);
+                ((BlendedSDF) parent).setK((k <= 0) ? Core.EPS : k);
             } catch (Exception e) { System.err.println(e.getMessage()); }
             
         } else if (!blended)
@@ -1080,6 +1080,8 @@ public class Window extends javax.swing.JFrame {
         // Get all objects and display them to the user so that they can then select from that
         // and delete them, merge them, or edit them.
         
+        // Get a copy of the list of SDFs
+        java.util.ArrayList<SDFs.SDF> sdfs = core.scene.getSDFsList();
     }//GEN-LAST:event_seeAllObjActionPerformed
 
     /**
