@@ -190,11 +190,9 @@ public class SDFManager implements Iterable<SDFs.SDF> {
     }
     
     /**
-     * Copies the internal container and returns the copy.
-     * 
-     * @return The copied {@link java.util.ArrayList}.
+     * @return The {@link java.util.List} container.
      */
-    public java.util.ArrayList<SDFs.SDF> getSDFsCopy() { return new java.util.ArrayList<>(sdfs); }
+    public java.util.List<SDFs.SDF> getSDFs() { return sdfs; }
     
     @Override
     public java.util.Iterator<SDFs.SDF> iterator() { return sdfs.iterator(); }

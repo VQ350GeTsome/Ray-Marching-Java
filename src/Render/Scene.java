@@ -50,7 +50,7 @@ public class Scene {
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
     public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
-    public java.util.ArrayList<SDFs.SDF> getSDFsList() { return sdfManager.getSDFsCopy(); }
+    public java.util.List<SDFs.SDF> getSDFsList() { return sdfManager.getSDFs(); }
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Camera Abstraction ">
@@ -58,7 +58,7 @@ public class Scene {
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
     public void zoomCamera(float z)             { camera.zoom(z); }
     
-    public vec3 getCameraPos()                  { return camera.getOrientation()[0]; }
+    public vec3 getCameraPos()                  { return camera.getPosition(); }
     public vec3[] getCameraOrien()              { return camera.getOrientation(); }
     
     public void cameraObj(boolean add) {
@@ -71,7 +71,7 @@ public class Scene {
     public HitInfo marchRay(int x, int y, int w, int h) { 
         float nx = (x + 0.5f) / (float) w;
         float ny = (y + 0.5f) / (float) h;
-        vec3 pos = camera.getOrientation()[3];
+        vec3 pos = camera.getPosition();
         vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
         
         return raymchr.marchRaySkipCam(pos, dir);

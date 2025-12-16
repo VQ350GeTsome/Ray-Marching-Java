@@ -61,7 +61,7 @@ public class Camera extends SDFs.SDF {
         tanOfHalfFov = (float)Math.tan(this.fov / 2.0);
         
         m = new Util.Material(new Vectors.vec3(200.0f));
-        type = "camera";
+        type = "camera"; name = "camera";
     }
     
     /**

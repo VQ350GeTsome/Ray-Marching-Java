@@ -98,12 +98,12 @@ public class Window extends javax.swing.JFrame {
     //</editor-fold>
     
     //<editor-fold defaultstate="collpased" desc=" Pane Creators ">
-    private String[] createOptionsPane(String title, String[] options, String[] defaults, int inputsPerRow) {  
+    private String[] createInputsPane(String title, String[] options, String[] defaults, int inputsPerRow) {  
         int length = options.length;
         JTextField[] fields = new JTextField[length];               //Initialize the feilds we will use
         int rows = (int) Math.ceil((double) length / inputsPerRow); //Calculate the amount of rows we'll need
         
-         //Create the panel we will use & input a grid layout with the right amount of rows
+         // Create the panel we will use & input a grid layout with the right amount of rows
          // & inputs per row ( double since we do label field + input field )
         JPanel panel = new JPanel(new java.awt.GridLayout(rows, inputsPerRow * 2, 5, 5));
         
@@ -133,7 +133,7 @@ public class Window extends javax.swing.JFrame {
         }
         
     }
-    private String[] createOptionsPane(String title, String[] both, int inputsPerRow) {
+    private String[] createInputsPane(String title, String[] both, int inputsPerRow) {
         int length = both.length;                       //Get the amount of settings (double the amount because the current values are stored too)
         
         String[] options  = new String[length / 2];     //Initialize the options  array
@@ -142,24 +142,60 @@ public class Window extends javax.swing.JFrame {
         for (int i = 0; length / 2 > i; i++)  options[i] = both[i];                 //Fill the options  array
         for (int i = 0; length / 2 > i; i++) defaults[i] = both[i + length / 2];    //Fill the defualts array
         
-        return createOptionsPane(title, options, defaults, inputsPerRow);
+        return createInputsPane(title, options, defaults, inputsPerRow);
     }
-    private int createButtonsPane(String prompt, String[] options) {
-        int choice = JOptionPane.showOptionDialog(
+    private int createButtonsPane(String prompt, String[] options, int buttonsPerRow) {
+        // Create our panel
+        JPanel panel = new JPanel(new java.awt.BorderLayout());
+        
+        // Add our prompt ( with extra spacing ) .
+        JLabel label = new JLabel(prompt);
+        label.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        panel.add(label, java.awt.BorderLayout.NORTH);
+
+        // Calculate the row amount.
+        int rows = (int) Math.ceil((double) options.length / buttonsPerRow);
+        JPanel buttonsPanel = new JPanel(new java.awt.GridLayout(rows, buttonsPerRow, 5, 10));
+
+        // Create an array of buttons
+        javax.swing.JButton[] buttons = new javax.swing.JButton[options.length];
+        final int[] choice = {-1};
+
+        // Fill the buttons array and add them to the sub panel ( buttonsPanel ) .
+        for (int i = 0; i < options.length; i++) {
+            buttons[i] = new javax.swing.JButton(options[i]);
+            final int index = i;
+            buttons[i].addActionListener(e -> {
+                choice[0] = index;
+                javax.swing.SwingUtilities.getWindowAncestor(panel).dispose();
+            });
+            buttonsPanel.add(buttons[i]);
+        }
+
+        // Add the sub panel ( buttonsPanel ) to the main panel.
+        panel.add(buttonsPanel, java.awt.BorderLayout.CENTER);
+
+        // Show the panel
+        JOptionPane.showOptionDialog(
             null,
-            prompt,
+            panel,
             "Selector...",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.INFORMATION_MESSAGE,
             null,
-            options,
-            options[0]
+            new Object[]{}, // no default options, we use our custom buttons
+            null
         );
-        if (choice >= 0) return choice;
+
+        // Return the choice.
+        // If no choice was made return -1.
+        int finalChoice = choice[0];
+        if (finalChoice >= 0) return finalChoice;
         else return -1;
     }
     //</editor-fold>
-            
+
+    //<editor-fold defaultstate="collapsed" desc=" Clicks ">
     private void rightClick(int x, int y, int w, int h) {
         HitInfo info = core.scene.marchRay(x, y, w, h);
         SDFs.SDF clickedObj = info.sdf;
@@ -178,7 +214,6 @@ public class Window extends javax.swing.JFrame {
 
         popup.show(core, nx, ny);
     }
-    
     private javax.swing.JPopupMenu nothingClicked(){
         javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
         
@@ -196,23 +231,6 @@ public class Window extends javax.swing.JFrame {
         
         return popup;
     }
-    private void changeBG() {
-        java.awt.Color input = getColor(core.scene.getBackground().toAwtColor());
-        if (input == null) return;
-        
-        vec3 newBG = new vec3(input);
-        
-        core.scene.setBackground(newBG);
-    }
-    private void changeSecBG() {
-        java.awt.Color input = getColor(core.scene.getSecondaryBG().toAwtColor());
-        if (input == null) return;
-        
-        vec3 newBG = new vec3(input);
-        
-        core.scene.setSecondaryBG(newBG);
-    }
-    
     private javax.swing.JPopupMenu objectClicked(SDFs.SDF clickedObj, HitInfo info) {
         javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
 
@@ -281,7 +299,7 @@ public class Window extends javax.swing.JFrame {
         
     }
     private void colorClicked(SDFs.SDF obj, vec3 hit) {
-        int choice = createButtonsPane("Base Color or Highlight Color ?", new String[] { "Base", "Highlight" } );
+        int choice = createButtonsPane("Base Color or Highlight Color ?", new String[] { "Base", "Highlight" }, 1 );
         if (choice == -1) return;
         boolean baseColor = choice == 0;
         
@@ -308,7 +326,7 @@ public class Window extends javax.swing.JFrame {
         String[] settings = new String[] { "Reflectivity: ", "Specular: ", "Shinyness: ", "Roughness: ",
                                             "Metalness: ", "Opacity: ", "IOR: ", "Texture: ", "Textureness: " };
         String[] defaults = ArrayMath.subArray(objMat.toStringArray(), 2, Material.FIELDS); //Use subarray to not include the first two colors
-        String[] inputs = createOptionsPane
+        String[] inputs = createInputsPane
             (   
                     "Enter New Material Settings For " 
                     + ((obj.getName() == null) ? obj.getType() : obj.getName()) + " ... ",
@@ -355,7 +373,7 @@ public class Window extends javax.swing.JFrame {
         }
         
         //Get the new settings 
-        String[] inputs = createOptionsPane
+        String[] inputs = createInputsPane
             (
                 "Enter New Settings for " + 
                  ((obj.getName() == null) ? obj.getType() : obj.getName()) 
@@ -381,7 +399,7 @@ public class Window extends javax.swing.JFrame {
         String quat = obj.getRotQuat().toStringImag();
         quat = quat.substring(1, quat.length() - 1);
         String[] defaults = quat.split(":");
-        String[] inputs = createOptionsPane("Enter New Rotation (will be normalized): ", options, defaults, 1);
+        String[] inputs = createInputsPane("Enter New Rotation (will be normalized): ", options, defaults, 1);
         
         if (inputs == null) return;
         
@@ -393,6 +411,13 @@ public class Window extends javax.swing.JFrame {
             System.err.println(e.getMessage());
         }
     }
+    //</editor-fold>
+    
+    private void generalEditSDF(SDFs.SDF sdf) {
+        // Make a list that'll be later turnt into an array
+        // to be used to create a buttno
+        java.util.List<String> choices = new java.util.ArrayList<>();
+    }
     
     private void addSDF(int type) {
         final int   SPHERE = 0, CUBE = 1, TORUS = 2,
@@ -400,7 +425,7 @@ public class Window extends javax.swing.JFrame {
         
         //This will be applicable for primitives & repeating
         String[] choices = SDFs.SDFParser.getImplementedPrimitives();  
-        int choice = createButtonsPane("Choose an SDF...", choices);
+        int choice = createButtonsPane("Choose an SDF...", choices, 1);
         
         java.util.ArrayList<String> placeHolder = new java.util.ArrayList<>(3);
         
@@ -413,7 +438,7 @@ public class Window extends javax.swing.JFrame {
         int n = 25;
         vec3[] camOrien = core.scene.getCameraOrien();  
         vec3 forward    = camOrien[0];
-        vec3 pos        = camOrien[3];
+        vec3 pos        = core.scene.getCameraPos();
         placeHolder.add((pos.add(forward.scale(n))).round().toString());
 
         //Now we fill the placeholder with more values and prompt the user for any changes
@@ -438,11 +463,10 @@ public class Window extends javax.swing.JFrame {
                 t = "cylinder"; break;
         }
         if (type == 1) t = "repeat" + t;
-        String[] inputs = createOptionsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, type == 1), placeHolder.toArray(String[]::new), 1);
+        String[] inputs = createInputsPane("New " + t + "...", SDFs.SDFParser.getSettings(t, type == 1), placeHolder.toArray(String[]::new), 1);
         if (inputs == null) return;
-        safeAddSDF(mat, t, inputs); 
+        this.safeAddSDF(mat, t, inputs); 
     }
-    //Helper method to just parse an SDF safely using a try catch
     private void safeAddSDF(Material mat, String type, String[] inputs) {
         try { core.scene.addSDF(SDFs.SDFParser.getSDF(mat, type, inputs)); }
         catch (Exception e) { System.err.print(e.getMessage()); }
@@ -455,6 +479,23 @@ public class Window extends javax.swing.JFrame {
     private java.awt.Color getColor(java.awt.Color defaultArg) {
         java.awt.Color color = JColorChooser.showDialog(rootPane, "Choose a Color: ", defaultArg);
         return color;
+    }
+    
+    private void changeBG() {
+        java.awt.Color input = getColor(core.scene.getBackground().toAwtColor());
+        if (input == null) return;
+        
+        vec3 newBG = new vec3(input);
+        
+        core.scene.setBackground(newBG);
+    }
+    private void changeSecBG() {
+        java.awt.Color input = getColor(core.scene.getSecondaryBG().toAwtColor());
+        if (input == null) return;
+        
+        vec3 newBG = new vec3(input);
+        
+        core.scene.setSecondaryBG(newBG);
     }
     
     @SuppressWarnings("unchecked")
@@ -838,7 +879,7 @@ public class Window extends javax.swing.JFrame {
         String defaultMove  = String.valueOf(Core.cameraMoveGrain);
         String defaultPan   = String.valueOf(Core.cameraRotateGrain);
         String[] defaults   = new String[] { defaultMove, defaultPan };
-        String[] inputs = createOptionsPane("Enter new grains: ", options, defaults, 3);
+        String[] inputs = createInputsPane("Enter new grains: ", options, defaults, 3);
         
         if (inputs == null) return;
         
@@ -851,7 +892,7 @@ public class Window extends javax.swing.JFrame {
     private void sceneLighitngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sceneLighitngActionPerformed
         String[] options    = new String[] { "Scene Light Direction: " };
         String[] defaultDir = new String[] { core.scene.getSceneLighting().round(2).toString() };
-        String[] inputs     = createOptionsPane("Enter new Lighting Direction", options, defaultDir, 3);
+        String[] inputs     = createInputsPane("Enter new Lighting Direction", options, defaultDir, 3);
         
         if (inputs == null) return; 
         
@@ -862,7 +903,7 @@ public class Window extends javax.swing.JFrame {
     private void ambientLightingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ambientLightingActionPerformed
         String[] options = new String[] { "New Level: " };
         String[] current = new String[] { ""+core.scene.getAmbientLighting() };
-        String[] input  = createOptionsPane("Enter New Ambient Lighting Level", options, current, 3);
+        String[] input  = createInputsPane("Enter New Ambient Lighting Level", options, current, 3);
         
         if (input == null) return;
         
@@ -876,7 +917,7 @@ public class Window extends javax.swing.JFrame {
     private void cameraPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraPositionActionPerformed
         String[] options    = new String[] { "New Camera Position: " };
         String[] defaultDir = new String[] { core.scene.getCameraPos().round(2).toString() };
-        String[] inputs     = createOptionsPane("Enter new Camera Position", options, defaultDir, 3);
+        String[] inputs     = createInputsPane("Enter new Camera Position", options, defaultDir, 3);
         
         if (inputs == null) return; 
         
@@ -907,7 +948,7 @@ public class Window extends javax.swing.JFrame {
                   REPEATING = 1;
         
         String[] options = SDFs.SDFParser.getTypes();                       //Get the currently implemented SDFs
-        int typeChoice = createButtonsPane("Choose a type...", options);    //Prompt the user with which type they want
+        int typeChoice = createButtonsPane("Choose a type...", options, 1);    //Prompt the user with which type they want
         if (typeChoice == -1) return;   //The user chose nothing
         
         addSDF(typeChoice);
@@ -921,7 +962,7 @@ public class Window extends javax.swing.JFrame {
     private void bloomSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bloomSettingsActionPerformed
         String[] options  = new String[] { "Bloom Sensitivity: " , "Bloom Radius: " };
         String[] defaults = PostProcessor.getBloomSettings();
-        String[] inputs   = createOptionsPane("Enter New Bloom Settings: ", options, defaults, 3);
+        String[] inputs   = createInputsPane("Enter New Bloom Settings: ", options, defaults, 3);
         
         PostProcessor.setBloomSettings(inputs);
     }//GEN-LAST:event_bloomSettingsActionPerformed
@@ -929,7 +970,7 @@ public class Window extends javax.swing.JFrame {
     private void changeRenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeRenderActionPerformed
         String[] options = new String[] { "Max Steps: ", "Max Distance: ", "Shadow Max Steps: " };
         String[] defaults = core.scene.getMarchParams();
-        String[] inputs = createOptionsPane("Enter New March Settings: ", options, defaults, 3);
+        String[] inputs = createInputsPane("Enter New March Settings: ", options, defaults, 3);
         
         core.scene.setMarchParams(inputs);
     }//GEN-LAST:event_changeRenderActionPerformed
@@ -937,7 +978,7 @@ public class Window extends javax.swing.JFrame {
     private void changeFPSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeFPSActionPerformed
         String[] options = new String[] { "Enter new FPS Target: " };
         String[] current = new String[] { ""+(int) (1000.0f / core.timer.getDelay()) };
-        String inputs[] = createOptionsPane("New FPS Cap...", options, current, 1);
+        String inputs[] = createInputsPane("New FPS Cap...", options, current, 1);
         
         if (inputs == null) return;
         
@@ -978,7 +1019,7 @@ public class Window extends javax.swing.JFrame {
     private void resolutionChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resolutionChangeActionPerformed
         String[] settings = new String[] { "Width: ", "Height: " };
         String[] defaults = core.getResoultion();
-        String[] inputs   = createOptionsPane("Enter New Dimensions: ", settings, defaults, 1);
+        String[] inputs   = createInputsPane("Enter New Dimensions: ", settings, defaults, 1);
         
         if (inputs == null) return;
         
@@ -997,7 +1038,7 @@ public class Window extends javax.swing.JFrame {
     private void f2SSChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f2SSChangeActionPerformed
         String[] settings = new String[] { "Width: ", "Height: " };
         String[] defaults = core.getF2Res();
-        String[] inputs   = createOptionsPane("Enter High Resolution Screen Shot Dimensions: ", settings, defaults, 1);
+        String[] inputs   = createInputsPane("Enter High Resolution Screen Shot Dimensions: ", settings, defaults, 1);
         
         if (inputs == null) return;
         
@@ -1022,7 +1063,7 @@ public class Window extends javax.swing.JFrame {
     private void shadowAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shadowAmountActionPerformed
         String[] settings = new String[] { "New Shadow Amount: " };
         String[] defaults = new String[] { ""+core.scene.getShadowAmount() };
-        String[] inputs = createOptionsPane("Setting a New Shadow Amount ...", settings, defaults, 1);
+        String[] inputs = createInputsPane("Setting a New Shadow Amount ...", settings, defaults, 1);
         
         if (inputs == null) return;
         
@@ -1059,7 +1100,7 @@ public class Window extends javax.swing.JFrame {
     private void setSkyboxLightAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setSkyboxLightAmountActionPerformed
         String[] options  = new String[] { "New Skybox Light Amount: " };
         String[] defaults = new String[] { ""+core.scene.getSkyboxLightAmount() };
-        String[] inputs   = createOptionsPane("Setting New Skybox Light Amount ...", options, defaults, 1);
+        String[] inputs   = createInputsPane("Setting New Skybox Light Amount ...", options, defaults, 1);
         
         if (inputs == null) return;
         
@@ -1080,8 +1121,23 @@ public class Window extends javax.swing.JFrame {
         // Get all objects and display them to the user so that they can then select from that
         // and delete them, merge them, or edit them.
         
-        // Get a copy of the list of SDFs
-        java.util.ArrayList<SDFs.SDF> sdfs = core.scene.getSDFsList();
+        // Get the list of sdfs and make an array that'll store the names of them all.
+        java.util.List<SDFs.SDF> sdfs = core.scene.getSDFsList();
+        String[] sdfNames = new String[sdfs.size()];
+        
+        // Fill the name array with the names.
+        for (int i = 0; sdfNames.length > i; i++) {
+            SDFs.SDF sdf = sdfs.get(i);
+            String name = sdf.getName();
+            if (name == null) name = sdf.getType();
+            sdfNames[i] = name;
+        }
+        
+        // Get the user input and open the edit pane for that SDF.
+        // If the user selects nothing return.
+        int input = this.createButtonsPane("Select an object: ", sdfNames, 1);
+        if (input == -1) return;
+        this.generalEditSDF(sdfs.get(input));
     }//GEN-LAST:event_seeAllObjActionPerformed
 
     /**
