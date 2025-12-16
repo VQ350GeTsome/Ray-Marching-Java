@@ -1278,23 +1278,14 @@ public class Window extends javax.swing.JFrame {
         // Get all objects and display them to the user so that they can then select from that
         // and delete them, merge them, or edit them.
         
-        // Get the list of sdfs and make an array that'll store the names of them all.
-        java.util.List<SDFs.SDF> sdfs = core.scene.getSDFsList();
-        String[] sdfNames = new String[sdfs.size()];
-        
-        // Fill the name array with the names.
-        for (int i = 0; sdfNames.length > i; i++) {
-            SDFs.SDF sdf = sdfs.get(i);
-            String name = sdf.getName();
-            if (name == null) name = sdf.getType();
-            sdfNames[i] = name;
-        }
+        // Get all the SDF names.
+        String[] sdfNames = core.scene.getSDFNames();
         
         // Get the user input and open the edit pane for that SDF.
         // If the user selects nothing return.
         int input = this.createButtonsPane("Select an object: ", sdfNames, 1);
         if (input == -1) return;
-        this.generalEditSDF(sdfs.get(input));
+        this.generalEditSDF(core.scene.getSDF(input));
     }//GEN-LAST:event_seeAllObjActionPerformed
 
     /**

@@ -50,7 +50,8 @@ public class Scene {
     public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
     public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
     public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
-    public java.util.List<SDFs.SDF> getSDFsList() { return sdfManager.getSDFs(); }
+    public String[] getSDFNames() { return sdfManager.getNames(); }
+    public SDFs.SDF getSDF(int i) { return sdfManager.getSDF(i); }
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Camera Abstraction ">

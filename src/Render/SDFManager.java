@@ -1,11 +1,12 @@
 package Render;
 
 /**
- * 
+ * An SDF manager class. Meant to help with the adding, setting, 
+ * removing, querying, etc of the SDFs in the scene.
  * 
  * @author Harrison Davis
  */
-public class SDFManager implements Iterable<SDFs.SDF> {
+public class SDFManager {
     
     // The internal container of SDFs.
     private final java.util.List<SDFs.SDF> sdfs = new java.util.ArrayList<>();
@@ -16,16 +17,21 @@ public class SDFManager implements Iterable<SDFs.SDF> {
      * @param sdf The SDF to add.
      * @return If the operation completed.
      */
-    public boolean addSDF(SDFs.SDF sdf)      { return sdfs.add(sdf); }
+    public boolean addSDF(SDFs.SDF sdf) { return sdfs.add(sdf); }
     /**
      * Removes a specific SDF from the internal container.
+     * If that specific SDF isn't found, it will search the 
+     * blended SDFs in the internal container.
      * 
      * @param sdf The SDF to remove.
      * @return If the operation was completed.
      */
-    public boolean removeSDF(SDFs.SDF sdf)   { 
+    public boolean removeSDF(SDFs.SDF sdf) { 
+        // Try to remove from the list plainly.
         if (!sdfs.remove(sdf)) {
+            // If we didn't find the SDF search all the blendedSDFs.
             for (SDFs.SDF s : sdfs) if (s instanceof SDFs.BlendedSDF b) 
+                // If the sdf is found inside one of the blendedSDFs return true.
                 if (b.remove(sdf)) return true;
         }
         return false;
@@ -41,6 +47,13 @@ public class SDFManager implements Iterable<SDFs.SDF> {
         return sdfs.remove(removeSDF) &&
                sdfs.add(newSDF);
     }
+    /**
+     * Get an SDF at a specific index location.
+     * 
+     * @param i The index.
+     * @return The SDF at that index.
+     */
+    public SDFs.SDF getSDF(int i) { return this.sdfs.get(i); }
     
     /**
      * Calculates the signed distance to the surface of each SDF
@@ -195,11 +208,14 @@ public class SDFManager implements Iterable<SDFs.SDF> {
         }
     }
     
-    /**
-     * @return The {@link java.util.List} container.
-     */
-    public java.util.List<SDFs.SDF> getSDFs() { return sdfs; }
-    
-    @Override
-    public java.util.Iterator<SDFs.SDF> iterator() { return sdfs.iterator(); }
+    public String[] getNames() {
+        String[] arr = new String[sdfs.size()];
+        for (int i = 0; arr.length > i; i++) {
+            SDFs.SDF s = sdfs.get(i);
+            String name = s.getName();
+            if (name == null) name = s.getType();
+            arr[i] = name;
+        }
+        return arr;
+    }
 }
