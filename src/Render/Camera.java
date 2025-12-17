@@ -26,7 +26,7 @@ public final class Camera extends SDFs.SDF {
                   fov,
                   tanOfHalfFov;
     
-    public static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
+    private static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
     
     /**
      * Camera constructor. It takes in some general information about
@@ -120,11 +120,9 @@ public final class Camera extends SDFs.SDF {
     
     //<editor-fold defaultstate="collapsed" desc=" Sensitivity Setters, Changes, and Getters ">
     public void setMovementSensitivity(float newSens) { cameraMoveGrain = newSens; }
-    public void changeMovementSensitivity(float delta) { cameraMoveGrain += delta; }
     public float getMovementSensitivity() { return cameraMoveGrain; }
     
     public void setRotationSensitivity(float newSens) { cameraRotateGrain = newSens; }
-    public void changeRotationSensitivity(float delta) { cameraRotateGrain += delta; }
     public float getRotationSensitivity() { return cameraRotateGrain; }
     //</editor-fold>
     

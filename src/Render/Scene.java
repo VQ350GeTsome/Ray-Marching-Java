@@ -64,6 +64,12 @@ public final class Scene {
     public Vectors.vec3 getCameraPos() { return camera.getPosition(); }
     public Vectors.vec3[] getCameraOrien() { return camera.getOrientation(); }
     
+    public float getCameraMovementSensitivity() { return this.camera.getMovementSensitivity(); }
+    public float getCameraRotationSensitivity() { return this.camera.getRotationSensitivity(); }
+    
+    public void setCameraMovementSensitivity(float f) { this.camera.setMovementSensitivity(f); }
+    public void setCameraRotationSensitivity(float f) { this.camera.setRotationSensitivity(f); }
+    
     public void cameraObj(boolean add) {
         if (add) sdfManager.addSDF(camera);
         else sdfManager.removeSDF(camera);

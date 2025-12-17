@@ -13,9 +13,7 @@ public final class Core extends javax.swing.JPanel {
     public static final float EPS = 1e-4f;
     
     public static final Vectors.vec3 WORLDUP = new Vectors.vec3(0.0f, 0.0f, 1.0f);
-    
-    public static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
-    
+
     public boolean bloom = true;
     
     private java.awt.image.BufferedImage screen;               //What we will use as the screen

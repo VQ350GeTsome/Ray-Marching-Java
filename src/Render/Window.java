@@ -31,23 +31,30 @@ public class Window extends javax.swing.JFrame {
     
     //<editor-fold defaultstate="collapsed" desc=" Camera Modifiers ">
     private void cameraMover(int input, boolean shift) {
-        float   grain = Core.cameraMoveGrain;               //Get the current camera grain (sensitivity)
-        vec3[]  orien = core.scene.getCameraOrien();        //Get the three orientation vectors
+        // Get the current camera movement sens, 
+        // and the basic vectors.
+        float   grain = core.scene.getCameraMovementSensitivity();              
+        vec3[]  orien = core.scene.getCameraOrien();      
         vec3    forward = orien[0],
                 right   = orien[1],
                 up      = orien[2],
                 move    = new vec3();                       //Initalize what will be the move vector
        
         switch (input) { 
-            case W_KEY:   move = (shift) ? up.scale(  grain ) : forward.scale(  grain );    break;  //Move forward ... unless shift is held, then move up
-            case S_KEY:   move = (shift) ? up.scale( -grain ) : forward.scale( -grain );    break;  //Move down ... unless shift is held, then move down
-            case A_KEY:   move = right.scale( -grain );    break;  //Move left
-            case D_KEY:   move = right.scale(  grain );    break;  //Move right
+            // Move forward ... unless shift is held, then move up.
+            case W_KEY: move = (shift) ? up.scale( grain) : forward.scale( grain); break;
+            // Move down ... unless shift is held, then move down.
+            case S_KEY: move = (shift) ? up.scale(-grain) : forward.scale(-grain); break;  
+            // Move left.
+            case A_KEY: move = right.scale(-grain); break; 
+            // Move right.
+            case D_KEY: move = right.scale( grain); break;  
         }
-        core.scene.moveCamera(move); //Call the core that'll move the camera
+        // Move the camera by the calculated movement vector.
+        core.scene.moveCamera(move);
     }
     private void cameraMover(int dx, int dy, boolean middle) {
-        float  grain = Core.cameraMoveGrain;
+        // Get the  basic vectors.
         vec3[] orien = core.scene.getCameraOrien();   
                                      //        -y        
         vec3    forward = orien[0],  //         |
@@ -68,18 +75,20 @@ public class Window extends javax.swing.JFrame {
         
     }
     private void cameraRotater(int input) {
-        float grain = Core.cameraRotateGrain;
+        float grain = core.scene.getCameraRotationSensitivity();
         switch (input) {
-            case UP_ARROW:        core.scene.rotateCamera( 0.0f  , grain );    break;
-            case DOWN_ARROW:      core.scene.rotateCamera( 0.0f  ,-grain );    break; 
-            case RIGHT_ARROW:     core.scene.rotateCamera(-grain ,  0.0f );    break;  
-            case LEFT_ARROW:      core.scene.rotateCamera( grain ,  0.0f );    break;  
+            case UP_ARROW:    core.scene.rotateCamera( 0.0f  , grain); break;
+            case DOWN_ARROW:  core.scene.rotateCamera( 0.0f  ,-grain); break; 
+            case RIGHT_ARROW: core.scene.rotateCamera(-grain ,  0.0f); break;  
+            case LEFT_ARROW:  core.scene.rotateCamera( grain ,  0.0f); break;  
         }
     }
     private void cameraRotater(int dx, int dy) {
-        float cameraDYaw = dx * 0.1f;   // sensitivity factor
-        float cameraDPitch = dy * 0.1f;
-        core.scene.rotateCamera( -cameraDYaw,  -cameraDPitch );
+        // Get the camera sensitivity and scale it down by 50.
+        float sens = core.scene.getCameraRotationSensitivity() / 50.0f,
+              cameraDYaw = dx * sens, 
+              cameraDPitch = dy * sens;
+        core.scene.rotateCamera(-cameraDYaw, -cameraDPitch);
     }
     private void cameraZoomer(int input) {
         float zoom = 0.0f;
@@ -1033,16 +1042,17 @@ public class Window extends javax.swing.JFrame {
 
     private void cameraGrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cameraGrainActionPerformed
         String[] options    = new String[] { "Movement Grain: " , "Pan Grain: " };
-        String defaultMove  = String.valueOf(Core.cameraMoveGrain);
-        String defaultPan   = String.valueOf(Core.cameraRotateGrain);
+        String defaultMove  = String.valueOf(core.scene.getCameraMovementSensitivity());
+        String defaultPan   = String.valueOf(core.scene.getCameraRotationSensitivity());
         String[] defaults   = new String[] { defaultMove, defaultPan };
         String[] inputs = createInputsPane("Enter new grains: ", options, defaults, 3);
         
+        // If no input return.
         if (inputs == null) return;
         
         try {
-            Core.cameraMoveGrain = Float.parseFloat(inputs[0]);
-            Core.cameraRotateGrain = Float.parseFloat(inputs[1]);   
+            core.scene.setCameraMovementSensitivity(Float.parseFloat(inputs[0]));
+            core.scene.setCameraRotationSensitivity(Float.parseFloat(inputs[1]));
         } catch (Exception e) { System.err.println("Error in parsing new grains: " + e.getMessage()); }
     }//GEN-LAST:event_cameraGrainActionPerformed
 
