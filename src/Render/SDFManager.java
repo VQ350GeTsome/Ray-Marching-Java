@@ -72,23 +72,16 @@ public final class SDFManager {
                .min(Float::compare)
                .orElse(Float.MAX_VALUE);               
     }
-    /**
-     * Returns the closest surface of the SDFs contained
-     * from the input vector.
-     * 
-     * @param pos
-     * @return 
-     */
-    public float getClosestSDFDistSkipCam(Vectors.vec3 pos) {
-        float minDist = Float.MAX_VALUE, dist;
-        for (SDFs.SDF sdf : sdfs) if (!sdf.getType().equals("camera")) {          //For each SDF that's not the camera
-            dist = sdf.sdf(pos);        //Get the distance to surface
-            minDist = (minDist > dist)  //Store the closest surface
-                    ? dist : minDist;
-        }
-        return minDist;                 //Return the closest surface
+    public float getClosestSDFDist(Vectors.vec3 p, java.util.function.Predicate<SDFs.SDF> condition) {
+        // Filter out SDFs using the condition.
+        // Then return the closest surface.
+        return sdfs.stream()
+                   .filter(condition)              
+                   .map(sdf -> sdf.sdf(p))         
+                   .min(Float::compare)            
+                   .orElse(Float.MAX_VALUE);       
     }
-    
+
     /**
      * Returns the first SDF that's calculated to be 
      * within a small distance of the input vector.

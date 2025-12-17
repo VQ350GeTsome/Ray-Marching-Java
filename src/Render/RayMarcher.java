@@ -90,7 +90,7 @@ public class RayMarcher {
     public HitInfo marchRaySkipCam(vec3 pos, vec3 dir) {
         float totalDistance = 0.0f;
         for (int step = 0; step < maxSteps; step++) {
-            float distance = sdfMgr.getClosestSDFDistSkipCam(pos);        
+            float distance = sdfMgr.getClosestSDFDist(pos, sdf -> !sdf.getType().equals("camera"));        
             if (distance < Core.EPS || totalDistance > maxDist) {
                 vec3 hitPos = pos.add(dir.scale(distance));
                 totalDistance += distance;
@@ -102,7 +102,6 @@ public class RayMarcher {
         }
         return new HitInfo(pos, totalDistance, sdfMgr.getSDFAtPos(pos));
     }
-    
     
     public vec3[][] marchScreen(int w, int h) {
         // 2D array for image of size { width , height }
@@ -208,6 +207,7 @@ public class RayMarcher {
     }
    
     private vec3 refract(vec3 dir, vec3 norm, float etai, float etat) {
+        // Normalize incase it's yet to be normalized.
         dir = dir.normalize();
         norm = norm.normalize();
 
@@ -257,18 +257,20 @@ public class RayMarcher {
             vec3 pos = orgin.add(lightDir.scale(t));
             float minDist = sdfMgr.getClosestSDFDist(pos);
             
-            if (minDist < Core.EPS) {                      //If we hit an object.
-                HitInfo info = sdfMgr.getNearestSDFAtPos(pos);  //Get the obj we hit.
-                float objOpac = info.mat.opacity;               //As well as its opacity.
+            // If we have hit an object.
+            if (minDist < Core.EPS) {   
+                // Get the object and check its opacity.
+                HitInfo info = sdfMgr.getNearestSDFAtPos(pos);  
+                float objOpac = info.mat.opacity;               
                 
-                if (objOpac < 0) return ambientLight;           //If we hit a solid object return the ambient light
+                // If the opacity is negligable return the ambient lighting.
+                if (objOpac < 0.0001f) return ambientLight;           
                 
+                // Else accumulate it.
                 accumOpac *= objOpac;
                 
-                HitInfo mt = marchThrough(pos.add(lightDir.scale(Core.EPS * 2.0f)), lightDir);
-                orgin = mt.hit;
-                orgin = orgin.add(lightDir.scale(Core.EPS * 2.0f));
-                t += mt.totalDist;
+                // Then march through the object.
+                
             }
             lighting = Math.min(lighting, softness * minDist / t);
             t += minDist;

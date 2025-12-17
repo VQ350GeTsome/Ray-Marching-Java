@@ -10,29 +10,34 @@ package Render;
  */
 public final class Core extends javax.swing.JPanel {
 
+    // Epsilon and our worlds up vector ( z-up world ) .
     public static final float EPS = 1e-4f;
-    
     public static final Vectors.vec3 WORLDUP = new Vectors.vec3(0.0f, 0.0f, 1.0f);
 
+    // Some post processor settings.
     public boolean bloom = true;
+    private static boolean crosshair = false;
     
-    private java.awt.image.BufferedImage screen;               //What we will use as the screen
-    private int width = 125, height = width;    //screens dimensions
-    
+    // Screen dimensions and the screen itself.
+    private int width = 125, height = width;  
+    private java.awt.image.BufferedImage screen;          
+
+    // Our scene and timer.
     public Scene scene;
     public javax.swing.Timer timer;
     
     public Core() {
         // Initalize screen / image and the scene.
         this.imageSizer();                          
-        scene = new Scene(width, height);
+        this.scene = new Scene(width, height);
         
         // Default lighting
-        scene.setSceneLighting(new Vectors.vec3(0.25f, 0.33f, -1.0f));
-        scene.setAmbientLighting(0.05f);                      
+        this.scene.setSceneLighting(new Vectors.vec3(0.25f, 0.33f, -1.0f));
+        this.scene.setAmbientLighting(0.05f);                      
         
-        // Random SDFs
-        addRandomSDFs(10);
+        // Random SDFs or test SDFs
+        //this.addRandomSDFs(5);
+        this.addTestingSDFs();
         
         // Initalize the post processor
         Util.PostProcessor.setWidthHeight(width, height); 
@@ -58,8 +63,6 @@ public final class Core extends javax.swing.JPanel {
         scene.collectGarbageSDFs(); 
         renderScene();
     }
-
-    private static boolean crosshair = false;
     
     public String[] getResoultion() { return new String[] { ""+width, ""+height }; }
     
@@ -104,7 +107,7 @@ public final class Core extends javax.swing.JPanel {
     }
     
     private void addTestingSDFs() {
-        Util.Material sphereMat = new Util.Material(new Vectors.vec3(0, 255, 255));
+        Util.Material sphereMat = new Util.Material(new Vectors.vec3(0, 255, 255), Util.Material.GLASS);
         sphereMat.metalness = 0.33f;
         //sphereMat.reflectivity = 0.80f;
         SDFs.SDF sphere  = new SDFs.Primitives.Sphere(new Vectors.vec3(), 1.0f, sphereMat);
@@ -114,15 +117,14 @@ public final class Core extends javax.swing.JPanel {
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
 
+        scene.addSDF(sphere);
+        
         Util.Material floorMat = new Util.Material(new Vectors.vec3(100.0f));
         floorMat.reflectivity = 0.25f;
         SDFs.SDF floor = new SDFs.Primitives.Plane(new Vectors.vec3(0.0f, 0.0f, -4.0f), new Vectors.vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
-        //scene.addSDF(floor);
-        
-        SDFs.SDF blendBlend = new SDFs.BlendedSDF(blend, floor, 1.0f);
-        scene.addSDF(blendBlend);
-        blendBlend.setName("Double Blended Test Object");
+        scene.addSDF(floor);
+
     }
     
     /**
@@ -141,6 +143,7 @@ public final class Core extends javax.swing.JPanel {
     public void imageSizer() { screen = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_ARGB); }
     @Override public void paintComponent(java.awt.Graphics g) { super.paintComponent(g); g.drawImage(screen, 0, 0, getWidth(), getHeight(), null); }
     
+    // The resolution of F2 screenshots.
     private int hiResW = 2000, hiResH = 2000;
     public void changeF2Res(int w, int h) { hiResW = w; hiResH = h; }
     public String[] getF2Res() { return new String[] { ""+hiResW, ""+hiResH }; }
