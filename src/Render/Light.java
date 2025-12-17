@@ -1,20 +1,23 @@
 package Render;
 
-import Vectors.vec3;
+public final class Light {
 
-public class Light {
-
-    private vec3 sceneLight = new vec3(0.0f, 0.0f, 1.0f),   //Default lighting
-                 lightColor = new vec3(255.0f);
+    // Default scene lighting direction, and color.
+    private Vectors.vec3 sceneLight = new Vectors.vec3(0.0f, 0.0f, 1.0f),  
+                         lightColor = new Vectors.vec3(255.0f);
     private float ambientLight = 0.0f;
     
-    public void setSceneLighting(vec3 l)    { sceneLight = l.normalize(); }
-    public void setLightColor(vec3 c)       { lightColor = c; }
-    public vec3 getSceneLighting()          { return sceneLight; }
-    public vec3 getLightColor()             { return lightColor; }
+    public Light() {
+        sceneLight = new Vectors.vec3(Core.WORLDUP);
+    }
     
-    public void setAmbientLight(float l)    { ambientLight = l; }
-    public float getAmbientLight()          { return ambientLight; }
+    public void setSceneLighting(Vectors.vec3 l) { sceneLight = l.normalize(); }
+    public void setLightColor(Vectors.vec3 c) { lightColor = c; }
+    public Vectors.vec3 getSceneLighting() { return sceneLight; }
+    public Vectors.vec3 getLightColor() { return lightColor; }
+    
+    public void setAmbientLight(float l) { ambientLight = l; }
+    public float getAmbientLight() { return ambientLight; }
     
     public String packLight() {
         return  sceneLight.toString()   + "," +
@@ -22,8 +25,8 @@ public class Light {
                 ambientLight            + ",\n" ;
     }
     public void unpackLight(String[] parts) {
-        sceneLight = new vec3(parts[0]);
-        lightColor = new vec3(parts[1]);
+        sceneLight = new Vectors.vec3(parts[0]);
+        lightColor = new Vectors.vec3(parts[1]);
         ambientLight = Float.parseFloat(parts[2]);
     }
     

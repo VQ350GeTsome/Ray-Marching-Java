@@ -9,7 +9,7 @@ package Render;
  * 
  * @author Harrison Davis
  */
-public class Camera extends SDFs.SDF {
+public final class Camera extends SDFs.SDF {
     
     private static final float DEG_TO_RAD = (float) (Math.PI / 180.0),
                                RAD_TO_DEG = (float) (180.0 / Math.PI);
@@ -19,20 +19,20 @@ public class Camera extends SDFs.SDF {
                          forward,
                          up,
                          right;
-    
-    // World up vector.
-    private final Vectors.vec3 worldUp = new Vectors.vec3(0.0f, 0.0f, 1.0f);
-    
+       
     // Camera ( or viewing ) parameters.
-    private float   yaw,
-                    pitch,
-                    fov,
-                    tanOfHalfFov;
+    private float yaw,
+                  pitch,
+                  fov,
+                  tanOfHalfFov;
+    
+    public static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
     
     /**
      * Camera constructor. It takes in some general information about
      * the camera and calculates the forward vector, right vector, 
      * & yaw, & pitch
+     * 
      * @param pos The position of the camera in 3D space
      * @param target The point where it is looking at
      * @param up The up vector of the camera
@@ -40,16 +40,17 @@ public class Camera extends SDFs.SDF {
      */
     public Camera(Vectors.vec3 pos, Vectors.vec3 target, Vectors.vec3 up, int fov) {
         this.pos = pos;
-        forward =   target
-                    .subtract( pos )
-                    .normalize();
         
-        right =     forward
-                    .cross( worldUp )
-                    .normalize();
-        this.up =   right
-                    .cross( forward )
-                    .normalize();
+        forward = target
+                  .subtract(pos)
+                  .normalize();
+        
+        right = forward
+                .cross(Core.WORLDUP)
+                .normalize();
+        this.up = right
+                  .cross(forward)
+                  .normalize();
         
         yaw = (float)(Math.atan2(forward.x, forward.z) * RAD_TO_DEG);
         float fy = forward.y;
@@ -99,9 +100,9 @@ public class Camera extends SDFs.SDF {
      */
     public void rotate(float yawDelta, float pitchDelta) {
         forward = rotateAroundAxis(forward, right, pitchDelta);
-        forward = rotateAroundAxis(forward, worldUp, yawDelta);
+        forward = rotateAroundAxis(forward, Core.WORLDUP, yawDelta);
         forward = forward.normalize();
-        right = forward.cross(worldUp).normalize();
+        right = forward.cross(Core.WORLDUP).normalize();
         up = right.cross(forward).normalize();
     }
     /**
@@ -116,6 +117,16 @@ public class Camera extends SDFs.SDF {
         newFov = (newFov > 3.13f) ? 3.13f : newFov;     
         updateFov(newFov); 
     }
+    
+    //<editor-fold defaultstate="collapsed" desc=" Sensitivity Setters, Changes, and Getters ">
+    public void setMovementSensitivity(float newSens) { cameraMoveGrain = newSens; }
+    public void changeMovementSensitivity(float delta) { cameraMoveGrain += delta; }
+    public float getMovementSensitivity() { return cameraMoveGrain; }
+    
+    public void setRotationSensitivity(float newSens) { cameraRotateGrain = newSens; }
+    public void changeRotationSensitivity(float delta) { cameraRotateGrain += delta; }
+    public float getRotationSensitivity() { return cameraRotateGrain; }
+    //</editor-fold>
     
     /**
      * Updates FOV. Takes in FOV in radians, calculates
@@ -134,7 +145,6 @@ public class Camera extends SDFs.SDF {
                 .add(axis.cross(v).scale(sin))
                 .add(axis.scale(axis.dot(v) * (1 - cos)));
     }
-    
     
     /**
      * Packages the basic vectors into an array 

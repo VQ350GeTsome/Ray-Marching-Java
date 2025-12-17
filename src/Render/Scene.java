@@ -1,21 +1,21 @@
 package Render;
 
-import Util.HitInfo;
-import Vectors.vec3;
-import Util.PostProcessor;
-import File.FileManager;
-import SDFs.SDF;
-
-public class Scene {
+/**
+ * Scene class. 
+ * 
+ * @author Harrison Davis
+ */
+public final class Scene {
     
+    // Scene members
     private final Light       light;
     private final SDFManager  sdfManager;
     private final Camera      camera 
 		= new Camera(
-	  new vec3(-4.0f,  3.0f,  1.0f),        // Position in space
-	  new vec3( 0.0f,  0.0f, -0.8f),        // Where it is pointing
-          new vec3( 0.0f,  0.0f,  1.0f),        // Up vector
-          90                                    // Field of view
+	  new Vectors.vec3(-4.0f,  3.0f,  1.0f),        // Position in space
+	  new Vectors.vec3( 0.0f,  0.0f, -0.8f),        // Where it is pointing
+          new Vectors.vec3( 0.0f,  0.0f,  1.0f),        // Up vector
+          90                                            // Field of view
 	  );
     private final RayMarcher  raymchr;
     
@@ -23,44 +23,46 @@ public class Scene {
     private int w, h; 
     
     public Scene(int width, int height) {
-        light = new Light();                                    //Instatiate a new light
-        sdfManager = new SDFManager();                          //Instatiate a new SDFManager
-        raymchr = new RayMarcher(camera, light, sdfManager); //Instatiate a new RayMarcher        
-        FileManager.setScene(this);     //Send this scene to the file manager
+        // Instantiate scene members.
+        light = new Light();                                  
+        sdfManager = new SDFManager();                          
+        raymchr = new RayMarcher(camera, light, sdfManager);    
+        
+        // Send this scene to the file manager.
+        File.FileManager.setScene(this);    
+        
+        // Save width and height.
         w = width; h = height;
     }
     
-    public void setWidthHeight(int w, int h) {
-        this.w = w;
-        this.h = h;
-    }
+    public void setWidthHeight(int w, int h) { this.w = w; this.h = h; }
     
     public void collectGarbageSDFs() { sdfManager.garbageCollector(); }
     
     //<editor-fold defaultstate="collapsed" desc=" Light Abstraction ">
-    public void setSceneLighting(vec3 l)        { light.setSceneLighting(l); }
-    public vec3 getSceneLighting()              { return light.getSceneLighting(); }
-    public void setLightColor(vec3 l)           { light.setLightColor(l); }
-    public vec3 getLightColor()                 { return light.getLightColor(); }
-    public void  setAmbientLighting(float k)    { light.setAmbientLight(k); }
-    public float getAmbientLighting()           { return light.getAmbientLight(); }  
+    public void setSceneLighting(Vectors.vec3 l) { light.setSceneLighting(l); }
+    public Vectors.vec3 getSceneLighting() { return light.getSceneLighting(); }
+    public void setLightColor(Vectors.vec3 l) { light.setLightColor(l); }
+    public Vectors.vec3 getLightColor() { return light.getLightColor(); }
+    public void  setAmbientLighting(float k) { light.setAmbientLight(k); }
+    public float getAmbientLighting() { return light.getAmbientLight(); }  
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" SDF Manager Abstraction ">
-    public boolean addSDF(SDF sdf)      { return sdfManager.addSDF(sdf); }
-    public boolean removeSDF(SDF sdf)   { return sdfManager.removeSDF(sdf); }
-    public boolean setSDF(SDF s, SDF n) { return sdfManager.setSDF(s, n); }
+    public boolean addSDF(SDFs.SDF sdf) { return sdfManager.addSDF(sdf); }
+    public boolean removeSDF(SDFs.SDF sdf) { return sdfManager.removeSDF(sdf); }
+    public boolean setSDF(SDFs.SDF s, SDFs.SDF n) { return sdfManager.setSDF(s, n); }
     public String[] getSDFNames() { return sdfManager.getNames(); }
     public SDFs.SDF getSDF(int i) { return sdfManager.getSDF(i); }
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Camera Abstraction ">
-    public void moveCamera(vec3 m)              { camera.move(m); }
+    public void moveCamera(Vectors.vec3 m) { camera.move(m); }
     public void rotateCamera(float y, float p)  { camera.rotate(y, p); }
-    public void zoomCamera(float z)             { camera.zoom(z); }
+    public void zoomCamera(float z) { camera.zoom(z); }
     
-    public vec3 getCameraPos()                  { return camera.getPosition(); }
-    public vec3[] getCameraOrien()              { return camera.getOrientation(); }
+    public Vectors.vec3 getCameraPos() { return camera.getPosition(); }
+    public Vectors.vec3[] getCameraOrien() { return camera.getOrientation(); }
     
     public void cameraObj(boolean add) {
         if (add) sdfManager.addSDF(camera);
@@ -69,32 +71,32 @@ public class Scene {
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Ray Marcher Abstraction ">
-    public HitInfo marchRay(int x, int y, int w, int h) { 
+    public Util.HitInfo marchRay(int x, int y, int w, int h) { 
         float nx = (x + 0.5f) / (float) w;
         float ny = (y + 0.5f) / (float) h;
-        vec3 pos = camera.getPosition();
-        vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
+        Vectors.vec3 pos = camera.getPosition();
+        Vectors.vec3 dir = camera.getRayDirection(nx, ny, w / (float) h); 
         
         return raymchr.marchRaySkipCam(pos, dir);
     }
-    public vec3[][] renderScene() { return raymchr.marchScreen(w, h); }
+    public Vectors.vec3[][] renderScene() { return raymchr.marchScreen(w, h); }
     
-    public vec3 getBackground()         { return raymchr.background; }
-    public void setBackground(vec3 bg)  { raymchr.background = bg; }
-    public vec3 getSecondaryBG()        { return raymchr.bgSecondary; }
-    public void setSecondaryBG(vec3 bg) { raymchr.bgSecondary = bg; }
+    public Vectors.vec3 getBackground() { return raymchr.background; }
+    public void setBackground(Vectors.vec3 bg)  { raymchr.background = bg; }
+    public Vectors.vec3 getSecondaryBG() { return raymchr.bgSecondary; }
+    public void setSecondaryBG(Vectors.vec3 bg) { raymchr.bgSecondary = bg; }
     
-    public float getShadowAmount()        { return raymchr.shadowAmount; }
+    public float getShadowAmount() { return raymchr.shadowAmount; }
     public void  setShadowAmount(float f) { raymchr.shadowAmount = f; }
     
     public void setMarchParams(String[] params) { raymchr.setMarchParams(params); }
-    public String[] getMarchParams()            { return raymchr.getMarchParams(); }
+    public String[] getMarchParams() { return raymchr.getMarchParams(); }
     
-    public void setSeeLight(boolean b)    { raymchr.seeLight = b; }
+    public void setSeeLight(boolean b) { raymchr.seeLight = b; }
     public void setUseGradient(boolean b) { raymchr.gradient = b; }
-    public void setGradUseZ(boolean b)    { raymchr.gradUseZ = b; }
+    public void setGradUseZ(boolean b) { raymchr.gradUseZ = b; }
     
-    public float getSkyboxLightAmount()        { return raymchr.skyboxLightAmount; }
+    public float getSkyboxLightAmount() { return raymchr.skyboxLightAmount; }
     public void  setSkyboxLightAmount(float f) { raymchr.skyboxLightAmount = f; }
     //</editor-fold>
     
@@ -103,7 +105,7 @@ public class Scene {
         return  camera.packageCamera() +
                 raymchr.packRayMarcher() +
                 light.packLight() +
-                PostProcessor.packagePostProcessor() +
+                Util.PostProcessor.packagePostProcessor() +
                 sdfManager.packSDFs();
                 
     }
@@ -130,7 +132,7 @@ public class Scene {
         light.unpackLight(lightPack);                               //Update light
         
         //Post proccesor parts 22 - 23
-        PostProcessor.setBloomSettings(new String[] { parts[22], parts[23] } );
+        Util.PostProcessor.setBloomSettings(new String[] { parts[22], parts[23] } );
         
         //Sdf pars 24 -> rest
         String[] sdfs = java.util.Arrays.copyOfRange(parts, 24, parts.length);

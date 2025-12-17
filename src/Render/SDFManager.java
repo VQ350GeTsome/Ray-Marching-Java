@@ -6,7 +6,7 @@ package Render;
  * 
  * @author Harrison Davis
  */
-public class SDFManager {
+public final class SDFManager {
     
     // The internal container of SDFs.
     private final java.util.List<SDFs.SDF> sdfs = new java.util.ArrayList<>();

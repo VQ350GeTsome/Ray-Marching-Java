@@ -8,11 +8,7 @@ public class BlendedSDF extends SDF {
     // The blending factor.
     private float k;
     
-    public BlendedSDF(SDF a, SDF b, float k) {
-        this.a = a;
-        this.b = b;
-        this.k = k;
-    }
+    public BlendedSDF(SDF a, SDF b, float k) { this.a = a; this.b = b; this.k = k; }
 
     @Override
     public float sdf(Vectors.vec3 p) {      

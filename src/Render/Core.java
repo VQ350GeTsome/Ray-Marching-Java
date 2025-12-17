@@ -1,14 +1,18 @@
 package Render;
 
-import Util.*;
-import SDFs.Primitives.*;
-import SDFs.*;
-
-import Vectors.vec3;
-
-public class Core extends javax.swing.JPanel {
+/**
+ * Core class, extends {@link java.swing.JPanel}. 
+ * 
+ * This class stores
+ * 
+ * 
+ * @author Harrison Davis
+ */
+public final class Core extends javax.swing.JPanel {
 
     public static final float EPS = 1e-4f;
+    
+    public static final Vectors.vec3 WORLDUP = new Vectors.vec3(0.0f, 0.0f, 1.0f);
     
     public static float cameraMoveGrain = 0.5f, cameraRotateGrain = 5.0f;
     
@@ -26,14 +30,14 @@ public class Core extends javax.swing.JPanel {
         scene = new Scene(width, height);
         
         // Default lighting
-        scene.setSceneLighting(new vec3(0.25f, 0.33f, -1.0f));
+        scene.setSceneLighting(new Vectors.vec3(0.25f, 0.33f, -1.0f));
         scene.setAmbientLighting(0.05f);                      
         
         // Default SDFs
         addDefaultSDFs();
         
         // Initalize the post processor
-        PostProcessor.setWidthHeight(width, height); 
+        Util.PostProcessor.setWidthHeight(width, height); 
     }
     
     /**
@@ -70,16 +74,16 @@ public class Core extends javax.swing.JPanel {
      */
     private void renderScene() {        
         // Render the scene
-        vec3[][] vec3Image = scene.renderScene();
+        Vectors.vec3[][] vec3Image = scene.renderScene();
               
         // Add post processing depending on the settings.
         if (bloom)
-            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
+            vec3Image = Util.PostProcessor.addBloom(vec3Image, scene.getBackground());
         if (crosshair)
-            vec3Image = PostProcessor.addCrossHair(vec3Image, new vec3(255.0f), 0.005f);
+            vec3Image = Util.PostProcessor.addCrossHair(vec3Image, new Vectors.vec3(255.0f), 0.005f);
         
         // Conver the settings 2D array to a java.awt.Color 2D array.
-        java.awt.Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
+        java.awt.Color[][] colorImage = Util.PostProcessor.convertToColor(vec3Image);
         
         // Fill in the actual screen using the 2D screen array and then update it.
         java.util.stream.IntStream.range(0, this.width).parallel().forEach(x -> {
@@ -90,23 +94,23 @@ public class Core extends javax.swing.JPanel {
     }
     
     private void addDefaultSDFs() {
-        Material sphereMat = new Material(new vec3(0, 255, 255));
+        Util.Material sphereMat = new Util.Material(new Vectors.vec3(0, 255, 255));
         sphereMat.metalness = 0.33f;
         //sphereMat.reflectivity = 0.80f;
-        SDF sphere  = new Sphere(new vec3(), 1.0f, sphereMat);
-        SDF cube    = new Cube(new vec3(0.0f , 0.0f, -3.0f), 1.0f, new Material(new vec3(128)));
+        SDFs.SDF sphere  = new SDFs.Primitives.Sphere(new Vectors.vec3(), 1.0f, sphereMat);
+        SDFs.SDF cube    = new SDFs.Primitives.Cube(new Vectors.vec3(0.0f , 0.0f, -3.0f), 1.0f, new Util.Material(new Vectors.vec3(128)));
 
-        SDF blend = new BlendedSDF(sphere, cube, 2.1f);
+        SDFs.SDF blend = new SDFs.BlendedSDF(sphere, cube, 2.1f);
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
 
-        Material floorMat = new Material(new vec3(100.0f));
+        Util.Material floorMat = new Util.Material(new Vectors.vec3(100.0f));
         floorMat.reflectivity = 0.25f;
-        SDF floor = new Plane(new vec3(0.0f, 0.0f, -4.0f), new vec3(0.0f, 0.0f, 1.0f), floorMat);
+        SDFs.SDF floor = new SDFs.Primitives.Plane(new Vectors.vec3(0.0f, 0.0f, -4.0f), new Vectors.vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
         //scene.addSDF(floor);
         
-        SDF blendBlend = new BlendedSDF(blend, floor, 1.0f);
+        SDFs.SDF blendBlend = new SDFs.BlendedSDF(blend, floor, 1.0f);
         scene.addSDF(blendBlend);
         blendBlend.setName("Double Blended Test Object");
         
@@ -122,7 +126,7 @@ public class Core extends javax.swing.JPanel {
         width = w; height = h;
         imageSizer();
         scene.setWidthHeight(w, h);
-        PostProcessor.setWidthHeight(w, h);
+        Util.PostProcessor.setWidthHeight(w, h);
     }
         
     public void imageSizer() { screen = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_ARGB); }
@@ -141,11 +145,11 @@ public class Core extends javax.swing.JPanel {
         
         changeResolution(hiResW, hiResH);
         
-        vec3[][] vec3Image = scene.renderScene();
+        Vectors.vec3[][] vec3Image = scene.renderScene();
               
         if (bloom)
-            vec3Image = PostProcessor.addBloom(vec3Image, scene.getBackground());
-        java.awt.Color[][] colorImage = PostProcessor.convertToColor(vec3Image);
+            vec3Image = Util.PostProcessor.addBloom(vec3Image, scene.getBackground());
+        java.awt.Color[][] colorImage = Util.PostProcessor.convertToColor(vec3Image);
         
         File.ScreenShot.screenshot(colorImage);
         
