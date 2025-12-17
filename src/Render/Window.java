@@ -513,6 +513,9 @@ public class Window extends javax.swing.JFrame {
             }
         }
     }
+    private void joinSDF(SDFs.SDF obj) {
+        
+    }
     
     private void addSDF(int type) {
         final int   SPHERE = 0, CUBE = 1, TORUS = 2,
@@ -1295,7 +1298,20 @@ public class Window extends javax.swing.JFrame {
         // If the user selects nothing return.
         int input = this.createButtonsPane("Select an object: ", sdfNames, 1);
         if (input == -1) return;
-        this.generalEditSDF(core.scene.getSDF(input));
+        
+        // Save the selected SDF.
+        SDFs.SDF sdf = core.scene.getSDF(input);
+        
+        // Prompt the user if they wanna edit the selected SDF or join it ( blend, intersection, subtraction )
+        input = this.createButtonsPane("Edit or Join?", new String[] { "Edit", "Join" }, 1);
+        if (input == -1) return;
+        
+        final int EDIT = 0, JOIN = 1;
+        
+        if (input == EDIT) 
+            this.generalEditSDF(sdf);
+        else if (input == JOIN) 
+            this.joinSDF(sdf);
     }//GEN-LAST:event_seeAllObjActionPerformed
 
     /**

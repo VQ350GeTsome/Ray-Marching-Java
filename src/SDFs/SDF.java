@@ -63,6 +63,64 @@ public abstract class SDF {
      * @param n The new name
      */
     public void setName(String n) { name = n; }
+    
+    public static final SDFs.SDF getRandom(Vectors.vec3 center, float maxDistFromCenter) {
+        // Get some random color.
+        Vectors.vec3 color = Vectors.vec3.getRandom();
+        color = color.scale(255.0f);
+        
+        // Get some random material
+        int matType = (int) (Math.random() * 4.0);
+        final int PLASTIC = 0, MIRROR = 1, GLASS = 2, METAL = 3;
+        Util.Material matToUse = null;
+        
+        switch (matType) {
+            case PLASTIC: matToUse = Util.Material.PLASTIC; break;
+            case MIRROR: matToUse = Util.Material.MIRROR; break;
+            case GLASS: matToUse = Util.Material.GLASS; break;
+            case METAL: matToUse = Util.Material.METAL; break;
+        }
+        
+        Util.Material mat = new Util.Material(color, matToUse);
+        
+        // Get a random position within the bounds
+        Vectors.vec3 pos = Vectors.vec3.getRandom().normalize();
+        pos = pos.scale(2.0f)
+                 .subtract(1.0f)
+                 .scale((float) (Math.random() * maxDistFromCenter))
+                 .add(center);
+
+        // Get some random inital size.
+        final float SCALE = 3.0f, BIAS = 0.33f;
+        float size1 = BIAS + (float) (Math.random() * SCALE);
+        
+        // Get a random type, sphere, cube, cylinder, or torus.
+        int sdfType = (int) (Math.random() * 4);
+        final int SPHERE = 0, CUBE = 1, CYLINDER = 2, TORUS = 3;
+        
+        // Get a second size scalar if needed, & size it correctly.
+        float size2 = 0;
+        if (sdfType == CYLINDER ) size2 = BIAS + (float) (Math.random() * SCALE);
+        if (sdfType == TORUS) size2 = BIAS + (float) (Math.random() * (size1 / 1.5f));
+        
+        // Parse the type and add everything together to create a random SDF.
+        switch (sdfType) {
+            case SPHERE: 
+                return new SDFs.Primitives.Sphere(pos, size1, mat);
+            case CUBE:
+                return new SDFs.Primitives.Cube(pos, size1, mat);
+            case CYLINDER:
+                return new SDFs.Primitives.Cylinder(pos, size1, size2, mat);
+            case TORUS:
+                return new SDFs.Primitives.Torus(pos, size1, size2, mat);
+            // If somehow default is reached just return some random grey sphere...
+            default:
+                return new SDFs.Primitives.Sphere(
+                        new Vectors.vec3(0.0f), 1, new Util.Material(new Vectors.vec3(128), Util.Material.PLASTIC)
+                );
+        }
+    }
+    
     /**
      * Default toString method, returns the type & color
      * @return 

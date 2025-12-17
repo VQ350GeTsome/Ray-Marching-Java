@@ -31,8 +31,8 @@ public final class Core extends javax.swing.JPanel {
         scene.setSceneLighting(new Vectors.vec3(0.25f, 0.33f, -1.0f));
         scene.setAmbientLighting(0.05f);                      
         
-        // Default SDFs
-        addDefaultSDFs();
+        // Random SDFs
+        addRandomSDFs(10);
         
         // Initalize the post processor
         Util.PostProcessor.setWidthHeight(width, height); 
@@ -91,7 +91,19 @@ public final class Core extends javax.swing.JPanel {
         repaint();  
     }
     
-    private void addDefaultSDFs() {
+    private void addRandomSDFs(int n) {
+        // Add a floor.
+        Util.Material floorMat = new Util.Material(new Vectors.vec3(128));
+        floorMat.reflectivity = 0.25f;
+        SDFs.SDF floor = new SDFs.Primitives.Plane(new Vectors.vec3(0, 0, -10), new Vectors.vec3(0, 0, 1), floorMat);
+        floor.setName("Scene Floor");
+        scene.addSDF(floor);
+        
+        // Add n SDFs
+        while (n-- > 0) scene.addSDF(SDFs.SDF.getRandom(new Vectors.vec3(0, 0, 10), 10));
+    }
+    
+    private void addTestingSDFs() {
         Util.Material sphereMat = new Util.Material(new Vectors.vec3(0, 255, 255));
         sphereMat.metalness = 0.33f;
         //sphereMat.reflectivity = 0.80f;
@@ -111,7 +123,6 @@ public final class Core extends javax.swing.JPanel {
         SDFs.SDF blendBlend = new SDFs.BlendedSDF(blend, floor, 1.0f);
         scene.addSDF(blendBlend);
         blendBlend.setName("Double Blended Test Object");
-        
     }
     
     /**

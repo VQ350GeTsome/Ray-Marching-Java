@@ -18,9 +18,10 @@ public class Material {
     //Light emission later ... maybe
     
     //<editor-fold defaultstate="collapsed" desc=" Common Defaults ">
-    public final static Material PLASTIC = new Material(new vec3(128));
-    public final static Material MIRROR  = new Material(new vec3(255), 1.0f, 0.5f, 8.0f, 0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f);
-    public final static Material GLASS   = new Material(new vec3(255), 0.0f, 0.5f, 8.0f, 0.0f, 1.0f, 1.0f, 1.52f, 0.0f, 0.0f);
+    public final static Material PLASTIC = new Material(new vec3(128)),
+                                 MIRROR  = new Material(new vec3(255), 1.0f, 0.5f,  8.0f, 0.0f, 1.0f, 0.0f, 1.00f, 0.0f, 0.0f),
+                                 GLASS   = new Material(new vec3(255), 0.0f, 0.5f,  8.0f, 0.0f, 1.0f, 1.0f, 1.52f, 0.0f, 0.0f),
+                                 METAL   = new Material(new vec3(128), 0.4f, 0.3f, 16.0f, 0.0f, 1.0f, 0.0f, 1.00f, 0.0f, 0.0f);
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc=" Constructors ">
@@ -54,11 +55,11 @@ public class Material {
     public Material(vec3 color, float reflect, float spec, float shiny, float rough, float metal,
         float opacity, float ior, float texture, float textureness) {
         this.color = color; 
-        reflectivity = reflect;
-        specular = spec;
-        shinyness = shiny;
-        roughness = rough;
-        metalness = metal;
+        this.reflectivity = reflect;
+        this.specular = spec;
+        this.shinyness = shiny;
+        this.roughness = rough;
+        this.metalness = metal;
         this.opacity = opacity;
         this.ior = ior;
         this.texture = texture;
@@ -74,31 +75,31 @@ public class Material {
      */
     public Material(vec3 color, Material m) {
         this.color = color;
-        reflectivity    = m.reflectivity;
-        specular        = m.specular;
-        shinyness       = m.shinyness;
-        roughness       = m.roughness;
-        metalness       = m.metalness;
-        opacity         = m.opacity;
-        ior             = m.ior;
-        texture         = m.texture;
-        textureness     = m.textureness;
+        this.reflectivity    = m.reflectivity;
+        this.specular        = m.specular;
+        this.shinyness       = m.shinyness;
+        this.roughness       = m.roughness;
+        this.metalness       = m.metalness;
+        this.opacity         = m.opacity;
+        this.ior             = m.ior;
+        this.texture         = m.texture;
+        this.textureness     = m.textureness;
     }
     public Material(java.awt.Color color, Material m) { this(new vec3(color), m); }
     
     //</editor-fold>
     
     public Material blend(Material b, float w) {
-        Material m = new Material(color.blend(b.color, w));
+        Material m = new Material(this.color.blend(b.color, w));
         
-        m.reflectivity  = wAvg(reflectivity, b.reflectivity, w);
-        m.specular      = wAvg(specular,     b.specular,     w);
-        m.roughness     = wAvg(roughness,    b.roughness,    w);
-        m.metalness     = wAvg(metalness,    b.metalness,    w);
-        m.opacity       = wAvg(opacity,      b.opacity,      w);
-        m.ior           = wAvg(ior,          b.ior,          w);
-        m.texture       = wAvg(texture,      b.texture,      w);
-        m.textureness   = wAvg(textureness,  b.textureness,  w);
+        m.reflectivity  = wAvg(this.reflectivity, b.reflectivity, w);
+        m.specular      = wAvg(this.specular,     b.specular,     w);
+        m.roughness     = wAvg(this.roughness,    b.roughness,    w);
+        m.metalness     = wAvg(this.metalness,    b.metalness,    w);
+        m.opacity       = wAvg(this.opacity,      b.opacity,      w);
+        m.ior           = wAvg(this.ior,          b.ior,          w);
+        m.texture       = wAvg(this.texture,      b.texture,      w);
+        m.textureness   = wAvg(this.textureness,  b.textureness,  w);
         
         return m;
     }
@@ -109,25 +110,25 @@ public class Material {
     public String toString() {
         //Turn the color a string
         String str = 
-                    colorString(color) + "," +
-                    colorString(specularColor) + "," +
-                    reflectivity + "," + 
-                    specular     + "," +
-                    shinyness    + "," +
-                    roughness    + "," + 
-                    metalness    + "," + 
-                    opacity      + "," + 
-                    ior          + "," +
-                    texture      + "," +
+                    colorString(this.color) + "," +
+                    colorString(this.specularColor) + "," +
+                    this.reflectivity + "," + 
+                    this.specular     + "," +
+                    this.shinyness    + "," +
+                    this.roughness    + "," + 
+                    this.metalness    + "," + 
+                    this.opacity      + "," + 
+                    this.ior          + "," +
+                    this.texture      + "," +
                     textureness;
         return str;
     }
     public String[] toStringArray() {
         return new String[] 
         { 
-            colorString(color), colorString(specularColor), ""+reflectivity, 
-            ""+specular, ""+shinyness, ""+roughness, ""+metalness, ""+opacity, ""+ior,
-            ""+texture, ""+textureness
+            colorString(this.color), colorString(this.specularColor), ""+this.reflectivity, 
+            ""+this.specular, ""+this.shinyness, ""+this.roughness, ""+this.metalness, ""+this.opacity, ""+this.ior,
+            ""+this.texture, ""+this.textureness
         };
     }
     public String colorString(vec3 color) {
