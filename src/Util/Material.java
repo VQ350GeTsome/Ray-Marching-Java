@@ -11,7 +11,7 @@ public class Material {
                     shinyness       = 16.0f,
                     roughness       =  0.0f,
                     metalness       =  0.0f,
-                    opacity         =  0.0f,
+                    transparency    =  0.0f,
                     ior             =  1.5f,    //Glass
                     texture         =  0.0f,
                     textureness     =  0.0f;
@@ -47,7 +47,7 @@ public class Material {
      * @param shiny         The shinyness.
      * @param rough         The roughness.
      * @param metal         The metalness.
-     * @param opacity       The opacity.
+     * @param opacity       The transparency.
      * @param ior           The index of refraction.
      * @param texture       The texture.
      * @param textureness   The textureness ( size of texture ).
@@ -60,7 +60,7 @@ public class Material {
         this.shinyness = shiny;
         this.roughness = rough;
         this.metalness = metal;
-        this.opacity = opacity;
+        this.transparency = opacity;
         this.ior = ior;
         this.texture = texture;
         this.textureness = textureness;
@@ -80,7 +80,7 @@ public class Material {
         this.shinyness       = m.shinyness;
         this.roughness       = m.roughness;
         this.metalness       = m.metalness;
-        this.opacity         = m.opacity;
+        this.transparency         = m.transparency;
         this.ior             = m.ior;
         this.texture         = m.texture;
         this.textureness     = m.textureness;
@@ -96,7 +96,7 @@ public class Material {
         m.specular      = wAvg(this.specular,     b.specular,     w);
         m.roughness     = wAvg(this.roughness,    b.roughness,    w);
         m.metalness     = wAvg(this.metalness,    b.metalness,    w);
-        m.opacity       = wAvg(this.opacity,      b.opacity,      w);
+        m.transparency       = wAvg(this.transparency,      b.transparency,      w);
         m.ior           = wAvg(this.ior,          b.ior,          w);
         m.texture       = wAvg(this.texture,      b.texture,      w);
         m.textureness   = wAvg(this.textureness,  b.textureness,  w);
@@ -117,7 +117,7 @@ public class Material {
                     this.shinyness    + "," +
                     this.roughness    + "," + 
                     this.metalness    + "," + 
-                    this.opacity      + "," + 
+                    this.transparency      + "," + 
                     this.ior          + "," +
                     this.texture      + "," +
                     textureness;
@@ -127,7 +127,7 @@ public class Material {
         return new String[] 
         { 
             colorString(this.color), colorString(this.specularColor), ""+this.reflectivity, 
-            ""+this.specular, ""+this.shinyness, ""+this.roughness, ""+this.metalness, ""+this.opacity, ""+this.ior,
+            ""+this.specular, ""+this.shinyness, ""+this.roughness, ""+this.metalness, ""+this.transparency, ""+this.ior,
             ""+this.texture, ""+this.textureness
         };
     }

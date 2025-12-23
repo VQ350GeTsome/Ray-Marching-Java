@@ -110,21 +110,23 @@ public final class Core extends javax.swing.JPanel {
         Util.Material sphereMat = new Util.Material(new Vectors.vec3(0, 255, 255), Util.Material.GLASS);
         sphereMat.metalness = 0.33f;
         //sphereMat.reflectivity = 0.80f;
-        SDFs.SDF sphere  = new SDFs.Primitives.Sphere(new Vectors.vec3(), 1.0f, sphereMat);
-        SDFs.SDF cube    = new SDFs.Primitives.Cube(new Vectors.vec3(0.0f , 0.0f, -3.0f), 1.0f, new Util.Material(new Vectors.vec3(128)));
+        SDFs.SDF sphere  = new SDFs.Primitives.Sphere(new Vectors.vec3(), 1, sphereMat);
+        SDFs.SDF cube    = new SDFs.Primitives.Cube(new Vectors.vec3(0, 0, -3), 1, new Util.Material(new Vectors.vec3(128)));
 
         SDFs.SDF blend = new SDFs.BlendedSDF(sphere, cube, 2.1f);
         blend.setName("Blended Sphere & Cube");
         //scene.addSDF(blend);
 
-        scene.addSDF(sphere);
+        SDFs.SDF cube1 = new SDFs.Primitives.Cube(new Vectors.vec3(0, 0, -3), 1, new Util.Material(new Vectors.vec3(128)));
+        scene.addSDF(cube1);
         
         Util.Material floorMat = new Util.Material(new Vectors.vec3(100.0f));
         floorMat.reflectivity = 0.25f;
-        SDFs.SDF floor = new SDFs.Primitives.Plane(new Vectors.vec3(0.0f, 0.0f, -4.0f), new Vectors.vec3(0.0f, 0.0f, 1.0f), floorMat);
+        SDFs.SDF floor = new SDFs.Primitives.Plane(new Vectors.vec3(0.0f, 0.0f, -4.5f), new Vectors.vec3(0.0f, 0.0f, 1.0f), floorMat);
         floor.setName("Scene Floor");
         scene.addSDF(floor);
 
+        scene.setSceneLighting(new Vectors.vec3(0, 1, -0.5f));
     }
     
     /**

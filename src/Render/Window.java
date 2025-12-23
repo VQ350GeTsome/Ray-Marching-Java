@@ -598,7 +598,7 @@ public class Window extends javax.swing.JFrame {
             newMaterial.shinyness     = Float.parseFloat(inputs[i++].trim());
             newMaterial.roughness     = Float.parseFloat(inputs[i++].trim());
             newMaterial.metalness     = Float.parseFloat(inputs[i++].trim());
-            newMaterial.opacity       = Float.parseFloat(inputs[i++].trim());
+            newMaterial.transparency       = Float.parseFloat(inputs[i++].trim());
             newMaterial.ior           = Float.parseFloat(inputs[i++].trim()); 
             newMaterial.texture       = Float.parseFloat(inputs[i++].trim()); 
             newMaterial.textureness   = Float.parseFloat(inputs[i++].trim()); 

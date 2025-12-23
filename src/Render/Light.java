@@ -13,7 +13,7 @@ public final class Light {
     
     public void setSceneLighting(Vectors.vec3 l) { sceneLight = l.normalize(); }
     public void setLightColor(Vectors.vec3 c) { lightColor = c; }
-    public Vectors.vec3 getSceneLighting() { return sceneLight; }
+    public Vectors.vec3 getSceneLightingDirection() { return sceneLight; }
     public Vectors.vec3 getLightColor() { return lightColor; }
     
     public void setAmbientLight(float l) { ambientLight = l; }

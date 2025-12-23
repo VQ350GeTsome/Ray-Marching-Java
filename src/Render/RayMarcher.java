@@ -140,10 +140,10 @@ public class RayMarcher {
         if (gradUseZ && gradient)
             bg = bg.blend(bgSecondary, 0.50f - (dir.z / 2.0f));
         else if (gradient)
-            bg = bg.blend(bgSecondary, 0.50f + (dir.dot(light.getSceneLighting()) / 2.0f));
+            bg = bg.blend(bgSecondary, 0.50f + (dir.dot(light.getSceneLightingDirection()) / 2.0f));
         
         if (seeLight) {
-            float k = Math.max(0.0f, dir.dot(light.getSceneLighting().negate()));
+            float k = Math.max(0.0f, dir.dot(light.getSceneLightingDirection().negate()));
             k = (float) Math.pow(k, (1000.0f / skyboxLightAmount));
             bg = bg.add(light.getLightColor().scale(k));
         }
@@ -165,9 +165,9 @@ public class RayMarcher {
         
         //Using recursion calculate the color of the reflected ray & the transmitted ray
         vec3 reflectColor = (objMat.reflectivity > 0.01f && depth > 0) ? reflect(hit, norm, dir, depth).scale(objMat.reflectivity) : new vec3();
-        vec3 transmitColor = (objMat.opacity > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth).scale(objMat.opacity) : new vec3();
+        vec3 transmitColor = (objMat.transparency > 0.01f && depth > 0) ? opacity(hit, norm, dir, depth).scale(objMat.transparency) : new vec3();
         
-        vec3 finalColor = baseColor.blend(reflectColor.add(transmitColor), Math.max(objMat.reflectivity, objMat.opacity) );
+        vec3 finalColor = baseColor.blend(reflectColor.add(transmitColor), Math.max(objMat.reflectivity, objMat.transparency) );
 
         float fog = hit.totalDist / maxDist;           //Fog is the % distance to max distance ie if maxDist is 100 and the objs distance is 10 the fog is 10%
         fog = (float) Math.pow(fog, fogFalloff);       //We exponentiate fog by the falloff making a convex curve if fogFalloff > 1
@@ -239,18 +239,18 @@ public class RayMarcher {
     }
         
     private vec3 diffuse(HitInfo hit, vec3 normal) {
-        vec3 sceneLight = light.getSceneLighting().negate();   
+        vec3 sceneLight = light.getSceneLightingDirection().negate();   
         float brightness = Math.max(0.0f, normal.dot(sceneLight));
         vec3 finalColor = hit.mat.color.scale(brightness);    
         return finalColor;
     }
     
     private float getShadow(vec3 orgin) {
-        float ambientLight = light.getAmbientLight();           //Get the scenes ambient lighting
-        float lighting = 1.0f - ambientLight;                   //Minus the starting light % by the ambient light, for it will be added back later ... 
-        float t = 0.10f;                                        //Start slightly off the surface ... this must be greater than epsilon
-        final float softness = 1 / shadowAmount;                //Penumbra width ... i think
-        vec3 lightDir = light.getSceneLighting().negate();      //Flip lighting around
+        float ambientLight = light.getAmbientLight();           
+        float lighting = 1.0f - ambientLight;                  
+        float t = 0.1f;                                      
+        final float softness = 1 / shadowAmount;            
+        vec3 lightDir = light.getSceneLightingDirection().negate();   
         float accumOpac = 1.0f;
         
         for (int i = 0; shadowSteps > i; i++) {
@@ -261,16 +261,16 @@ public class RayMarcher {
             if (minDist < Core.EPS) {   
                 // Get the object and check its opacity.
                 HitInfo info = sdfMgr.getNearestSDFAtPos(pos);  
-                float objOpac = info.mat.opacity;               
+                float objTrans = info.mat.transparency;               
                 
-                // If the opacity is negligable return the ambient lighting.
-                if (objOpac < 0.0001f) return ambientLight;           
+                // If the object is basically opaque return ambientLight.
+                if (objTrans < Core.EPS) return ambientLight;           
                 
                 // Else accumulate it.
-                accumOpac *= objOpac;
+                accumOpac *= objTrans;
                 
                 // Then march through the object.
-                
+                               
             }
             lighting = Math.min(lighting, softness * minDist / t);
             t += minDist;
@@ -280,7 +280,7 @@ public class RayMarcher {
     }
     
     private vec3 specular(vec3 norm, vec3 viewDir, Material mat) {
-        vec3 lightDir = light.getSceneLighting();//.negate();
+        vec3 lightDir = light.getSceneLightingDirection();//.negate();
 
         vec3 reflectDir = lightDir.negate()
                           .subtract(norm.scale(2.0f * lightDir.negate().dot(norm)))

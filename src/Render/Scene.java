@@ -41,7 +41,7 @@ public final class Scene {
     
     //<editor-fold defaultstate="collapsed" desc=" Light Abstraction ">
     public void setSceneLighting(Vectors.vec3 l) { light.setSceneLighting(l); }
-    public Vectors.vec3 getSceneLighting() { return light.getSceneLighting(); }
+    public Vectors.vec3 getSceneLighting() { return light.getSceneLightingDirection(); }
     public void setLightColor(Vectors.vec3 l) { light.setLightColor(l); }
     public Vectors.vec3 getLightColor() { return light.getLightColor(); }
     public void  setAmbientLighting(float k) { light.setAmbientLight(k); }

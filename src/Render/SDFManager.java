@@ -120,6 +120,18 @@ public final class SDFManager {
         }
         return new Util.HitInfo(p, minDist, near);
     }
+    public Util.HitInfo getNearestSDFAtPos(Vectors.vec3 p, java.util.function.Predicate<SDFs.SDF> condition) {
+        float minDist = Float.MAX_VALUE, d;
+        SDFs.SDF near = null;
+        for (SDFs.SDF s : sdfs) if (condition.test(s)) {
+            d = s.sdf(p);
+            if (minDist > d) {
+                minDist = d;
+                near = s;
+            }
+        }
+        return new Util.HitInfo(p, minDist, near);
+    }
     
     /**
      * Removes any SDFs that need to be removed.

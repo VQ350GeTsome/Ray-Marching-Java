@@ -101,7 +101,7 @@ public class SDFParser {
         m.shinyness       = Float.parseFloat(info[i.i++].trim());
         m.roughness       = Float.parseFloat(info[i.i++].trim());
         m.metalness       = Float.parseFloat(info[i.i++].trim());
-        m.opacity         = Float.parseFloat(info[i.i++].trim());
+        m.transparency         = Float.parseFloat(info[i.i++].trim());
         m.ior             = Float.parseFloat(info[i.i++].trim());
         m.texture         = Float.parseFloat(info[i.i++].trim());
         m.textureness     = Float.parseFloat(info[i.i++].trim());

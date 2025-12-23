@@ -15,21 +15,7 @@ public class FileManager {
      * @return The File where this program is stored
      */
     public static File getCurrentDirectory(){
-        String directory = System.getProperty("user.dir");
-        int i = directory.length();
-        String slashCheck = "";
-        int slashIndex = 0;
-        while (i > 0){
-            slashCheck = directory.substring(i - 1, i);
-            if (slashCheck.equals("\\")){
-               slashIndex = i;
-               i = 0;
-                String finalDirectory = directory.substring(0, slashIndex);
-                
-            }
-            i--;
-        } 
-        return new File(directory);
+        return new java.io.File(System.getProperty("user.dir"));
     }
     
     private static Scene scene;
